@@ -86,6 +86,12 @@ The chart shows how each complexity's curve grows as the input size increases.`,
     // Helper: visible curves up to a certain name
     const upTo = (name: string) => all.slice(0, all.indexOf(name) + 1)
 
+    // Code line references (1-indexed within the code string):
+    //  1: // O(1) — Constant time       |  15: // O(n²) — Quadratic time
+    //  2: function getFirst(arr) {       |  16: function hasDuplicate(arr) {
+    //  6: // O(n) — Linear time          |  25: // O(log n) — Logarithmic time
+    //  7: function findMax(arr) {        |  26: function binarySearch(arr, target) {
+
     // Step 1: Introduction — no curves yet
     steps.push({
       concept: { type: 'bigO', curves: makeCurves([]), maxN: 10 },
@@ -106,7 +112,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(1) — Constant time. No matter how big n gets, operations stay at 1. A perfectly flat line.',
         'O(1) — Tiempo constante. Sin importar cuánto crezca n, las operaciones se mantienen en 1. Una línea perfectamente plana.',
       ),
-      codeLine: 2,
+      codeLine: 1,
       variables: { complexity: 'O(1)', 'ops(1)': 1, 'ops(5)': 1, 'ops(10)': 1 },
     })
 
@@ -118,7 +124,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(log n) — Logarithmic time. At small inputs (n≤4) it barely grows. Let\'s see what happens as n increases...',
         'O(log n) — Tiempo logarítmico. Con entradas pequeñas (n≤4) apenas crece. Veamos qué pasa cuando n aumenta...',
       ),
-      codeLine: 19,
+      codeLine: 25,
       variables: { complexity: 'O(log n)', 'ops(2)': 1, 'ops(4)': 2 },
     })
 
@@ -129,7 +135,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(log n) at n=10: only ~3.3 operations. Halving the problem each step keeps growth very slow — great for binary search.',
         'O(log n) con n=10: solo ~3.3 operaciones. Dividir el problema a la mitad en cada paso mantiene un crecimiento muy lento — ideal para búsqueda binaria.',
       ),
-      codeLine: 19,
+      codeLine: 26,
       variables: { complexity: 'O(log n)', 'ops(4)': 2, 'ops(10)': '3.3' },
     })
 
@@ -141,7 +147,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(n) — Linear time. At n=4, 4 operations. It grows proportionally. Watch the diagonal extend...',
         'O(n) — Tiempo lineal. Con n=4, 4 operaciones. Crece proporcionalmente. Observa cómo se extiende la diagonal...',
       ),
-      codeLine: 7,
+      codeLine: 6,
       variables: { complexity: 'O(n)', 'ops(2)': 2, 'ops(4)': 4 },
     })
 
@@ -157,6 +163,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
     })
 
     // ── O(n log n) — grow from small to large ──
+    // No dedicated code example; highlight the O(n) section as the closest reference
     steps.push({
       concept: { type: 'bigO', curves: makeCurves(upTo('O(n log n)'), 'O(n log n)'), maxN: 4 },
       description: d(
@@ -164,7 +171,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(n log n) — Linearithmic. At small n it looks close to O(n). Let\'s see it diverge...',
         'O(n log n) — Linearítmico. Con n pequeño se parece a O(n). Veamos cómo diverge...',
       ),
-      codeLine: 7,
+      codeLine: 9,
       variables: { complexity: 'O(n log n)', 'ops(2)': 2, 'ops(4)': 8 },
     })
 
@@ -175,7 +182,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(n log n) at n=10: ~33 operations. Typical of Merge Sort and Quick Sort. It bends away from O(n) as n grows.',
         'O(n log n) con n=10: ~33 operaciones. Típico de Merge Sort y Quick Sort. Se curva alejándose de O(n) conforme n crece.',
       ),
-      codeLine: 7,
+      codeLine: 9,
       variables: { complexity: 'O(n log n)', 'ops(5)': '11.6', 'ops(10)': '33.2' },
     })
 
@@ -187,7 +194,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(n²) — Quadratic time. At n=4 it\'s already 16 operations. Nested loops. Watch it explode...',
         'O(n²) — Tiempo cuadrático. Con n=4 ya son 16 operaciones. Bucles anidados. Observa cómo explota...',
       ),
-      codeLine: 14,
+      codeLine: 15,
       variables: { complexity: 'O(n²)', 'ops(2)': 4, 'ops(4)': 16 },
     })
 
@@ -198,7 +205,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(n²) at n=7: 49 operations — already double O(n log n). The curve is pulling away fast...',
         'O(n²) con n=7: 49 operaciones — ya el doble de O(n log n). La curva se aleja rápidamente...',
       ),
-      codeLine: 14,
+      codeLine: 17,
       variables: { complexity: 'O(n²)', 'ops(5)': 25, 'ops(7)': 49 },
     })
 
@@ -209,7 +216,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(n²) at n=10: 100 operations! Three times more than O(n log n). Bubble Sort lives here.',
         'O(n²) con n=10: ¡100 operaciones! Tres veces más que O(n log n). Bubble Sort vive aquí.',
       ),
-      codeLine: 14,
+      codeLine: 18,
       variables: { complexity: 'O(n²)', 'ops(10)': 100, 'vs O(n log n)': '33 → 100' },
     })
 
@@ -293,6 +300,15 @@ Common recursive algorithms:
   generateSteps(locale = 'en') {
     const steps: Step[] = []
 
+    // Code line references (1-indexed within the code string):
+    //  1: function factorial(n) {
+    //  2:   // Base case: factorial of 0 or 1 is 1
+    //  3:   if (n <= 1) return 1;
+    //  4:   (empty)
+    //  5:   // Recursive case: n * factorial(n - 1)
+    //  6:   return n * factorial(n - 1);
+    //  7: }
+
     // Step 1: Introduction
     steps.push({
       concept: {
@@ -321,7 +337,7 @@ Common recursive algorithms:
         'factorial(5): n=5, not a base case. It needs factorial(4), so it pushes a new call onto the stack.',
         'factorial(5): n=5, no es caso base. Necesita factorial(4), así que agrega una nueva llamada a la pila.',
       ),
-      codeLine: 5,
+      codeLine: 6,
       variables: { n: 5, returns: '5 × factorial(4)' },
     })
 
@@ -338,7 +354,7 @@ Common recursive algorithms:
         'factorial(4): n=4, not a base case. Call factorial(3). The stack grows deeper.',
         'factorial(4): n=4, no es caso base. Llamar factorial(3). La pila crece.',
       ),
-      codeLine: 5,
+      codeLine: 6,
       variables: { n: 4, returns: '4 × factorial(3)', stackDepth: 2 },
     })
 
@@ -356,7 +372,7 @@ Common recursive algorithms:
         'factorial(3): n=3, not a base case. Call factorial(2). Stack keeps growing.',
         'factorial(3): n=3, no es caso base. Llamar factorial(2). La pila sigue creciendo.',
       ),
-      codeLine: 5,
+      codeLine: 6,
       variables: { n: 3, returns: '3 × factorial(2)', stackDepth: 3 },
     })
 
@@ -375,7 +391,7 @@ Common recursive algorithms:
         'factorial(2): n=2, not a base case. Call factorial(1). Almost at the base!',
         'factorial(2): n=2, no es caso base. Llamar factorial(1). ¡Casi en el caso base!',
       ),
-      codeLine: 5,
+      codeLine: 6,
       variables: { n: 2, returns: '2 × factorial(1)', stackDepth: 4 },
     })
 
@@ -395,7 +411,7 @@ Common recursive algorithms:
         'factorial(1): BASE CASE reached! n ≤ 1, return 1. Now results will propagate back up the stack.',
         'factorial(1): ¡CASO BASE alcanzado! n ≤ 1, retorna 1. Ahora los resultados se propagan hacia arriba.',
       ),
-      codeLine: 2,
+      codeLine: 3,
       variables: { n: 1, returns: 1, stackDepth: 5 },
     })
 
@@ -415,7 +431,7 @@ Common recursive algorithms:
         'Back to factorial(2): receives 1 from factorial(1). Returns 2 × 1 = 2. Frame popped from stack.',
         'Volviendo a factorial(2): recibe 1 de factorial(1). Retorna 2 × 1 = 2. Frame eliminado de la pila.',
       ),
-      codeLine: 5,
+      codeLine: 6,
       variables: { n: 2, 'factorial(1)': 1, returns: '2 × 1 = 2', stackDepth: 4 },
     })
 
@@ -433,7 +449,7 @@ Common recursive algorithms:
         'Back to factorial(3): receives 2 from factorial(2). Returns 3 × 2 = 6. Stack unwinding.',
         'Volviendo a factorial(3): recibe 2 de factorial(2). Retorna 3 × 2 = 6. La pila se desenrolla.',
       ),
-      codeLine: 5,
+      codeLine: 6,
       variables: { n: 3, 'factorial(2)': 2, returns: '3 × 2 = 6', stackDepth: 3 },
     })
 
@@ -450,7 +466,7 @@ Common recursive algorithms:
         'Back to factorial(4): receives 6 from factorial(3). Returns 4 × 6 = 24. Almost done!',
         'Volviendo a factorial(4): recibe 6 de factorial(3). Retorna 4 × 6 = 24. ¡Casi listo!',
       ),
-      codeLine: 5,
+      codeLine: 6,
       variables: { n: 4, 'factorial(3)': 6, returns: '4 × 6 = 24', stackDepth: 2 },
     })
 
@@ -466,7 +482,7 @@ Common recursive algorithms:
         'Back to factorial(5): receives 24 from factorial(4). Returns 5 × 24 = 120. Done! The call stack is empty.',
         'Volviendo a factorial(5): recibe 24 de factorial(4). Retorna 5 × 24 = 120. ¡Listo! La pila está vacía.',
       ),
-      codeLine: 5,
+      codeLine: 6,
       variables: { n: 5, 'factorial(4)': 24, result: 120, stackDepth: 0 },
     })
 
