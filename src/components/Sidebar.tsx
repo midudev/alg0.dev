@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import type { Algorithm, Category } from '../lib/types'
-import type { Locale } from '../i18n/translations'
-import { translations, getCategoryName } from '../i18n/translations'
+import type { Algorithm, Category } from '@lib/types'
+import type { Locale } from '@i18n/translations'
+import { translations, getCategoryName } from '@i18n/translations'
 
 interface SidebarProps {
   categories: Category[]

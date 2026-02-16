@@ -1,5 +1,5 @@
-import type { Algorithm, Step, GraphNode, GraphEdge, GraphState } from '../types'
-import { d, graphNodes, graphEdges, graphAdj } from './shared'
+import type { Algorithm, Step, GraphNode, GraphEdge, GraphState } from '@lib/types'
+import { d, graphNodes, graphEdges, graphAdj } from '@lib/algorithms/shared'
 
 const bfs: Algorithm = {
   id: 'bfs',

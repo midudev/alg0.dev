@@ -1,8 +1,8 @@
 import { useRef, useEffect, useCallback, useMemo } from 'react'
 import Editor, { type Monaco, useMonaco } from '@monaco-editor/react'
-import type { Locale } from '../i18n/translations'
-import { translations } from '../i18n/translations'
-import ComplexityChart from './ComplexityChart'
+import type { Locale } from '@i18n/translations'
+import { translations } from '@i18n/translations'
+import ComplexityChart from '@components/ComplexityChart'
 
 interface CodePanelProps {
   code: string

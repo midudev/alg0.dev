@@ -1,5 +1,5 @@
-import type { Algorithm, Step, HighlightType } from '../types'
-import { d } from './shared'
+import type { Algorithm, Step, HighlightType } from '@lib/types'
+import { d } from '@lib/algorithms/shared'
 
 // ============================================================
 // TOWER OF HANOI

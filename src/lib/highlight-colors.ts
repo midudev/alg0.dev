@@ -1,4 +1,4 @@
-import type { HighlightType } from './types'
+import type { HighlightType } from '@lib/types'
 
 /** Hex colors used by the ArrayVisualizer bar chart */
 export const highlightColors: Record<HighlightType, string> = {

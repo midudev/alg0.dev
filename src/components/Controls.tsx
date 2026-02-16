@@ -1,5 +1,5 @@
-import type { Locale } from '../i18n/translations'
-import { translations } from '../i18n/translations'
+import type { Locale } from '@i18n/translations'
+import { translations } from '@i18n/translations'
 
 interface ControlsProps {
   currentStep: number

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import type { Algorithm, Step } from '../lib/types'
-import type { Locale } from '../i18n/translations'
+import type { Algorithm, Step } from '@lib/types'
+import type { Locale } from '@i18n/translations'
 
 const SPEED_MAP: Record<number, number> = {
   1: 1500,

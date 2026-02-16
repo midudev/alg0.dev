@@ -1,5 +1,5 @@
-import type { Step } from '../lib/types'
-import { highlightStyles } from '../lib/highlight-colors'
+import type { Step } from '@lib/types'
+import { highlightStyles } from '@lib/highlight-colors'
 
 const VALUE_SYMBOLS: Record<string, string> = {
   Q: '♛',

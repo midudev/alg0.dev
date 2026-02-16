@@ -1,4 +1,4 @@
-import type { Translations } from '../i18n/translations'
+import type { Translations } from '@i18n/translations'
 
 interface WelcomeScreenProps {
   t: Translations

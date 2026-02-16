@@ -1,6 +1,6 @@
-import type { Step } from '../lib/types'
-import type { Locale } from '../i18n/translations'
-import { translations } from '../i18n/translations'
+import type { Step } from '@lib/types'
+import type { Locale } from '@i18n/translations'
+import { translations } from '@i18n/translations'
 
 const NODE_RADIUS = 22
 

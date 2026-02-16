@@ -1,10 +1,10 @@
-import type { Algorithm, Category } from '../types'
+import type { Algorithm, Category } from '@lib/types'
 
 import {
   bigONotation,
   recursion,
   stacksAndQueues,
-} from './concepts'
+} from '@lib/algorithms/concepts'
 
 import {
   bubbleSort,
@@ -16,14 +16,14 @@ import {
   countingSort,
   radixSort,
   shellSort,
-} from './sorting'
+} from '@lib/algorithms/sorting'
 
 import {
   binarySearch,
   linearSearch,
   jumpSearch,
   interpolationSearch,
-} from './searching'
+} from '@lib/algorithms/searching'
 
 import {
   bfs,
@@ -31,21 +31,21 @@ import {
   dijkstra,
   prim,
   topologicalSort,
-} from './graphs'
+} from '@lib/algorithms/graphs'
 
 import {
   fibonacciDp,
   knapsack,
   lcs,
-} from './dynamic-programming'
+} from '@lib/algorithms/dynamic-programming'
 
 import {
   nQueens,
   sudokuSolver,
   mazePathfinding,
-} from './backtracking'
+} from '@lib/algorithms/backtracking'
 
-import { towerOfHanoi } from './divide-and-conquer'
+import { towerOfHanoi } from '@lib/algorithms/divide-and-conquer'
 
 export const algorithms: Algorithm[] = [
   // Concepts

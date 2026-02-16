@@ -1,5 +1,5 @@
-import type { Step } from '../lib/types'
-import { highlightColors, DEFAULT_BAR_COLOR } from '../lib/highlight-colors'
+import type { Step } from '@lib/types'
+import { highlightColors, DEFAULT_BAR_COLOR } from '@lib/highlight-colors'
 
 interface ArrayVisualizerProps {
   step: Step

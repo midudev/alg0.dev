@@ -1,7 +1,7 @@
-import type { Algorithm } from '../lib/types'
-import type { Locale, Translations } from '../i18n/translations'
-import { getCategoryName, locales, localeNames } from '../i18n/translations'
-import Controls from './Controls'
+import type { Algorithm } from '@lib/types'
+import type { Locale, Translations } from '@i18n/translations'
+import { getCategoryName, locales, localeNames } from '@i18n/translations'
+import Controls from '@components/Controls'
 
 interface HeaderProps {
   locale: Locale

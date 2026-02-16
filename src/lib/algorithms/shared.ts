@@ -1,4 +1,4 @@
-import type { GraphNode, GraphEdge } from '../types'
+import type { GraphNode, GraphEdge } from '@lib/types'
 
 /** Locale-aware description helper */
 export const d = (locale: string, en: string, es: string) => (locale === 'es' ? es : en)
