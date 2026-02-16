@@ -23,6 +23,14 @@ const {
 } = Astro.props
 
 const siteName = "alg0.dev"
+
+// Compute dynamic hreflang alternates
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/'
+const basePath = locale === 'es' && pathname.startsWith('/es')
+  ? pathname.slice(3) || '/'
+  : pathname
+const enAlternateUrl = new URL(basePath, Astro.site).href
+const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Astro.site).href
 ---
 
 <!doctype html>
@@ -50,12 +58,8 @@ const siteName = "alg0.dev"
     <meta property="og:image" content={new URL(ogImage, Astro.site).href} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:locale" content={ogLocale} />
-    <link rel="alternate" hreflang="en" href={new URL("/", Astro.site).href} />
-    <link
-      rel="alternate"
-      hreflang="es"
-      href={new URL("/es/", Astro.site).href}
-    />
+    <link rel="alternate" hreflang="en" href={enAlternateUrl} />
+    <link rel="alternate" hreflang="es" href={esAlternateUrl} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />

@@ -1520,3 +1520,20 @@ export function getAlgorithmDescription(locale: Locale, algorithmId: string): st
 export function getCategoryName(locale: Locale, categoryKey: string): string {
   return translations[locale].categories[categoryKey] || categoryKey
 }
+
+export function getAlgorithmMetaTitle(locale: Locale, algorithmId: string, fallbackName: string): string {
+  const desc = translations[locale].algorithmDescriptions[algorithmId]
+  if (!desc) return `${fallbackName} | alg0.dev`
+  const firstLine = desc.split('\n')[0].trim()
+  return `${firstLine || fallbackName} | alg0.dev`
+}
+
+export function getAlgorithmMetaDescription(locale: Locale, algorithmId: string): string {
+  const desc = translations[locale].algorithmDescriptions[algorithmId]
+  if (!desc) return translations[locale].siteDescription
+  const paragraphs = desc.split('\n\n')
+  const content = paragraphs.length > 1 ? paragraphs[1] : paragraphs[0]
+  const cleaned = content.replace(/\n/g, ' ').trim()
+  if (cleaned.length <= 160) return cleaned
+  return cleaned.slice(0, 157) + '...'
+}

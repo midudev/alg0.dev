@@ -232,18 +232,22 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
               >
                 <div className="ml-4 mt-0.5 space-y-0.5 border-l border-white/[0.06] pl-2">
                   {category.algorithms.map((algo) => (
-                    <button
+                    <a
                       key={algo.id}
-                      onClick={() => onSelect(algo)}
-                      aria-current={selectedId === algo.id ? 'true' : undefined}
-                      className={`w-full text-left px-3 py-1.5 text-[13px] rounded-md transition-all duration-150 ${
+                      href={locale === 'es' ? `/es/${algo.id}` : `/${algo.id}`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        onSelect(algo)
+                      }}
+                      aria-current={selectedId === algo.id ? 'page' : undefined}
+                      className={`block px-3 py-1.5 text-[13px] rounded-md transition-all duration-150 ${
                         selectedId === algo.id
                           ? 'bg-white/[0.08] text-white font-medium'
                           : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.04]'
                       }`}
                     >
                       {algo.name}
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>

@@ -1,14 +1,34 @@
-import type { Algorithm, Step, HighlightType } from '@lib/types'
+import type { Algorithm, Step, BigOCurve } from '@lib/types'
 import { d } from '@lib/algorithms/shared'
 
 // ============================================================
 // BIG O NOTATION
 // ============================================================
+
+const BIG_O_CURVES: Omit<BigOCurve, 'visible' | 'highlighted'>[] = [
+  { name: 'O(1)', color: '#34d399' },
+  { name: 'O(log n)', color: '#22d3ee' },
+  { name: 'O(n)', color: '#fb923c' },
+  { name: 'O(n log n)', color: '#c084fc' },
+  { name: 'O(n²)', color: '#f87171' },
+]
+
+function makeCurves(
+  visibleNames: string[],
+  highlightedName?: string,
+): BigOCurve[] {
+  return BIG_O_CURVES.map((c) => ({
+    ...c,
+    visible: visibleNames.includes(c.name),
+    highlighted: c.name === highlightedName,
+  }))
+}
+
 export const bigONotation: Algorithm = {
   id: 'big-o-notation',
   name: 'Big O Notation',
   category: 'Concepts',
-  visualization: 'array',
+  visualization: 'concept',
   code: `// O(1) — Constant time
 function getFirst(arr) {
   return arr[0];
@@ -57,128 +77,163 @@ Common complexities (from fastest to slowest):
   O(2^n)    — Exponential: doubles with each element
   O(n!)     — Factorial: all permutations
 
-This visualization shows how many operations each complexity requires as the input size grows from 1 to 8.`,
+The chart shows how each complexity's curve grows as the input size increases.`,
 
   generateSteps(locale = 'en') {
     const steps: Step[] = []
+    const all = BIG_O_CURVES.map((c) => c.name)
 
-    // Show the number of operations for n=1..8 for O(1)
-    const sizes = [1, 2, 3, 4, 5, 6, 7, 8]
+    // Helper: visible curves up to a certain name
+    const upTo = (name: string) => all.slice(0, all.indexOf(name) + 1)
 
-    // Step 1: Introduction
+    // Step 1: Introduction — no curves yet
     steps.push({
-      array: [1, 1, 1, 1, 1, 1, 1, 1],
-      highlights: {},
-      sorted: [],
+      concept: { type: 'bigO', curves: makeCurves([]), maxN: 10 },
       description: d(
         locale,
-        'Big O measures how an algorithm scales. Each bar represents the number of operations for input sizes 1 through 8.',
-        'Big O mide cómo escala un algoritmo. Cada barra representa el número de operaciones para tamaños de entrada del 1 al 8.',
+        'Big O measures how an algorithm scales. Watch each curve grow as the input size (n) increases.',
+        'Big O mide cómo escala un algoritmo. Observa cómo crece cada curva conforme aumenta el tamaño de entrada (n).',
       ),
       codeLine: 1,
-      variables: { complexity: 'O(1)', n: '1..8' },
+      variables: { complexity: '—' },
     })
 
-    // Step 2: O(1) — Constant
+    // ── O(1) — one step is enough (it's flat) ──
     steps.push({
-      array: [1, 1, 1, 1, 1, 1, 1, 1],
-      highlights: { 0: 'sorted', 1: 'sorted', 2: 'sorted', 3: 'sorted', 4: 'sorted', 5: 'sorted', 6: 'sorted', 7: 'sorted' },
-      sorted: [],
+      concept: { type: 'bigO', curves: makeCurves(['O(1)'], 'O(1)'), maxN: 10 },
       description: d(
         locale,
-        'O(1) — Constant time. Always 1 operation regardless of input size. Example: accessing an array element by index.',
-        'O(1) — Tiempo constante. Siempre 1 operación sin importar el tamaño de entrada. Ejemplo: acceder a un elemento del arreglo por índice.',
+        'O(1) — Constant time. No matter how big n gets, operations stay at 1. A perfectly flat line.',
+        'O(1) — Tiempo constante. Sin importar cuánto crezca n, las operaciones se mantienen en 1. Una línea perfectamente plana.',
       ),
       codeLine: 2,
-      variables: { complexity: 'O(1)', 'ops(1)': 1, 'ops(4)': 1, 'ops(8)': 1 },
+      variables: { complexity: 'O(1)', 'ops(1)': 1, 'ops(5)': 1, 'ops(10)': 1 },
     })
 
-    // Step 3: O(log n) — Logarithmic
-    const logOps = sizes.map((n) => Math.max(1, Math.ceil(Math.log2(n))))
+    // ── O(log n) — grow from small n to large ──
     steps.push({
-      array: logOps,
-      highlights: Object.fromEntries(logOps.map((_, i) => [i, 'searching' as HighlightType])),
-      sorted: [],
+      concept: { type: 'bigO', curves: makeCurves(upTo('O(log n)'), 'O(log n)'), maxN: 4 },
       description: d(
         locale,
-        'O(log n) — Logarithmic time. The problem is halved at each step. Example: binary search in a sorted array.',
-        'O(log n) — Tiempo logarítmico. El problema se divide a la mitad en cada paso. Ejemplo: búsqueda binaria en un arreglo ordenado.',
+        'O(log n) — Logarithmic time. At small inputs (n≤4) it barely grows. Let\'s see what happens as n increases...',
+        'O(log n) — Tiempo logarítmico. Con entradas pequeñas (n≤4) apenas crece. Veamos qué pasa cuando n aumenta...',
       ),
       codeLine: 19,
-      variables: { complexity: 'O(log n)', 'ops(1)': logOps[0], 'ops(4)': logOps[3], 'ops(8)': logOps[7] },
+      variables: { complexity: 'O(log n)', 'ops(2)': 1, 'ops(4)': 2 },
     })
 
-    // Step 4: O(n) — Linear
-    const linearOps = sizes.map((n) => n)
     steps.push({
-      array: linearOps,
-      highlights: Object.fromEntries(linearOps.map((_, i) => [i, 'current' as HighlightType])),
-      sorted: [],
+      concept: { type: 'bigO', curves: makeCurves(upTo('O(log n)'), 'O(log n)'), maxN: 10 },
       description: d(
         locale,
-        'O(n) — Linear time. Visits each element once. Example: finding the maximum value in an unsorted array.',
-        'O(n) — Tiempo lineal. Visita cada elemento una vez. Ejemplo: encontrar el valor máximo en un arreglo sin ordenar.',
+        'O(log n) at n=10: only ~3.3 operations. Halving the problem each step keeps growth very slow — great for binary search.',
+        'O(log n) con n=10: solo ~3.3 operaciones. Dividir el problema a la mitad en cada paso mantiene un crecimiento muy lento — ideal para búsqueda binaria.',
+      ),
+      codeLine: 19,
+      variables: { complexity: 'O(log n)', 'ops(4)': 2, 'ops(10)': '3.3' },
+    })
+
+    // ── O(n) — grow from small to large ──
+    steps.push({
+      concept: { type: 'bigO', curves: makeCurves(upTo('O(n)'), 'O(n)'), maxN: 4 },
+      description: d(
+        locale,
+        'O(n) — Linear time. At n=4, 4 operations. It grows proportionally. Watch the diagonal extend...',
+        'O(n) — Tiempo lineal. Con n=4, 4 operaciones. Crece proporcionalmente. Observa cómo se extiende la diagonal...',
       ),
       codeLine: 7,
-      variables: { complexity: 'O(n)', 'ops(1)': 1, 'ops(4)': 4, 'ops(8)': 8 },
+      variables: { complexity: 'O(n)', 'ops(2)': 2, 'ops(4)': 4 },
     })
 
-    // Step 5: O(n log n) — Linearithmic
-    const nLogNOps = sizes.map((n) => Math.max(1, Math.ceil(n * Math.log2(n))))
     steps.push({
-      array: nLogNOps,
-      highlights: Object.fromEntries(nLogNOps.map((_, i) => [i, 'pivot' as HighlightType])),
-      sorted: [],
+      concept: { type: 'bigO', curves: makeCurves(upTo('O(n)'), 'O(n)'), maxN: 10 },
       description: d(
         locale,
-        'O(n log n) — Linearithmic time. Typical of efficient sorting algorithms. Example: Merge Sort, Quick Sort (average).',
-        'O(n log n) — Tiempo linearítmico. Típico de algoritmos de ordenamiento eficientes. Ejemplo: Merge Sort, Quick Sort (promedio).',
+        'O(n) at n=10: exactly 10 operations. One operation per element — notice how it pulls away from O(log n).',
+        'O(n) con n=10: exactamente 10 operaciones. Una operación por elemento — observa cómo se aleja de O(log n).',
       ),
       codeLine: 7,
-      variables: { complexity: 'O(n log n)', 'ops(1)': nLogNOps[0], 'ops(4)': nLogNOps[3], 'ops(8)': nLogNOps[7] },
+      variables: { complexity: 'O(n)', 'ops(4)': 4, 'ops(10)': 10 },
     })
 
-    // Step 6: O(n²) — Quadratic
-    const quadOps = sizes.map((n) => n * n)
+    // ── O(n log n) — grow from small to large ──
     steps.push({
-      array: quadOps,
-      highlights: Object.fromEntries(quadOps.map((_, i) => [i, 'comparing' as HighlightType])),
-      sorted: [],
+      concept: { type: 'bigO', curves: makeCurves(upTo('O(n log n)'), 'O(n log n)'), maxN: 4 },
       description: d(
         locale,
-        'O(n²) — Quadratic time. Nested loops over the input. Example: checking all pairs for duplicates, Bubble Sort.',
-        'O(n²) — Tiempo cuadrático. Bucles anidados sobre la entrada. Ejemplo: verificar todos los pares por duplicados, Bubble Sort.',
+        'O(n log n) — Linearithmic. At small n it looks close to O(n). Let\'s see it diverge...',
+        'O(n log n) — Linearítmico. Con n pequeño se parece a O(n). Veamos cómo diverge...',
+      ),
+      codeLine: 7,
+      variables: { complexity: 'O(n log n)', 'ops(2)': 2, 'ops(4)': 8 },
+    })
+
+    steps.push({
+      concept: { type: 'bigO', curves: makeCurves(upTo('O(n log n)'), 'O(n log n)'), maxN: 10 },
+      description: d(
+        locale,
+        'O(n log n) at n=10: ~33 operations. Typical of Merge Sort and Quick Sort. It bends away from O(n) as n grows.',
+        'O(n log n) con n=10: ~33 operaciones. Típico de Merge Sort y Quick Sort. Se curva alejándose de O(n) conforme n crece.',
+      ),
+      codeLine: 7,
+      variables: { complexity: 'O(n log n)', 'ops(5)': '11.6', 'ops(10)': '33.2' },
+    })
+
+    // ── O(n²) — grow from small to large (most dramatic) ──
+    steps.push({
+      concept: { type: 'bigO', curves: makeCurves(all, 'O(n²)'), maxN: 4 },
+      description: d(
+        locale,
+        'O(n²) — Quadratic time. At n=4 it\'s already 16 operations. Nested loops. Watch it explode...',
+        'O(n²) — Tiempo cuadrático. Con n=4 ya son 16 operaciones. Bucles anidados. Observa cómo explota...',
       ),
       codeLine: 14,
-      variables: { complexity: 'O(n²)', 'ops(1)': 1, 'ops(4)': 16, 'ops(8)': 64 },
+      variables: { complexity: 'O(n²)', 'ops(2)': 4, 'ops(4)': 16 },
     })
 
-    // Step 7: Compare all together — show n=8 operations side by side
     steps.push({
-      array: [1, 3, 8, 24, 64],
-      highlights: { 0: 'sorted', 1: 'searching', 2: 'current', 3: 'pivot', 4: 'comparing' },
-      sorted: [],
+      concept: { type: 'bigO', curves: makeCurves(all, 'O(n²)'), maxN: 7 },
       description: d(
         locale,
-        'Comparison for n=8: O(1)=1, O(log n)=3, O(n)=8, O(n log n)=24, O(n²)=64. Notice how quadratic grows much faster!',
-        'Comparación para n=8: O(1)=1, O(log n)=3, O(n)=8, O(n log n)=24, O(n²)=64. ¡Observa cómo el cuadrático crece mucho más rápido!',
+        'O(n²) at n=7: 49 operations — already double O(n log n). The curve is pulling away fast...',
+        'O(n²) con n=7: 49 operaciones — ya el doble de O(n log n). La curva se aleja rápidamente...',
       ),
-      codeLine: 1,
-      variables: { n: 8, 'O(1)': 1, 'O(log n)': 3, 'O(n)': 8, 'O(n log n)': 24, 'O(n²)': 64 },
+      codeLine: 14,
+      variables: { complexity: 'O(n²)', 'ops(5)': 25, 'ops(7)': 49 },
     })
 
-    // Step 8: Why it matters
     steps.push({
-      array: [1, 10, 100, 1000, 10000],
-      highlights: { 0: 'sorted', 1: 'searching', 2: 'current', 3: 'pivot', 4: 'comparing' },
-      sorted: [],
+      concept: { type: 'bigO', curves: makeCurves(all, 'O(n²)'), maxN: 10 },
       description: d(
         locale,
-        'For n=100: O(1)=1, O(log n)=10, O(n)=100, O(n log n)=1000, O(n²)=10000. Choosing the right algorithm matters!',
-        'Para n=100: O(1)=1, O(log n)=10, O(n)=100, O(n log n)=1000, O(n²)=10000. ¡Elegir el algoritmo correcto importa!',
+        'O(n²) at n=10: 100 operations! Three times more than O(n log n). Bubble Sort lives here.',
+        'O(n²) con n=10: ¡100 operaciones! Tres veces más que O(n log n). Bubble Sort vive aquí.',
+      ),
+      codeLine: 14,
+      variables: { complexity: 'O(n²)', 'ops(10)': 100, 'vs O(n log n)': '33 → 100' },
+    })
+
+    // ── Compare all — zoom out progressively ──
+    steps.push({
+      concept: { type: 'bigO', curves: makeCurves(all), maxN: 25 },
+      description: d(
+        locale,
+        'Zooming out to n=25. The gap becomes dramatic: O(n²)=625 while O(n)=25. Quadratic is 25× worse!',
+        'Ampliando a n=25. La brecha se vuelve dramática: O(n²)=625 mientras O(n)=25. ¡Cuadrático es 25× peor!',
       ),
       codeLine: 1,
-      variables: { n: 100, 'O(1)': 1, 'O(log n)': 10, 'O(n)': 100, 'O(n log n)': 1000, 'O(n²)': 10000 },
+      variables: { n: 25, 'O(1)': 1, 'O(n)': 25, 'O(n²)': 625 },
+    })
+
+    steps.push({
+      concept: { type: 'bigO', curves: makeCurves(all), maxN: 50 },
+      description: d(
+        locale,
+        'At n=50: O(1)=1, O(n)=50, O(n²)=2500. Choosing the right algorithm matters enormously as data grows!',
+        'Con n=50: O(1)=1, O(n)=50, O(n²)=2500. ¡Elegir el algoritmo correcto importa enormemente conforme crecen los datos!',
+      ),
+      codeLine: 1,
+      variables: { n: 50, 'O(1)': 1, 'O(n)': 50, 'O(n²)': 2500 },
     })
 
     return steps
@@ -192,7 +247,7 @@ export const recursion: Algorithm = {
   id: 'recursion',
   name: 'Recursion',
   category: 'Concepts',
-  visualization: 'array',
+  visualization: 'concept',
   code: `function factorial(n) {
   // Base case: factorial of 0 or 1 is 1
   if (n <= 1) return 1;
@@ -238,17 +293,16 @@ Common recursive algorithms:
   generateSteps(locale = 'en') {
     const steps: Step[] = []
 
-    // Show factorial(5) computation step by step
-    // Array represents the call stack depth / accumulated values
-
+    // Step 1: Introduction
     steps.push({
-      array: [5, 4, 3, 2, 1],
-      highlights: {},
-      sorted: [],
+      concept: {
+        type: 'callStack',
+        frames: [],
+      },
       description: d(
         locale,
-        'Let\'s compute factorial(5). We need to multiply: 5 × 4 × 3 × 2 × 1. Recursion breaks this into smaller calls.',
-        'Calculemos factorial(5). Necesitamos multiplicar: 5 × 4 × 3 × 2 × 1. La recursión divide esto en llamadas más pequeñas.',
+        'Let\'s compute factorial(5). Recursion breaks the problem into smaller calls stacked on the call stack.',
+        'Calculemos factorial(5). La recursión divide el problema en llamadas más pequeñas apiladas en la pila de llamadas.',
       ),
       codeLine: 1,
       variables: { n: 5 },
@@ -256,118 +310,161 @@ Common recursive algorithms:
 
     // Going down the call stack
     steps.push({
-      array: [5, 0, 0, 0, 0],
-      highlights: { 0: 'current' },
-      sorted: [],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × factorial(4)', state: 'active' },
+        ],
+      },
       description: d(
         locale,
-        'factorial(5): n=5, not a base case. Call factorial(4). Push to call stack.',
-        'factorial(5): n=5, no es caso base. Llamar factorial(4). Agregar a la pila de llamadas.',
+        'factorial(5): n=5, not a base case. It needs factorial(4), so it pushes a new call onto the stack.',
+        'factorial(5): n=5, no es caso base. Necesita factorial(4), así que agrega una nueva llamada a la pila.',
       ),
       codeLine: 5,
-      variables: { n: 5, 'returns': '5 × factorial(4)' },
+      variables: { n: 5, returns: '5 × factorial(4)' },
     })
 
     steps.push({
-      array: [5, 4, 0, 0, 0],
-      highlights: { 0: 'active', 1: 'current' },
-      sorted: [],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × factorial(4)', state: 'waiting' },
+          { label: 'factorial(4)', detail: '4 × factorial(3)', state: 'active' },
+        ],
+      },
       description: d(
         locale,
-        'factorial(4): n=4, not a base case. Call factorial(3). Stack grows.',
+        'factorial(4): n=4, not a base case. Call factorial(3). The stack grows deeper.',
         'factorial(4): n=4, no es caso base. Llamar factorial(3). La pila crece.',
       ),
       codeLine: 5,
-      variables: { n: 4, 'returns': '4 × factorial(3)', stackDepth: 2 },
+      variables: { n: 4, returns: '4 × factorial(3)', stackDepth: 2 },
     })
 
     steps.push({
-      array: [5, 4, 3, 0, 0],
-      highlights: { 0: 'active', 1: 'active', 2: 'current' },
-      sorted: [],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × factorial(4)', state: 'waiting' },
+          { label: 'factorial(4)', detail: '4 × factorial(3)', state: 'waiting' },
+          { label: 'factorial(3)', detail: '3 × factorial(2)', state: 'active' },
+        ],
+      },
       description: d(
         locale,
         'factorial(3): n=3, not a base case. Call factorial(2). Stack keeps growing.',
         'factorial(3): n=3, no es caso base. Llamar factorial(2). La pila sigue creciendo.',
       ),
       codeLine: 5,
-      variables: { n: 3, 'returns': '3 × factorial(2)', stackDepth: 3 },
+      variables: { n: 3, returns: '3 × factorial(2)', stackDepth: 3 },
     })
 
     steps.push({
-      array: [5, 4, 3, 2, 0],
-      highlights: { 0: 'active', 1: 'active', 2: 'active', 3: 'current' },
-      sorted: [],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × factorial(4)', state: 'waiting' },
+          { label: 'factorial(4)', detail: '4 × factorial(3)', state: 'waiting' },
+          { label: 'factorial(3)', detail: '3 × factorial(2)', state: 'waiting' },
+          { label: 'factorial(2)', detail: '2 × factorial(1)', state: 'active' },
+        ],
+      },
       description: d(
         locale,
-        'factorial(2): n=2, not a base case. Call factorial(1). Almost at the base.',
-        'factorial(2): n=2, no es caso base. Llamar factorial(1). Casi en el caso base.',
+        'factorial(2): n=2, not a base case. Call factorial(1). Almost at the base!',
+        'factorial(2): n=2, no es caso base. Llamar factorial(1). ¡Casi en el caso base!',
       ),
       codeLine: 5,
-      variables: { n: 2, 'returns': '2 × factorial(1)', stackDepth: 4 },
+      variables: { n: 2, returns: '2 × factorial(1)', stackDepth: 4 },
     })
 
     steps.push({
-      array: [5, 4, 3, 2, 1],
-      highlights: { 0: 'active', 1: 'active', 2: 'active', 3: 'active', 4: 'found' },
-      sorted: [],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × factorial(4)', state: 'waiting' },
+          { label: 'factorial(4)', detail: '4 × factorial(3)', state: 'waiting' },
+          { label: 'factorial(3)', detail: '3 × factorial(2)', state: 'waiting' },
+          { label: 'factorial(2)', detail: '2 × factorial(1)', state: 'waiting' },
+          { label: 'factorial(1)', detail: 'return 1', state: 'base' },
+        ],
+      },
       description: d(
         locale,
-        'factorial(1): BASE CASE reached! n ≤ 1, return 1. Now results propagate back up.',
+        'factorial(1): BASE CASE reached! n ≤ 1, return 1. Now results will propagate back up the stack.',
         'factorial(1): ¡CASO BASE alcanzado! n ≤ 1, retorna 1. Ahora los resultados se propagan hacia arriba.',
       ),
       codeLine: 2,
-      variables: { n: 1, 'returns': 1, stackDepth: 5 },
+      variables: { n: 1, returns: 1, stackDepth: 5 },
     })
 
     // Going back up the call stack
     steps.push({
-      array: [5, 4, 3, 2, 1],
-      highlights: { 0: 'active', 1: 'active', 2: 'active', 3: 'current', 4: 'sorted' },
-      sorted: [4],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × factorial(4)', state: 'waiting' },
+          { label: 'factorial(4)', detail: '4 × factorial(3)', state: 'waiting' },
+          { label: 'factorial(3)', detail: '3 × factorial(2)', state: 'waiting' },
+          { label: 'factorial(2)', detail: '2 × 1 = 2', state: 'active' },
+        ],
+      },
       description: d(
         locale,
-        'Back to factorial(2): returns 2 × 1 = 2. Pop from call stack.',
-        'Volviendo a factorial(2): retorna 2 × 1 = 2. Desapilar de la pila de llamadas.',
+        'Back to factorial(2): receives 1 from factorial(1). Returns 2 × 1 = 2. Frame popped from stack.',
+        'Volviendo a factorial(2): recibe 1 de factorial(1). Retorna 2 × 1 = 2. Frame eliminado de la pila.',
       ),
       codeLine: 5,
-      variables: { n: 2, 'factorial(1)': 1, 'returns': '2 × 1 = 2', stackDepth: 4 },
+      variables: { n: 2, 'factorial(1)': 1, returns: '2 × 1 = 2', stackDepth: 4 },
     })
 
     steps.push({
-      array: [5, 4, 6, 2, 1],
-      highlights: { 0: 'active', 1: 'active', 2: 'current', 3: 'sorted', 4: 'sorted' },
-      sorted: [3, 4],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × factorial(4)', state: 'waiting' },
+          { label: 'factorial(4)', detail: '4 × factorial(3)', state: 'waiting' },
+          { label: 'factorial(3)', detail: '3 × 2 = 6', state: 'active' },
+        ],
+      },
       description: d(
         locale,
-        'Back to factorial(3): returns 3 × 2 = 6. Stack unwinding.',
-        'Volviendo a factorial(3): retorna 3 × 2 = 6. Desenrollando la pila.',
+        'Back to factorial(3): receives 2 from factorial(2). Returns 3 × 2 = 6. Stack unwinding.',
+        'Volviendo a factorial(3): recibe 2 de factorial(2). Retorna 3 × 2 = 6. La pila se desenrolla.',
       ),
       codeLine: 5,
-      variables: { n: 3, 'factorial(2)': 2, 'returns': '3 × 2 = 6', stackDepth: 3 },
+      variables: { n: 3, 'factorial(2)': 2, returns: '3 × 2 = 6', stackDepth: 3 },
     })
 
     steps.push({
-      array: [5, 24, 6, 2, 1],
-      highlights: { 0: 'active', 1: 'current', 2: 'sorted', 3: 'sorted', 4: 'sorted' },
-      sorted: [2, 3, 4],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × factorial(4)', state: 'waiting' },
+          { label: 'factorial(4)', detail: '4 × 6 = 24', state: 'active' },
+        ],
+      },
       description: d(
         locale,
-        'Back to factorial(4): returns 4 × 6 = 24. Almost done!',
-        'Volviendo a factorial(4): retorna 4 × 6 = 24. ¡Casi listo!',
+        'Back to factorial(4): receives 6 from factorial(3). Returns 4 × 6 = 24. Almost done!',
+        'Volviendo a factorial(4): recibe 6 de factorial(3). Retorna 4 × 6 = 24. ¡Casi listo!',
       ),
       codeLine: 5,
-      variables: { n: 4, 'factorial(3)': 6, 'returns': '4 × 6 = 24', stackDepth: 2 },
+      variables: { n: 4, 'factorial(3)': 6, returns: '4 × 6 = 24', stackDepth: 2 },
     })
 
     steps.push({
-      array: [120, 24, 6, 2, 1],
-      highlights: { 0: 'found', 1: 'sorted', 2: 'sorted', 3: 'sorted', 4: 'sorted' },
-      sorted: [1, 2, 3, 4],
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'factorial(5)', detail: '5 × 24 = 120', state: 'resolved' },
+        ],
+      },
       description: d(
         locale,
-        'Back to factorial(5): returns 5 × 24 = 120. Done! The call stack is empty. factorial(5) = 120.',
-        'Volviendo a factorial(5): retorna 5 × 24 = 120. ¡Listo! La pila de llamadas está vacía. factorial(5) = 120.',
+        'Back to factorial(5): receives 24 from factorial(4). Returns 5 × 24 = 120. Done! The call stack is empty.',
+        'Volviendo a factorial(5): recibe 24 de factorial(4). Retorna 5 × 24 = 120. ¡Listo! La pila está vacía.',
       ),
       codeLine: 5,
       variables: { n: 5, 'factorial(4)': 24, result: 120, stackDepth: 0 },
@@ -380,11 +477,18 @@ Common recursive algorithms:
 // ============================================================
 // STACKS & QUEUES
 // ============================================================
+
+type SQItem = { value: number; state: 'normal' | 'entering' | 'leaving' }
+
+function sq(items: SQItem[]): SQItem[] {
+  return items
+}
+
 export const stacksAndQueues: Algorithm = {
   id: 'stacks-queues',
   name: 'Stacks & Queues',
   category: 'Concepts',
-  visualization: 'array',
+  visualization: 'concept',
   code: `// === STACK (LIFO: Last In, First Out) ===
 class Stack {
   constructor() { this.items = []; }
@@ -443,40 +547,52 @@ Space Complexity: O(n) for n elements`,
 
   generateSteps(locale = 'en') {
     const steps: Step[] = []
-    const EMPTY = 0
 
-    // --- STACK DEMONSTRATION ---
+    // ── STACK DEMONSTRATION ──
+
     steps.push({
-      array: [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-      highlights: {},
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'stack',
+        items: [],
+      },
       description: d(
         locale,
-        'STACK (LIFO): Last In, First Out. Like a stack of plates — add and remove from the top only.',
+        'STACK (LIFO): Last In, First Out. Like a stack of plates — you add and remove from the top only.',
         'PILA (LIFO): Último en Entrar, Primero en Salir. Como una pila de platos — se añade y retira solo desde arriba.',
       ),
       codeLine: 1,
       variables: { structure: 'Stack', size: 0 },
     })
 
-    // Push operations
+    // Push 10
     steps.push({
-      array: [10, EMPTY, EMPTY, EMPTY, EMPTY],
-      highlights: { 0: 'placed' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'stack',
+        items: sq([{ value: 10, state: 'entering' }]),
+        operation: 'push(10)',
+      },
       description: d(
         locale,
-        'stack.push(10) — Push 10 onto the stack. It becomes the top element.',
-        'stack.push(10) — Apilar 10. Se convierte en el elemento superior.',
+        'stack.push(10) — Push 10 onto the stack. It becomes the top (and only) element.',
+        'stack.push(10) — Apilar 10. Se convierte en el elemento superior (y único).',
       ),
       codeLine: 5,
       variables: { structure: 'Stack', operation: 'push(10)', top: 10, size: 1 },
     })
 
+    // Push 20
     steps.push({
-      array: [10, 20, EMPTY, EMPTY, EMPTY],
-      highlights: { 0: 'active', 1: 'placed' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'stack',
+        items: sq([
+          { value: 10, state: 'normal' },
+          { value: 20, state: 'entering' },
+        ]),
+        operation: 'push(20)',
+      },
       description: d(
         locale,
         'stack.push(20) — Push 20. It goes on top of 10.',
@@ -486,10 +602,18 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Stack', operation: 'push(20)', top: 20, size: 2 },
     })
 
+    // Push 30
     steps.push({
-      array: [10, 20, 30, EMPTY, EMPTY],
-      highlights: { 0: 'active', 1: 'active', 2: 'placed' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'stack',
+        items: sq([
+          { value: 10, state: 'normal' },
+          { value: 20, state: 'normal' },
+          { value: 30, state: 'entering' },
+        ]),
+        operation: 'push(30)',
+      },
       description: d(
         locale,
         'stack.push(30) — Push 30. Now the stack has [10, 20, 30] with 30 on top.',
@@ -499,10 +623,19 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Stack', operation: 'push(30)', top: 30, size: 3 },
     })
 
+    // Push 42
     steps.push({
-      array: [10, 20, 42, EMPTY, EMPTY],
-      highlights: { 0: 'active', 1: 'active', 2: 'placed' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'stack',
+        items: sq([
+          { value: 10, state: 'normal' },
+          { value: 20, state: 'normal' },
+          { value: 30, state: 'normal' },
+          { value: 42, state: 'entering' },
+        ]),
+        operation: 'push(42)',
+      },
       description: d(
         locale,
         'stack.push(42) — Push 42. The most recent element is always on top.',
@@ -512,11 +645,19 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Stack', operation: 'push(42)', top: 42, size: 4 },
     })
 
-    // Pop operations
+    // Pop 42
     steps.push({
-      array: [10, 20, 30, EMPTY, EMPTY],
-      highlights: { 2: 'swapped' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'stack',
+        items: sq([
+          { value: 10, state: 'normal' },
+          { value: 20, state: 'normal' },
+          { value: 30, state: 'normal' },
+        ]),
+        operation: 'pop() → 42',
+        removedValue: 42,
+      },
       description: d(
         locale,
         'stack.pop() → 42. LIFO: the last pushed element (42) is removed first.',
@@ -526,10 +667,18 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Stack', operation: 'pop()', removed: 42, top: 30, size: 3 },
     })
 
+    // Pop 30
     steps.push({
-      array: [10, 20, EMPTY, EMPTY, EMPTY],
-      highlights: { 1: 'swapped' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'stack',
+        items: sq([
+          { value: 10, state: 'normal' },
+          { value: 20, state: 'normal' },
+        ]),
+        operation: 'pop() → 30',
+        removedValue: 30,
+      },
       description: d(
         locale,
         'stack.pop() → 30. Now 20 is the top element.',
@@ -539,25 +688,31 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Stack', operation: 'pop()', removed: 30, top: 20, size: 2 },
     })
 
-    // --- QUEUE DEMONSTRATION ---
+    // ── QUEUE DEMONSTRATION ──
+
     steps.push({
-      array: [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-      highlights: {},
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'queue',
+        items: [],
+      },
       description: d(
         locale,
-        'QUEUE (FIFO): First In, First Out. Like a line at a store — first person in line is served first.',
-        'COLA (FIFO): Primero en Entrar, Primero en Salir. Como una fila en una tienda — el primero en la fila es atendido primero.',
+        'QUEUE (FIFO): First In, First Out. Like a line at a store — the first person in line is served first.',
+        'COLA (FIFO): Primero en Entrar, Primero en Salir. Como una fila en una tienda — el primero en llegar es atendido primero.',
       ),
       codeLine: 18,
       variables: { structure: 'Queue', size: 0 },
     })
 
-    // Enqueue operations
+    // Enqueue 10
     steps.push({
-      array: [10, EMPTY, EMPTY, EMPTY, EMPTY],
-      highlights: { 0: 'placed' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'queue',
+        items: sq([{ value: 10, state: 'entering' }]),
+        operation: 'enqueue(10)',
+      },
       description: d(
         locale,
         'queue.enqueue(10) — Add 10 to the back of the queue.',
@@ -567,10 +722,17 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Queue', operation: 'enqueue(10)', front: 10, size: 1 },
     })
 
+    // Enqueue 20
     steps.push({
-      array: [10, 20, EMPTY, EMPTY, EMPTY],
-      highlights: { 0: 'active', 1: 'placed' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'queue',
+        items: sq([
+          { value: 10, state: 'normal' },
+          { value: 20, state: 'entering' },
+        ]),
+        operation: 'enqueue(20)',
+      },
       description: d(
         locale,
         'queue.enqueue(20) — Add 20 to the back. 10 is still at the front.',
@@ -580,10 +742,18 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Queue', operation: 'enqueue(20)', front: 10, size: 2 },
     })
 
+    // Enqueue 30
     steps.push({
-      array: [10, 20, 30, EMPTY, EMPTY],
-      highlights: { 0: 'active', 1: 'active', 2: 'placed' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'queue',
+        items: sq([
+          { value: 10, state: 'normal' },
+          { value: 20, state: 'normal' },
+          { value: 30, state: 'entering' },
+        ]),
+        operation: 'enqueue(30)',
+      },
       description: d(
         locale,
         'queue.enqueue(30) — Add 30 to the back. Queue: [10, 20, 30].',
@@ -593,10 +763,19 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Queue', operation: 'enqueue(30)', front: 10, size: 3 },
     })
 
+    // Enqueue 42
     steps.push({
-      array: [10, 20, 30, 42, EMPTY],
-      highlights: { 0: 'active', 1: 'active', 2: 'active', 3: 'placed' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'queue',
+        items: sq([
+          { value: 10, state: 'normal' },
+          { value: 20, state: 'normal' },
+          { value: 30, state: 'normal' },
+          { value: 42, state: 'entering' },
+        ]),
+        operation: 'enqueue(42)',
+      },
       description: d(
         locale,
         'queue.enqueue(42) — Add 42 to the back. 10 is still first in line.',
@@ -606,11 +785,19 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Queue', operation: 'enqueue(42)', front: 10, size: 4 },
     })
 
-    // Dequeue operations
+    // Dequeue 10
     steps.push({
-      array: [20, 30, 42, EMPTY, EMPTY],
-      highlights: { 0: 'swapped' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'queue',
+        items: sq([
+          { value: 20, state: 'normal' },
+          { value: 30, state: 'normal' },
+          { value: 42, state: 'normal' },
+        ]),
+        operation: 'dequeue() → 10',
+        removedValue: 10,
+      },
       description: d(
         locale,
         'queue.dequeue() → 10. FIFO: the first element added (10) is removed first! Unlike a stack.',
@@ -620,14 +807,22 @@ Space Complexity: O(n) for n elements`,
       variables: { structure: 'Queue', operation: 'dequeue()', removed: 10, front: 20, size: 3 },
     })
 
+    // Dequeue 20
     steps.push({
-      array: [30, 42, EMPTY, EMPTY, EMPTY],
-      highlights: { 0: 'swapped' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'queue',
+        items: sq([
+          { value: 30, state: 'normal' },
+          { value: 42, state: 'normal' },
+        ]),
+        operation: 'dequeue() → 20',
+        removedValue: 20,
+      },
       description: d(
         locale,
-        'queue.dequeue() → 20. Now 30 is at the front. Elements are processed in arrival order.',
-        'queue.dequeue() → 20. Ahora 30 está al frente. Los elementos se procesan en orden de llegada.',
+        'queue.dequeue() → 20. Now 30 is at the front. Elements are always processed in arrival order.',
+        'queue.dequeue() → 20. Ahora 30 está al frente. Los elementos se procesan siempre en orden de llegada.',
       ),
       codeLine: 26,
       variables: { structure: 'Queue', operation: 'dequeue()', removed: 20, front: 30, size: 2 },
@@ -635,16 +830,21 @@ Space Complexity: O(n) for n elements`,
 
     // Summary
     steps.push({
-      array: [30, 42, EMPTY, EMPTY, EMPTY],
-      highlights: { 0: 'found', 1: 'found' },
-      sorted: [],
+      concept: {
+        type: 'stackQueue',
+        structure: 'queue',
+        items: sq([
+          { value: 30, state: 'normal' },
+          { value: 42, state: 'normal' },
+        ]),
+      },
       description: d(
         locale,
         'Key difference: Stack removes the NEWEST element (LIFO), Queue removes the OLDEST element (FIFO). Both have O(1) operations.',
         'Diferencia clave: La Pila retira el elemento MÁS NUEVO (LIFO), la Cola retira el MÁS ANTIGUO (FIFO). Ambas tienen operaciones O(1).',
       ),
       codeLine: 1,
-      variables: { 'Stack': 'LIFO', 'Queue': 'FIFO', complexity: 'O(1)' },
+      variables: { Stack: 'LIFO', Queue: 'FIFO', complexity: 'O(1)' },
     })
 
     return steps

@@ -1,0 +1,23 @@
+---
+import Layout from "@layouts/Layout.astro"
+import AlgoViz from "@components/AlgoViz"
+import { algorithms } from "@lib/algorithms"
+import { getAlgorithmMetaTitle, getAlgorithmMetaDescription } from "@i18n/translations"
+import type { GetStaticPaths } from "astro"
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return algorithms.map((algo) => ({
+    params: { algorithm: algo.id },
+  }))
+}
+
+const { algorithm } = Astro.params as { algorithm: string }
+const algo = algorithms.find((a) => a.id === algorithm)!
+
+const title = getAlgorithmMetaTitle("es", algo.id, algo.name)
+const description = getAlgorithmMetaDescription("es", algo.id)
+---
+
+<Layout locale="es" title={title} description={description}>
+  <AlgoViz locale="es" initialAlgorithmId={algorithm} client:load />
+</Layout>

@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { Locale } from '@i18n/translations'
 import { translations, getAlgorithmDescription } from '@i18n/translations'
-import { categories } from '@lib/algorithms'
+import { algorithms, categories } from '@lib/algorithms'
 import { usePlayback } from '@hooks/usePlayback'
 import { useResizablePanel } from '@hooks/useResizablePanel'
 import { useKeyboardShortcuts } from '@hooks/useKeyboardShortcuts'
@@ -11,6 +11,7 @@ import WelcomeScreen from '@components/WelcomeScreen'
 import ArrayVisualizer from '@components/ArrayVisualizer'
 import GraphVisualizer from '@components/GraphVisualizer'
 import MatrixVisualizer from '@components/MatrixVisualizer'
+import ConceptVisualizer from '@components/ConceptVisualizer'
 import CodePanel from '@components/CodePanel'
 import type { Algorithm } from '@lib/types'
 
@@ -18,11 +19,23 @@ const SIDEBAR_MAX = 260
 const CODEPANEL_MAX = 420
 const COLLAPSE_THRESHOLD = 100
 
-interface AlgoVizProps {
-  locale?: Locale
+function getAlgorithmUrl(locale: string, algoId: string): string {
+  return locale === 'es' ? `/es/${algoId}` : `/${algoId}`
 }
 
-export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
+function getAlgorithmIdFromPath(pathname: string): string | null {
+  const cleaned = pathname.replace(/\/$/, '')
+  if (cleaned === '' || cleaned === '/es') return null
+  if (cleaned.startsWith('/es/')) return cleaned.slice(4)
+  return cleaned.slice(1)
+}
+
+interface AlgoVizProps {
+  locale?: Locale
+  initialAlgorithmId?: string
+}
+
+export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizProps) {
   const t = translations[locale]
   const [activeTab, setActiveTab] = useState<'code' | 'about'>('code')
 
@@ -35,11 +48,19 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
     speed,
     setSpeed,
     selectAlgorithm: selectAlgorithmBase,
+    clearSelection,
     stepForward,
     stepBackward,
     togglePlay,
     currentStepData,
   } = usePlayback(locale)
+
+  useEffect(() => {
+    if (initialAlgorithmId) {
+      const algo = algorithms.find((a) => a.id === initialAlgorithmId)
+      if (algo) selectAlgorithmBase(algo)
+    }
+  }, [])
 
   const sidebar = useResizablePanel({
     maxWidth: SIDEBAR_MAX,
@@ -55,10 +76,33 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
 
   useKeyboardShortcuts({ togglePlay, stepForward, stepBackward })
 
-  const selectAlgorithm = (algo: Algorithm) => {
+  const selectAlgorithm = useCallback((algo: Algorithm) => {
     selectAlgorithmBase(algo)
     setActiveTab('code')
-  }
+    const url = getAlgorithmUrl(locale, algo.id)
+    window.history.pushState({ algorithmId: algo.id }, '', url)
+    document.title = `${algo.name} | alg0.dev`
+  }, [locale, selectAlgorithmBase])
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const algoId = getAlgorithmIdFromPath(window.location.pathname)
+      if (algoId) {
+        const algo = algorithms.find((a) => a.id === algoId)
+        if (algo) {
+          selectAlgorithmBase(algo)
+          setActiveTab('code')
+          document.title = `${algo.name} | alg0.dev`
+          return
+        }
+      }
+      clearSelection()
+      document.title = t.siteTitle
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [selectAlgorithmBase, clearSelection, t.siteTitle])
 
   const getLocalizedDescription = (algo: Algorithm): string => {
     return getAlgorithmDescription(locale, algo.id) ?? algo.description
@@ -76,6 +120,8 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
         return <GraphVisualizer step={currentStepData} locale={locale} />
       case 'matrix':
         return <MatrixVisualizer step={currentStepData} />
+      case 'concept':
+        return <ConceptVisualizer step={currentStepData} />
       default:
         return null
     }

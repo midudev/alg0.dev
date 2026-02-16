@@ -68,6 +68,13 @@ export function usePlayback(locale: Locale) {
     }
   }, [isPlaying, speed, steps.length])
 
+  const clearSelection = useCallback(() => {
+    setIsPlaying(false)
+    setSelectedAlgorithm(null)
+    setSteps([])
+    setCurrentStep(0)
+  }, [])
+
   const currentStepData = steps[currentStep] || null
 
   return {
@@ -79,6 +86,7 @@ export function usePlayback(locale: Locale) {
     speed,
     setSpeed,
     selectAlgorithm,
+    clearSelection,
     stepForward,
     stepBackward,
     togglePlay,
