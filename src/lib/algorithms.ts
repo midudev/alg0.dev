@@ -450,7 +450,7 @@ Time Complexity:
   Average: O(n log n)
   Worst:   O(n²) — when pivot is always the smallest/largest
 
-Space Complexity: O(log n) — recursive call stack
+Space Complexity: O(log n) average, O(n) worst — recursive call stack
 
 Properties:
   - Not stable
