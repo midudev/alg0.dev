@@ -111,7 +111,7 @@ Mainly used for educational purposes. For production, prefer Quick Sort or Merge
           array: [...arr],
           highlights: { [j]: 'comparing', [j + 1]: 'comparing' },
           sorted: [...sorted],
-          description: `Comparing ${arr[j]} and ${arr[j + 1]}`,
+          description: d(locale, `Comparing ${arr[j]} and ${arr[j + 1]}`, `Comparando ${arr[j]} y ${arr[j + 1]}`),
           codeLine: 5,
           variables: { i, j, n, 'array[j]': arr[j], 'array[j+1]': arr[j + 1] },
         })
@@ -361,7 +361,7 @@ Excellent for small datasets or nearly sorted data. Often used as the base case 
           array: [...arr],
           highlights: { [j]: 'comparing', [j + 1]: 'selected' },
           sorted: [...sorted],
-          description: `${arr[j]} > ${key}, shifting ${arr[j]} to the right`,
+          description: d(locale, `${arr[j]} > ${key}, shifting ${arr[j]} to the right`, `${arr[j]} > ${key}, desplazando ${arr[j]} a la derecha`),
           codeLine: 7,
           variables: { i, j, key, 'array[j]': arr[j] },
         })
@@ -396,7 +396,7 @@ Excellent for small datasets or nearly sorted data. Often used as the base case 
       array: [...arr],
       highlights: {},
       sorted: Array.from({ length: n }, (_, i) => i),
-      description: 'Array is sorted! Insertion Sort complete.',
+      description: d(locale, 'Array is sorted! Insertion Sort complete.', '¡Arreglo ordenado! Insertion Sort completado.'),
       codeLine: 15,
       variables: { array: `[${arr.join(', ')}]` },
     })
@@ -498,7 +498,7 @@ Quick Sort is one of the fastest general-purpose sorting algorithms in practice.
         array: [...arr],
         highlights: { [high]: 'pivot' },
         sorted: [...sorted],
-        description: `Partitioning [${low}..${high}]. Pivot: ${arr[high]}`,
+        description: d(locale, `Partitioning [${low}..${high}]. Pivot: ${arr[high]}`, `Particionando [${low}..${high}]. Pivote: ${arr[high]}`),
         codeLine: 10,
         variables: { low, high, pivot, i },
       })
@@ -650,7 +650,7 @@ Merge Sort guarantees O(n log n) performance regardless of input. Ideal when sta
         array: [...arr],
         highlights: { ...leftH, ...rightH },
         sorted: [],
-        description: `Dividing [${start}..${end}] into [${start}..${mid}] and [${mid + 1}..${end}]`,
+        description: d(locale, `Dividing [${start}..${end}] into [${start}..${mid}] and [${mid + 1}..${end}]`, `Dividiendo [${start}..${end}] en [${start}..${mid}] y [${mid + 1}..${end}]`),
         codeLine: 4,
         variables: { start, end, mid },
       })
@@ -715,7 +715,7 @@ Merge Sort guarantees O(n log n) performance regardless of input. Ideal when sta
       array: [...arr],
       highlights: {},
       sorted: Array.from({ length: n }, (_, i) => i),
-      description: 'Array is sorted! Merge Sort complete.',
+      description: d(locale, 'Array is sorted! Merge Sort complete.', '¡Arreglo ordenado! Merge Sort completado.'),
       codeLine: 1,
       variables: { array: `[${arr.join(', ')}]` },
     })
@@ -847,7 +847,7 @@ Useful when worst-case performance matters and stability is not required.`,
           array: [...arr],
           highlights: { [root]: 'swapped', [largest]: 'swapped' },
           sorted: [...sortedIndices],
-          description: `Swapped ${arr[root]} and ${arr[largest]}`,
+          description: d(locale, `Swapped ${arr[root]} and ${arr[largest]}`, `Intercambiados ${arr[root]} y ${arr[largest]}`),
           codeLine: 33,
           variables: { root, largest },
         })
@@ -917,7 +917,7 @@ Useful when worst-case performance matters and stability is not required.`,
       array: [...arr],
       highlights: {},
       sorted: Array.from({ length: n }, (_, i) => i),
-      description: 'Array is sorted! Heap Sort complete.',
+      description: d(locale, 'Array is sorted! Heap Sort complete.', '¡Arreglo ordenado! Heap Sort completado.'),
       codeLine: 15,
       variables: { array: `[${arr.join(', ')}]` },
     })
@@ -1937,7 +1937,7 @@ BFS guarantees finding the shortest path (fewest edges) between two nodes in an 
         currentEdge: null,
         queue: [0],
       },
-      description: 'Starting BFS from node 0. Added to queue.',
+      description: d(locale, 'Starting BFS from node 0. Added to queue.', 'Iniciando BFS desde el nodo 0. Agregado a la cola.'),
       codeLine: 3,
       variables: { start: 0, queue: '[0]', visited: '{0}', result: '[]' },
     })
@@ -1956,7 +1956,7 @@ BFS guarantees finding the shortest path (fewest edges) between two nodes in an 
           currentEdge: null,
           queue: [...queue],
         },
-        description: `Dequeued node ${node}. Processing neighbors...`,
+        description: d(locale, `Dequeued node ${node}. Processing neighbors...`, `Nodo ${node} desencolado. Procesando vecinos...`),
         codeLine: 8,
         variables: { node, queue: `[${queue.join(', ')}]`, result: `[${visitedNodes.join(', ')}]` },
       })
@@ -1977,7 +1977,7 @@ BFS guarantees finding the shortest path (fewest edges) between two nodes in an 
               currentEdge: [node, neighbor],
               queue: [...queue],
             },
-            description: `Discovered node ${neighbor} via edge ${node}→${neighbor}. Added to queue.`,
+            description: d(locale, `Discovered node ${neighbor} via edge ${node}→${neighbor}. Added to queue.`, `Nodo ${neighbor} descubierto por arista ${node}→${neighbor}. Agregado a la cola.`),
             codeLine: 13,
             variables: {
               node,
@@ -2000,7 +2000,7 @@ BFS guarantees finding the shortest path (fewest edges) between two nodes in an 
         currentEdge: null,
         queue: [],
       },
-      description: `BFS complete! Visit order: ${visitedNodes.join(' → ')}`,
+      description: d(locale, `BFS complete! Visit order: ${visitedNodes.join(' → ')}`, `¡BFS completado! Orden de visita: ${visitedNodes.join(' → ')}`),
       codeLine: 19,
       variables: { result: `[${visitedNodes.join(', ')}]` },
     })
@@ -2076,7 +2076,7 @@ DFS explores deep paths first, which makes it useful for topological sorting and
         currentEdge: null,
         stack: [],
       },
-      description: 'Starting DFS from node 0.',
+      description: d(locale, 'Starting DFS from node 0.', 'Iniciando DFS desde el nodo 0.'),
       codeLine: 16,
       variables: { start: 0, visited: '{}', result: '[]' },
     })
@@ -2096,7 +2096,7 @@ DFS explores deep paths first, which makes it useful for topological sorting and
           currentEdge: null,
           stack: [...stack],
         },
-        description: `Visiting node ${node}. Exploring its neighbors...`,
+        description: d(locale, `Visiting node ${node}. Exploring its neighbors...`, `Visitando nodo ${node}. Explorando sus vecinos...`),
         codeLine: 6,
         variables: {
           node,
@@ -2120,7 +2120,7 @@ DFS explores deep paths first, which makes it useful for topological sorting and
               currentEdge: [node, neighbor],
               stack: [...stack],
             },
-            description: `Exploring edge ${node} → ${neighbor}`,
+            description: d(locale, `Exploring edge ${node} → ${neighbor}`, `Explorando arista ${node} → ${neighbor}`),
             codeLine: 9,
             variables: {
               node,
@@ -2147,7 +2147,7 @@ DFS explores deep paths first, which makes it useful for topological sorting and
             currentEdge: null,
             stack: [...stack],
           },
-          description: `Backtracking from node ${node} to node ${stack[stack.length - 1]}`,
+          description: d(locale, `Backtracking from node ${node} to node ${stack[stack.length - 1]}`, `Retrocediendo del nodo ${node} al nodo ${stack[stack.length - 1]}`),
           codeLine: 12,
           variables: {
             node,
@@ -2170,7 +2170,7 @@ DFS explores deep paths first, which makes it useful for topological sorting and
         currentEdge: null,
         stack: [],
       },
-      description: `DFS complete! Visit order: ${visitedNodes.join(' → ')}`,
+      description: d(locale, `DFS complete! Visit order: ${visitedNodes.join(' → ')}`, `¡DFS completado! Orden de visita: ${visitedNodes.join(' → ')}`),
       codeLine: 17,
       variables: { result: `[${visitedNodes.join(', ')}]` },
     })
@@ -2292,7 +2292,7 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
         currentEdge: null,
         distances: { ...dist },
       },
-      description: 'Starting Dijkstra from node A. All distances set to ∞ except source (0).',
+      description: d(locale, 'Starting Dijkstra from node A. All distances set to ∞ except source (0).', 'Iniciando Dijkstra desde el nodo A. Todas las distancias en ∞ excepto el origen (0).'),
       codeLine: 1,
       variables: { start: 'A', distances: distStr() },
     })
@@ -2322,7 +2322,7 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
           currentEdge: null,
           distances: { ...dist },
         },
-        description: `Pick node ${djNodes[minNode].label} (distance ${dist[minNode]}). Relaxing its neighbors...`,
+        description: d(locale, `Pick node ${djNodes[minNode].label} (distance ${dist[minNode]}). Relaxing its neighbors...`, `Seleccionado nodo ${djNodes[minNode].label} (distancia ${dist[minNode]}). Relajando sus vecinos...`),
         codeLine: 8,
         variables: {
           node: djNodes[minNode].label,
@@ -2352,7 +2352,7 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
               currentEdge: [minNode, neighbor],
               distances: { ...dist },
             },
-            description: `Relaxed ${djNodes[minNode].label}→${djNodes[neighbor].label} (weight ${weight}). Distance to ${djNodes[neighbor].label}: ${oldDist} → ${newDist}`,
+            description: d(locale, `Relaxed ${djNodes[minNode].label}→${djNodes[neighbor].label} (weight ${weight}). Distance to ${djNodes[neighbor].label}: ${oldDist} → ${newDist}`, `Relajado ${djNodes[minNode].label}→${djNodes[neighbor].label} (peso ${weight}). Distancia a ${djNodes[neighbor].label}: ${oldDist} → ${newDist}`),
             codeLine: 20,
             variables: {
               from: djNodes[minNode].label,
@@ -2373,7 +2373,7 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
               currentEdge: [minNode, neighbor],
               distances: { ...dist },
             },
-            description: `Edge ${djNodes[minNode].label}→${djNodes[neighbor].label} (weight ${weight}): ${newDist} ≥ ${oldDist}. No improvement.`,
+            description: d(locale, `Edge ${djNodes[minNode].label}→${djNodes[neighbor].label} (weight ${weight}): ${newDist} ≥ ${oldDist}. No improvement.`, `Arista ${djNodes[minNode].label}→${djNodes[neighbor].label} (peso ${weight}): ${newDist} ≥ ${oldDist}. Sin mejora.`),
             codeLine: 20,
             variables: {
               from: djNodes[minNode].label,
@@ -2397,7 +2397,7 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
         currentEdge: null,
         distances: { ...dist },
       },
-      description: `Dijkstra complete! Shortest distances from A: ${distStr()}`,
+      description: d(locale, `Dijkstra complete! Shortest distances from A: ${distStr()}`, `¡Dijkstra completado! Distancias más cortas desde A: ${distStr()}`),
       codeLine: 26,
       variables: { distances: distStr() },
     })
@@ -2523,7 +2523,7 @@ Prim's Algorithm is a greedy algorithm that always picks the locally optimal edg
         currentEdge: null,
         distances: { ...key },
       },
-      description: "Starting Prim's MST from node A. All key values set to ∞ except source (0).",
+      description: d(locale, "Starting Prim's MST from node A. All key values set to ∞ except source (0).", 'Iniciando MST de Prim desde el nodo A. Todos los valores clave en ∞ excepto el origen (0).'),
       codeLine: 1,
       variables: { start: 'A', keys: keyStr() },
     })
@@ -2560,8 +2560,8 @@ Prim's Algorithm is a greedy algorithm that always picks the locally optimal edg
         },
         description:
           parent[minNode] !== null
-            ? `Added ${prNodes[minNode].label} to MST via edge ${prNodes[parent[minNode]!].label}→${prNodes[minNode].label} (weight ${key[minNode]})`
-            : `Starting MST from node ${prNodes[minNode].label}`,
+            ? d(locale, `Added ${prNodes[minNode].label} to MST via edge ${prNodes[parent[minNode]!].label}→${prNodes[minNode].label} (weight ${key[minNode]})`, `${prNodes[minNode].label} agregado al MST por arista ${prNodes[parent[minNode]!].label}→${prNodes[minNode].label} (peso ${key[minNode]})`)
+            : d(locale, `Starting MST from node ${prNodes[minNode].label}`, `Iniciando MST desde el nodo ${prNodes[minNode].label}`),
         codeLine: 8,
         variables: { node: prNodes[minNode].label, key: key[minNode] as number, keys: keyStr() },
       })
@@ -2585,7 +2585,7 @@ Prim's Algorithm is a greedy algorithm that always picks the locally optimal edg
               currentEdge: [minNode, neighbor],
               distances: { ...key },
             },
-            description: `Updated key of ${prNodes[neighbor].label}: ${oldKey} → ${weight} (via ${prNodes[minNode].label})`,
+            description: d(locale, `Updated key of ${prNodes[neighbor].label}: ${oldKey} → ${weight} (via ${prNodes[minNode].label})`, `Clave de ${prNodes[neighbor].label} actualizada: ${oldKey} → ${weight} (vía ${prNodes[minNode].label})`),
             codeLine: 21,
             variables: {
               from: prNodes[minNode].label,
@@ -2616,7 +2616,7 @@ Prim's Algorithm is a greedy algorithm that always picks the locally optimal edg
         currentEdge: null,
         distances: { ...key },
       },
-      description: `Prim's complete! MST total weight: ${totalWeight}. Edges: ${visitedEdges.map(([f, t]) => `${prNodes[f].label}-${prNodes[t].label}`).join(', ')}`,
+      description: d(locale, `Prim's complete! MST total weight: ${totalWeight}. Edges: ${visitedEdges.map(([f, t]) => `${prNodes[f].label}-${prNodes[t].label}`).join(', ')}`, `¡Prim completado! Peso total del MST: ${totalWeight}. Aristas: ${visitedEdges.map(([f, t]) => `${prNodes[f].label}-${prNodes[t].label}`).join(', ')}`),
       codeLine: 28,
       variables: { totalWeight, mstEdges: visitedEdges.length },
     })
@@ -2741,7 +2741,7 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
         currentEdge: null,
         queue: [],
       },
-      description: `DAG with ${tsNodes.length} nodes. Computing in-degrees for Kahn's algorithm.`,
+      description: d(locale, `DAG with ${tsNodes.length} nodes. Computing in-degrees for Kahn's algorithm.`, `DAG con ${tsNodes.length} nodos. Calculando grados de entrada para el algoritmo de Kahn.`),
       codeLine: 1,
       variables: { inDegrees: inDegStr() },
     })
@@ -2761,7 +2761,7 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
         currentEdge: null,
         queue: [...queue],
       },
-      description: `Nodes with in-degree 0: [${queue.map((id) => tsNodes[id].label).join(', ')}]. Added to queue.`,
+      description: d(locale, `Nodes with in-degree 0: [${queue.map((id) => tsNodes[id].label).join(', ')}]. Added to queue.`, `Nodos con grado de entrada 0: [${queue.map((id) => tsNodes[id].label).join(', ')}]. Agregados a la cola.`),
       codeLine: 12,
       variables: {
         queue: `[${queue.map((id) => tsNodes[id].label).join(', ')}]`,
@@ -2784,7 +2784,7 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
           currentEdge: null,
           queue: [...queue],
         },
-        description: `Dequeued ${tsNodes[node].label}. Order: [${order.map((id) => tsNodes[id].label).join(', ')}]`,
+        description: d(locale, `Dequeued ${tsNodes[node].label}. Order: [${order.map((id) => tsNodes[id].label).join(', ')}]`, `${tsNodes[node].label} desencolado. Orden: [${order.map((id) => tsNodes[id].label).join(', ')}]`),
         codeLine: 18,
         variables: {
           node: tsNodes[node].label,
@@ -2811,7 +2811,7 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
             currentEdge: [node, neighbor],
             queue: [...queue],
           },
-          description: `Reduced in-degree of ${tsNodes[neighbor].label} to ${inDegree[neighbor]}${inDegree[neighbor] === 0 ? ' → added to queue' : ''}`,
+          description: d(locale, `Reduced in-degree of ${tsNodes[neighbor].label} to ${inDegree[neighbor]}${inDegree[neighbor] === 0 ? ' → added to queue' : ''}`, `Grado de entrada de ${tsNodes[neighbor].label} reducido a ${inDegree[neighbor]}${inDegree[neighbor] === 0 ? ' → agregado a la cola' : ''}`),
           codeLine: 22,
           variables: {
             from: tsNodes[node].label,
@@ -2833,7 +2833,7 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
         currentEdge: null,
         queue: [],
       },
-      description: `Topological sort complete! Order: ${order.map((id) => tsNodes[id].label).join(' → ')}`,
+      description: d(locale, `Topological sort complete! Order: ${order.map((id) => tsNodes[id].label).join(' → ')}`, `¡Ordenamiento topológico completado! Orden: ${order.map((id) => tsNodes[id].label).join(' → ')}`),
       codeLine: 30,
       variables: { order: `[${order.map((id) => tsNodes[id].label).join(', ')}]` },
     })
@@ -2943,7 +2943,7 @@ The N-Queens problem is a classic example of backtracking algorithms and constra
       return h
     }
 
-    makeStep({}, `Empty ${N}x${N} board. Place ${N} queens with no conflicts.`, 1, { n: N })
+    makeStep({}, d(locale, `Empty ${N}x${N} board. Place ${N} queens with no conflicts.`, `Tablero ${N}x${N} vacío. Colocar ${N} reinas sin conflictos.`), 1, { n: N })
 
     function isSafe(row: number, col: number): boolean {
       for (let i = 0; i < row; i++) {
@@ -2969,14 +2969,14 @@ The N-Queens problem is a classic example of backtracking algorithms and constra
         if (isSafe(row, col)) {
           board[row][col] = 'Q'
           const ph = getQueenHighlights()
-          makeStep(ph, `Placed queen at (${row}, ${col})`, 22, { row, col, isSafe: true })
+          makeStep(ph, d(locale, `Placed queen at (${row}, ${col})`, `Reina colocada en (${row}, ${col})`), 22, { row, col, isSafe: true })
 
           if (solve(row + 1)) return true
 
           board[row][col] = 0
           const rh = getQueenHighlights()
           rh[`${row},${col}`] = 'conflict'
-          makeStep(rh, `Backtracking: removed queen from (${row}, ${col})`, 24, {
+          makeStep(rh, d(locale, `Backtracking: removed queen from (${row}, ${col})`, `Backtracking: reina removida de (${row}, ${col})`), 24, {
             row,
             col,
             action: 'backtrack',
@@ -2984,7 +2984,7 @@ The N-Queens problem is a classic example of backtracking algorithms and constra
         } else {
           const ch = getQueenHighlights()
           ch[`${row},${col}`] = 'conflict'
-          makeStep(ch, `(${row}, ${col}) not safe — conflicts with existing queen`, 21, {
+          makeStep(ch, d(locale, `(${row}, ${col}) not safe — conflicts with existing queen`, `(${row}, ${col}) no es seguro — conflicto con reina existente`), 21, {
             row,
             col,
             isSafe: false,
@@ -3003,7 +3003,7 @@ The N-Queens problem is a classic example of backtracking algorithms and constra
         if (board[r][c] === 'Q') fh[`${r},${c}`] = 'found'
       }
     }
-    makeStep(fh, `Solution found! All ${N} queens placed without conflicts.`, 29, {
+    makeStep(fh, d(locale, `Solution found! All ${N} queens placed without conflicts.`, `¡Solución encontrada! Las ${N} reinas colocadas sin conflictos.`), 29, {
       n: N,
       solved: true,
     })
@@ -3054,8 +3054,7 @@ This approach avoids the exponential time of naive recursion by storing previous
       array: [...arr],
       highlights: { 0: 'sorted', 1: 'sorted' },
       sorted: [0, 1],
-      description:
-        'Initial array: dp[0]=0, dp[1]=1. Fill remaining using dp[i] = dp[i-1] + dp[i-2].',
+      description: d(locale, 'Initial array: dp[0]=0, dp[1]=1. Fill remaining using dp[i] = dp[i-1] + dp[i-2].', 'Arreglo inicial: dp[0]=0, dp[1]=1. Rellenar usando dp[i] = dp[i-1] + dp[i-2].'),
       codeLine: 1,
       variables: { n, 'dp[0]': 0, 'dp[1]': 1 },
     })
@@ -3065,7 +3064,7 @@ This approach avoids the exponential time of naive recursion by storing previous
         array: [...arr],
         highlights: { [i - 1]: 'comparing', [i - 2]: 'comparing', [i]: 'current' },
         sorted: [...sorted],
-        description: `Computing dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${arr[i - 1]} + ${arr[i - 2]}`,
+        description: d(locale, `Computing dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${arr[i - 1]} + ${arr[i - 2]}`, `Calculando dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${arr[i - 1]} + ${arr[i - 2]}`),
         codeLine: 5,
         variables: { i, 'dp[i-1]': arr[i - 1], 'dp[i-2]': arr[i - 2] },
       })
@@ -3077,7 +3076,7 @@ This approach avoids the exponential time of naive recursion by storing previous
         array: [...arr],
         highlights: { [i]: 'sorted' },
         sorted: [...sorted],
-        description: `dp[${i}] = ${arr[i]}`,
+        description: d(locale, `dp[${i}] = ${arr[i]}`, `dp[${i}] = ${arr[i]}`),
         codeLine: 5,
         variables: { i, 'dp[i]': arr[i] },
       })
@@ -3087,7 +3086,7 @@ This approach avoids the exponential time of naive recursion by storing previous
       array: [...arr],
       highlights: {},
       sorted: Array.from({ length: n + 1 }, (_, i) => i),
-      description: `Fibonacci sequence complete! F(${n}) = ${arr[n]}`,
+      description: d(locale, `Fibonacci sequence complete! F(${n}) = ${arr[n]}`, `¡Secuencia de Fibonacci completa! F(${n}) = ${arr[n]}`),
       codeLine: 8,
       variables: { n, 'F(n)': arr[n], dp: `[${arr.join(', ')}]` },
     })
@@ -3156,7 +3155,7 @@ Classic DP optimization problem used in resource allocation, budgeting, and carg
         values: dp.map((r) => [...r]),
         highlights: {},
       },
-      description: 'DP table initialized to 0. Rows = items (0..4), Cols = capacity (0..8).',
+      description: d(locale, 'DP table initialized to 0. Rows = items (0..4), Cols = capacity (0..8).', 'Tabla DP inicializada en 0. Filas = artículos (0..4), Columnas = capacidad (0..8).'),
       codeLine: 1,
       variables: { weights: '[2,3,4,5]', values: '[3,4,5,6]', capacity },
     })
@@ -3180,7 +3179,7 @@ Classic DP optimization problem used in resource allocation, budgeting, and carg
               values: dp.map((r) => [...r]),
               highlights: h,
             },
-            description: `Item ${i} (w=${weights[i - 1]}, v=${values[i - 1]}), cap=${w}: max(skip=${skip}, take=${take}) = ${dp[i][w]}`,
+            description: d(locale, `Item ${i} (w=${weights[i - 1]}, v=${values[i - 1]}), cap=${w}: max(skip=${skip}, take=${take}) = ${dp[i][w]}`, `Artículo ${i} (p=${weights[i - 1]}, v=${values[i - 1]}), cap=${w}: max(omitir=${skip}, tomar=${take}) = ${dp[i][w]}`),
             codeLine: 9,
             variables: { i, w, skip, take, 'dp[i][w]': dp[i][w] },
           })
@@ -3195,7 +3194,7 @@ Classic DP optimization problem used in resource allocation, budgeting, and carg
               values: dp.map((r) => [...r]),
               highlights: h,
             },
-            description: `Item ${i} (w=${weights[i - 1]}) too heavy for cap=${w}. dp[${i}][${w}] = ${dp[i][w]}`,
+            description: d(locale, `Item ${i} (w=${weights[i - 1]}) too heavy for cap=${w}. dp[${i}][${w}] = ${dp[i][w]}`, `Artículo ${i} (p=${weights[i - 1]}) muy pesado para cap=${w}. dp[${i}][${w}] = ${dp[i][w]}`),
             codeLine: 14,
             variables: { i, w, weight: weights[i - 1], 'dp[i][w]': dp[i][w] },
           })
@@ -3212,7 +3211,7 @@ Classic DP optimization problem used in resource allocation, budgeting, and carg
         values: dp.map((r) => [...r]),
         highlights: finalH,
       },
-      description: `Knapsack complete! Maximum value: ${dp[n][capacity]}`,
+      description: d(locale, `Knapsack complete! Maximum value: ${dp[n][capacity]}`, `¡Mochila completada! Valor máximo: ${dp[n][capacity]}`),
       codeLine: 20,
       variables: { max_value: dp[n][capacity] },
     })
@@ -3279,7 +3278,7 @@ Used in diff tools, DNA sequence alignment, version control systems, and spell c
         values: dp.map((r) => [...r]),
         highlights: {},
       },
-      description: `DP table initialized. Comparing "${str1}" (rows) with "${str2}" (cols).`,
+      description: d(locale, `DP table initialized. Comparing "${str1}" (rows) with "${str2}" (cols).`, `Tabla DP inicializada. Comparando "${str1}" (filas) con "${str2}" (columnas).`),
       codeLine: 1,
       variables: { str1, str2, m, n },
     })
@@ -3300,7 +3299,7 @@ Used in diff tools, DNA sequence alignment, version control systems, and spell c
               values: dp.map((r) => [...r]),
               highlights: { ...h, [`${i},${j}`]: 'found' },
             },
-            description: `'${str1[i - 1]}' = '${str2[j - 1]}' — Match! dp[${i}][${j}] = dp[${i - 1}][${j - 1}] + 1 = ${dp[i][j]}`,
+            description: d(locale, `'${str1[i - 1]}' = '${str2[j - 1]}' — Match! dp[${i}][${j}] = dp[${i - 1}][${j - 1}] + 1 = ${dp[i][j]}`, `'${str1[i - 1]}' = '${str2[j - 1]}' — ¡Coincidencia! dp[${i}][${j}] = dp[${i - 1}][${j - 1}] + 1 = ${dp[i][j]}`),
             codeLine: 10,
             variables: { i, j, char1: str1[i - 1], char2: str2[j - 1], 'dp[i][j]': dp[i][j] },
           })
@@ -3316,7 +3315,7 @@ Used in diff tools, DNA sequence alignment, version control systems, and spell c
               values: dp.map((r) => [...r]),
               highlights: h,
             },
-            description: `'${str1[i - 1]}' ≠ '${str2[j - 1]}' — dp[${i}][${j}] = max(${dp[i - 1][j]}, ${dp[i][j - 1]}) = ${dp[i][j]}`,
+            description: d(locale, `'${str1[i - 1]}' ≠ '${str2[j - 1]}' — dp[${i}][${j}] = max(${dp[i - 1][j]}, ${dp[i][j - 1]}) = ${dp[i][j]}`, `'${str1[i - 1]}' ≠ '${str2[j - 1]}' — dp[${i}][${j}] = max(${dp[i - 1][j]}, ${dp[i][j - 1]}) = ${dp[i][j]}`),
             codeLine: 12,
             variables: { i, j, char1: str1[i - 1], char2: str2[j - 1], 'dp[i][j]': dp[i][j] },
           })
@@ -3333,7 +3332,7 @@ Used in diff tools, DNA sequence alignment, version control systems, and spell c
         values: dp.map((r) => [...r]),
         highlights: finalH,
       },
-      description: `LCS complete! Length of longest common subsequence: ${dp[m][n]}`,
+      description: d(locale, `LCS complete! Length of longest common subsequence: ${dp[m][n]}`, `¡LCS completado! Longitud de la subsecuencia común más larga: ${dp[m][n]}`),
       codeLine: 18,
       variables: { LCS_length: dp[m][n] },
     })
@@ -3439,8 +3438,7 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
         values: displayBoard(),
         highlights: getHighlights(),
       },
-      description:
-        '4×4 Sudoku puzzle. Fill with numbers 1-4, no repeats in rows, columns, or 2×2 boxes.',
+      description: d(locale, '4×4 Sudoku puzzle. Fill with numbers 1-4, no repeats in rows, columns, or 2×2 boxes.', 'Sudoku 4×4. Rellenar con números 1-4, sin repetir en filas, columnas o cajas 2×2.'),
       codeLine: 1,
       variables: { size: 4, boxSize: 2 },
     })
@@ -3479,7 +3477,7 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
                   values: tryValues,
                   highlights: tryH,
                 },
-                description: `Trying ${num} at (${r}, ${c})`,
+                description: d(locale, `Trying ${num} at (${r}, ${c})`, `Probando ${num} en (${r}, ${c})`),
                 codeLine: 22,
                 variables: { row: r, col: c, num },
               })
@@ -3495,7 +3493,7 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
                     values: displayBoard(),
                     highlights: ph,
                   },
-                  description: `Placed ${num} at (${r}, ${c}) — valid!`,
+                  description: d(locale, `Placed ${num} at (${r}, ${c}) — valid!`, `${num} colocado en (${r}, ${c}) — ¡válido!`),
                   codeLine: 24,
                   variables: { row: r, col: c, num, valid: true },
                 })
@@ -3513,7 +3511,7 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
                     values: displayBoard(),
                     highlights: bh,
                   },
-                  description: `Backtrack: removed ${num} from (${r}, ${c})`,
+                  description: d(locale, `Backtrack: removed ${num} from (${r}, ${c})`, `Backtrack: ${num} removido de (${r}, ${c})`),
                   codeLine: 26,
                   variables: { row: r, col: c, num, action: 'backtrack' },
                 })
@@ -3528,7 +3526,7 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
                     values: displayBoard(),
                     highlights: ch,
                   },
-                  description: `${num} at (${r}, ${c}) — conflict!`,
+                  description: d(locale, `${num} at (${r}, ${c}) — conflict!`, `${num} en (${r}, ${c}) — ¡conflicto!`),
                   codeLine: 23,
                   variables: { row: r, col: c, num, valid: false },
                 })
@@ -3556,7 +3554,7 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
         values: displayBoard(),
         highlights: finalH,
       },
-      description: 'Sudoku solved! All cells filled with valid numbers.',
+      description: d(locale, 'Sudoku solved! All cells filled with valid numbers.', '¡Sudoku resuelto! Todas las celdas llenas con números válidos.'),
       codeLine: 33,
       variables: { solved: true },
     })
@@ -3676,7 +3674,7 @@ BFS guarantees the shortest path in an unweighted grid. Used in robotics, game A
         values: toDisplayValues(),
         highlights: initH,
       },
-      description: 'Maze initialized. Finding shortest path from S(0,0) to E(5,5) using BFS.',
+      description: d(locale, 'Maze initialized. Finding shortest path from S(0,0) to E(5,5) using BFS.', 'Laberinto inicializado. Buscando el camino más corto de S(0,0) a E(5,5) usando BFS.'),
       codeLine: 1,
       variables: { start: '(0,0)', end: '(5,5)', rows, cols },
     })
@@ -3717,7 +3715,7 @@ BFS guarantees the shortest path in an unweighted grid. Used in robotics, game A
           values: toDisplayValues(),
           highlights: h,
         },
-        description: `Exploring cell (${cr}, ${cc})`,
+        description: d(locale, `Exploring cell (${cr}, ${cc})`, `Explorando celda (${cr}, ${cc})`),
         codeLine: 14,
         variables: { row: cr, col: cc, queueSize: queue.length },
       })
@@ -3773,7 +3771,7 @@ BFS guarantees the shortest path in an unweighted grid. Used in robotics, game A
           values: toDisplayValues(),
           highlights: pathH,
         },
-        description: `Path found! Length: ${path.length}. Route: ${path.map(([r, c]) => `(${r},${c})`).join(' → ')}`,
+        description: d(locale, `Path found! Length: ${path.length}. Route: ${path.map(([r, c]) => `(${r},${c})`).join(' → ')}`, `¡Camino encontrado! Longitud: ${path.length}. Ruta: ${path.map(([r, c]) => `(${r},${c})`).join(' → ')}`),
         codeLine: 22,
         variables: { pathLength: path.length },
       })
@@ -3856,7 +3854,7 @@ The minimum number of moves for n disks is 2^n - 1. For 3 disks, that's 7 moves.
         values: pegsToMatrix(),
         highlights: getAllHighlights(),
       },
-      description: `Tower of Hanoi: Move ${numDisks} disks from peg 0 to peg 2. Disks: 3 (large), 2 (medium), 1 (small).`,
+      description: d(locale, `Tower of Hanoi: Move ${numDisks} disks from peg 0 to peg 2. Disks: 3 (large), 2 (medium), 1 (small).`, `Torre de Hanoi: Mover ${numDisks} discos de la torre 0 a la torre 2. Discos: 3 (grande), 2 (mediano), 1 (pequeño).`),
       codeLine: 1,
       variables: { n: numDisks, source: 0, target: 2, auxiliary: 1 },
     })
@@ -3893,7 +3891,7 @@ The minimum number of moves for n disks is 2^n - 1. For 3 disks, that's 7 moves.
           values: pegsToMatrix(),
           highlights: h,
         },
-        description: `Move ${moveCount}: disk ${disk} from peg ${source} → peg ${target}`,
+        description: d(locale, `Move ${moveCount}: disk ${disk} from peg ${source} → peg ${target}`, `Movimiento ${moveCount}: disco ${disk} de torre ${source} → torre ${target}`),
         codeLine: 8,
         variables: { move: moveCount, disk, from: source, to: target },
       })
@@ -3914,7 +3912,7 @@ The minimum number of moves for n disks is 2^n - 1. For 3 disks, that's 7 moves.
         values: pegsToMatrix(),
         highlights: finalH,
       },
-      description: `Tower of Hanoi complete! All ${numDisks} disks moved to peg 2 in ${moveCount} moves.`,
+      description: d(locale, `Tower of Hanoi complete! All ${numDisks} disks moved to peg 2 in ${moveCount} moves.`, `¡Torre de Hanoi completada! Los ${numDisks} discos movidos a la torre 2 en ${moveCount} movimientos.`),
       codeLine: 14,
       variables: { totalMoves: moveCount, n: numDisks },
     })
