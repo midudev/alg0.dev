@@ -236,6 +236,7 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={1.5}
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -425,7 +426,7 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
         />
 
         {/* Right: Language switcher + code panel toggle */}
-        <div className="min-w-[260px] flex items-center justify-end gap-2" aria-hidden="false">
+        <div className="min-w-[260px] flex items-center justify-end gap-2">
           {codePanelCollapsed && (
             <button
               onClick={() => {
@@ -451,7 +452,7 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
               </svg>
             </button>
           )}
-          <div className="flex items-center gap-0.5 bg-white/[0.04] rounded-lg p-0.5 border border-white/[0.08]">
+          <nav aria-label={locale === 'es' ? 'Idioma' : 'Language'} className="flex items-center gap-0.5 bg-white/[0.04] rounded-lg p-0.5 border border-white/[0.08]">
             {locales.map((l) => (
               <a
                 key={l}
@@ -462,25 +463,28 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
                     : 'text-neutral-500 hover:text-white hover:bg-white/[0.06]'
                 }`}
                 aria-label={localeNames[l]}
-                aria-current={l === locale ? 'true' : undefined}
+                aria-current={l === locale ? 'page' : undefined}
+                lang={l}
               >
                 {l.toUpperCase()}
               </a>
             ))}
-          </div>
+          </nav>
         </div>
       </header>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
-        <div className="relative shrink-0 flex" aria-label="Algorithm categories">
+        <div className="relative shrink-0 flex">
           <aside
             className={`bg-black overflow-hidden ${
               isDraggingSidebar ? '' : 'transition-all duration-300 ease-in-out'
             }`}
             style={{ width: isDraggingSidebar ? sidebarWidth : sidebarCollapsed ? 0 : SIDEBAR_MAX }}
+            aria-label={locale === 'es' ? 'Categorías de algoritmos' : 'Algorithm categories'}
             aria-hidden={sidebarCollapsed}
+            inert={sidebarCollapsed || undefined}
           >
             <div
               className="h-full flex flex-col"
@@ -508,6 +512,17 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
               sidebarCollapsed && !isDraggingSidebar ? 'hidden' : ''
             }`}
             onMouseDown={handleSidebarDragStart}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={t.resizeSidebar}
+            tabIndex={sidebarCollapsed ? -1 : 0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setSidebarCollapsed(true)
+                setSidebarWidth(0)
+              }
+            }}
           >
             <div
               className={`absolute inset-y-0 -left-[2px] w-[5px] z-20 ${
@@ -540,13 +555,24 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
         </main>
 
         {/* Code Panel */}
-        <div className="relative shrink-0 flex" aria-label="Code and details panel">
+        <div className="relative shrink-0 flex">
           {/* Drag handle */}
           <div
             className={`w-[1px] shrink-0 cursor-col-resize group relative select-none ${
               codePanelCollapsed && !isDraggingCodePanel ? 'hidden' : ''
             }`}
             onMouseDown={handleCodePanelDragStart}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={t.resizeCodePanel}
+            tabIndex={codePanelCollapsed ? -1 : 0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setCodePanelCollapsed(true)
+                setCodePanelWidth(0)
+              }
+            }}
           >
             <div
               className={`absolute inset-y-0 -right-[2px] w-[5px] z-20 ${
@@ -560,7 +586,9 @@ export default function AlgoViz({ locale = 'en' }: AlgoVizProps) {
               isDraggingCodePanel ? '' : 'transition-all duration-300 ease-in-out'
             }`}
             style={{ width: isDraggingCodePanel ? codePanelWidth : codePanelCollapsed ? 0 : CODEPANEL_MAX }}
+            aria-label={locale === 'es' ? 'Panel de código y detalles' : 'Code and details panel'}
             aria-hidden={codePanelCollapsed}
+            inert={codePanelCollapsed || undefined}
           >
             <div
               className="h-full flex flex-col"
