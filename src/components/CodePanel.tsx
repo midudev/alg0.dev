@@ -129,7 +129,18 @@ export default function CodePanel({
       <div
         className="flex border-b border-white/[0.08] shrink-0"
         role="tablist"
-        aria-label="Code and details tabs"
+        aria-label={locale === 'es' ? 'Pestañas de código y detalles' : 'Code and details tabs'}
+        onKeyDown={(e) => {
+          const tabs = ['code', 'about'] as const
+          const currentIndex = tabs.indexOf(activeTab)
+          if (e.key === 'ArrowRight') {
+            e.preventDefault()
+            onTabChange(tabs[(currentIndex + 1) % tabs.length])
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault()
+            onTabChange(tabs[(currentIndex - 1 + tabs.length) % tabs.length])
+          }
+        }}
       >
         {(['code', 'about'] as const).map((tab) => (
           <button
@@ -205,7 +216,7 @@ export default function CodePanel({
 
           {/* Variables panel */}
           {variables && Object.keys(variables).length > 0 && (
-            <div className="shrink-0 border-t border-white/[0.08]">
+            <div className="shrink-0 border-t border-white/[0.08]" role="region" aria-label={t.variables}>
               <div className="px-4 py-2 flex items-center gap-2">
                 <div className="flex items-center gap-1.5">
                   <svg
@@ -214,6 +225,7 @@ export default function CodePanel({
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2}
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -222,18 +234,19 @@ export default function CodePanel({
                     />
                   </svg>
                   <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
-                    Variables
+                    {t.variables}
                   </span>
                 </div>
               </div>
-              <div className="px-4 pb-3 flex flex-wrap gap-x-3 gap-y-1.5">
+              <div className="px-4 pb-3 flex flex-wrap gap-x-3 gap-y-1.5" aria-live="polite">
                 {Object.entries(variables).map(([name, value]) => (
                   <div
                     key={name}
                     className="inline-flex items-center gap-1.5 text-[12px] font-mono"
                   >
                     <span className="text-neutral-300">{name}</span>
-                    <span className="text-neutral-600">=</span>
+                    <span className="text-neutral-600" aria-hidden="true">=</span>
+                    <span className="sr-only">=</span>
                     <span
                       className={`font-medium ${
                         typeof value === 'number'
@@ -267,57 +280,77 @@ export default function CodePanel({
           aria-labelledby="tab-about"
         >
           <article className="text-[13px] text-neutral-400 leading-relaxed whitespace-pre-wrap font-[inherit]">
-            {description.split('\n').map((line, i) => {
-              if (i === 0 && line.trim()) {
-                return (
-                  <h3 key={i} className="text-lg font-semibold text-white mb-4 font-heading">
-                    {line}
-                  </h3>
-                )
+            {(() => {
+              const lines = description.split('\n')
+              const elements: JSX.Element[] = []
+              let listItems: JSX.Element[] = []
+
+              const flushList = () => {
+                if (listItems.length > 0) {
+                  elements.push(
+                    <ul key={`list-${elements.length}`} className="list-none m-0 p-0" role="list">
+                      {listItems}
+                    </ul>,
+                  )
+                  listItems = []
+                }
               }
-              if (line.match(/^[A-ZÁ-Ú][a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+:$/)) {
-                return (
-                  <h4
-                    key={i}
-                    className="text-sm font-semibold text-neutral-200 mt-5 mb-2 font-heading"
-                  >
-                    {line}
-                  </h4>
-                )
-              }
-              if (line.trim().startsWith('-') || line.trim().startsWith('•')) {
-                return (
-                  <div key={i} className="flex gap-2 ml-2 my-0.5" role="listitem">
-                    <span className="text-neutral-600 shrink-0" aria-hidden="true">
-                      {'•'}
-                    </span>
-                    <span>{line.trim().replace(/^[-•]\s*/, '')}</span>
-                  </div>
-                )
-              }
-              if (line.match(/^\s{2,}/)) {
-                return (
-                  <div key={i} className="font-mono text-xs text-neutral-500 ml-4 my-0.5">
-                    {line.trim()}
-                  </div>
-                )
-              }
-              if (line.trim().match(/^\d+\./)) {
-                return (
-                  <div key={i} className="flex gap-2 ml-2 my-0.5">
-                    <span>{line.trim()}</span>
-                  </div>
-                )
-              }
-              if (!line.trim()) {
-                return <div key={i} className="h-2" />
-              }
-              return (
-                <p key={i} className="my-1">
-                  {line}
-                </p>
-              )
-            })}
+
+              lines.forEach((line, i) => {
+                const isBullet = line.trim().startsWith('-') || line.trim().startsWith('\u2022')
+
+                if (!isBullet) flushList()
+
+                if (i === 0 && line.trim()) {
+                  elements.push(
+                    <h3 key={i} className="text-lg font-semibold text-white mb-4 font-heading">
+                      {line}
+                    </h3>,
+                  )
+                } else if (line.match(/^[A-Z\u00C1-\u00DA][a-zA-Z\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\s]+:$/)) {
+                  elements.push(
+                    <h4
+                      key={i}
+                      className="text-sm font-semibold text-neutral-200 mt-5 mb-2 font-heading"
+                    >
+                      {line}
+                    </h4>,
+                  )
+                } else if (isBullet) {
+                  listItems.push(
+                    <li key={i} className="flex gap-2 ml-2 my-0.5">
+                      <span className="text-neutral-600 shrink-0" aria-hidden="true">
+                        {'\u2022'}
+                      </span>
+                      <span>{line.trim().replace(/^[-\u2022]\s*/, '')}</span>
+                    </li>,
+                  )
+                } else if (line.match(/^\s{2,}/)) {
+                  elements.push(
+                    <div key={i} className="font-mono text-xs text-neutral-500 ml-4 my-0.5">
+                      {line.trim()}
+                    </div>,
+                  )
+                } else if (line.trim().match(/^\d+\./)) {
+                  elements.push(
+                    <div key={i} className="flex gap-2 ml-2 my-0.5">
+                      <span>{line.trim()}</span>
+                    </div>,
+                  )
+                } else if (!line.trim()) {
+                  elements.push(<div key={i} className="h-2" />)
+                } else {
+                  elements.push(
+                    <p key={i} className="my-1">
+                      {line}
+                    </p>,
+                  )
+                }
+              })
+
+              flushList()
+              return elements
+            })()}
           </article>
         </div>
       )}
