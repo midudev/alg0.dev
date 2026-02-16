@@ -33,21 +33,21 @@ export default function Controls({
     'p-1.5 rounded-md hover:bg-white/[0.08] disabled:opacity-20 disabled:hover:bg-transparent transition-all text-neutral-500 hover:text-white active:scale-95'
 
   return (
-    <div className="flex items-center gap-5">
+    <div className="flex items-center gap-5" role="toolbar" aria-label={t.controlsLabel}>
       {/* Playback buttons */}
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center gap-0.5" role="group" aria-label={t.controlsLabel}>
         {/* Step backward */}
         <button
           onClick={onStepBackward}
           disabled={disabled || currentStep <= 0}
           className={btnClass}
-          title={t.stepBackward}
+          aria-label={t.stepBackward}
         >
           <svg
             className="w-4 h-4"
             viewBox="0 0 16 16"
             fill="currentColor"
-            style={{ color: 'currentcolor' }}
+            aria-hidden="true"
           >
             <path
               fillRule="evenodd"
@@ -63,15 +63,15 @@ export default function Controls({
           onClick={onTogglePlay}
           disabled={disabled}
           className="w-8 h-8 rounded-full bg-white hover:bg-neutral-200 disabled:bg-neutral-800 disabled:text-neutral-600 flex items-center justify-center transition-all active:scale-95 mx-1"
-          title={t.playPause}
+          aria-label={isPlaying ? t.playPause : t.playPause}
         >
           {isPlaying ? (
-            <svg className="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor">
+            <svg className="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <rect x="6" y="5" width="4" height="14" rx="1" />
               <rect x="14" y="5" width="4" height="14" rx="1" />
             </svg>
           ) : (
-            <svg className="w-3 h-3 text-black" viewBox="0 0 16 16" fill="currentColor">
+            <svg className="w-3 h-3 text-black" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -87,13 +87,13 @@ export default function Controls({
           onClick={onStepForward}
           disabled={disabled || currentStep >= totalSteps - 1}
           className={btnClass}
-          title={t.stepForward}
+          aria-label={t.stepForward}
         >
           <svg
             className="w-4 h-4"
             viewBox="0 0 16 16"
             fill="currentColor"
-            style={{ color: 'currentcolor' }}
+            aria-hidden="true"
           >
             <path
               fillRule="evenodd"
@@ -108,7 +108,7 @@ export default function Controls({
       {/* Progress bar + counter */}
       <div className="flex items-center gap-3">
         <div className="relative w-36 group cursor-pointer">
-          <div className="h-0.5 bg-white/[0.08] rounded-full overflow-hidden">
+          <div className="h-0.5 bg-white/[0.08] rounded-full overflow-hidden" aria-hidden="true">
             <div
               className="h-full bg-white rounded-full transition-all duration-200"
               style={{
@@ -123,17 +123,25 @@ export default function Controls({
             value={currentStep}
             onChange={(e) => onStepChange(Number(e.target.value))}
             disabled={disabled}
+            aria-label={
+              totalSteps > 0
+                ? t.progressStep.replace('{current}', String(currentStep + 1)).replace('{total}', String(totalSteps))
+                : t.progressStep.replace('{current}', '0').replace('{total}', '0')
+            }
+            aria-valuemin={0}
+            aria-valuemax={Math.max(totalSteps - 1, 0)}
+            aria-valuenow={currentStep}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-default"
           />
         </div>
-        <span className="text-[11px] text-neutral-600 font-mono tabular-nums min-w-[55px] text-right">
+        <span className="text-[11px] text-neutral-600 font-mono tabular-nums min-w-[55px] text-right" aria-hidden="true">
           {totalSteps > 0 ? `${currentStep + 1} / ${totalSteps}` : '\u2014 / \u2014'}
         </span>
       </div>
 
       {/* Speed */}
       <div className="flex items-center gap-2">
-        <span className="text-[10px] text-neutral-600 uppercase tracking-wider font-medium">
+        <span className="text-[10px] text-neutral-600 uppercase tracking-wider font-medium" id="speed-label">
           {t.speed}
         </span>
         <input
@@ -142,6 +150,12 @@ export default function Controls({
           max={5}
           value={speed}
           onChange={(e) => onSpeedChange(Number(e.target.value))}
+          aria-labelledby="speed-label"
+          aria-label={t.speedLevel.replace('{n}', String(speed))}
+          aria-valuemin={1}
+          aria-valuemax={5}
+          aria-valuenow={speed}
+          aria-valuetext={t.speedLevel.replace('{n}', String(speed))}
           className="w-16"
         />
       </div>
