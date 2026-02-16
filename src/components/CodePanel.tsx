@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback, useMemo } from 'react'
 import Editor, { type Monaco, useMonaco } from '@monaco-editor/react'
 import type { Locale } from '../i18n/translations'
 import { translations } from '../i18n/translations'
+import ComplexityChart from './ComplexityChart'
 
 interface CodePanelProps {
   code: string
@@ -349,6 +350,12 @@ export default function CodePanel({
               })
 
               flushList()
+
+              // Insert complexity chart right after the title
+              if (elements.length > 0) {
+                elements.splice(1, 0, <ComplexityChart key="complexity-chart" description={description} />)
+              }
+
               return elements
             })()}
           </article>

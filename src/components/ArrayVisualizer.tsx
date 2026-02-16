@@ -1,31 +1,5 @@
-import type { Step, HighlightType } from '../lib/types'
-
-const highlightColors: Record<HighlightType, string> = {
-  comparing: '#60a5fa',
-  swapped: '#f87171',
-  selected: '#fbbf24',
-  sorted: '#34d399',
-  pivot: '#c084fc',
-  found: '#4ade80',
-  current: '#fb923c',
-  searching: '#38bdf8',
-  left: '#60a5fa',
-  right: '#f472b6',
-  merged: '#818cf8',
-  minimum: '#fbbf24',
-  placed: '#4ade80',
-  conflict: '#f87171',
-  checking: '#fbbf24',
-  wall: '#475569',
-  path: '#22d3ee',
-  start: '#60a5fa',
-  end: '#f87171',
-  given: '#94a3b8',
-  active: '#fb923c',
-  visited: '#a78bfa',
-}
-
-const DEFAULT_COLOR = '#555'
+import type { Step } from '../lib/types'
+import { highlightColors, DEFAULT_BAR_COLOR } from '../lib/highlight-colors'
 
 interface ArrayVisualizerProps {
   step: Step
@@ -63,10 +37,9 @@ export default function ArrayVisualizer({ step }: ArrayVisualizerProps) {
             ? highlightColors[highlight]
             : isSorted
               ? highlightColors.sorted
-              : DEFAULT_COLOR
+              : DEFAULT_BAR_COLOR
 
           const heightPercent = Math.max((value / maxValue) * 100, 2)
-          const isActive = !!highlight
 
           return (
             <div

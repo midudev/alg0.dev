@@ -108,6 +108,7 @@ export const translations: Record<Locale, Translations> = {
     distances: 'Distances',
 
     categories: {
+      Concepts: 'Concepts',
       Sorting: 'Sorting',
       Searching: 'Searching',
       Graphs: 'Graphs',
@@ -117,6 +118,84 @@ export const translations: Record<Locale, Translations> = {
     },
 
     algorithmDescriptions: {
+      'big-o-notation': `Big O Notation
+
+Big O Notation describes how an algorithm's running time or space requirements grow relative to the input size. It focuses on the worst-case scenario and ignores constants and lower-order terms.
+
+Common complexities (fastest to slowest):
+  O(1)       — Constant: same time regardless of input size
+  O(log n)   — Logarithmic: halves the problem each step (binary search)
+  O(n)       — Linear: processes each element once
+  O(n log n) — Linearithmic: efficient sorting (Merge Sort, Quick Sort)
+  O(n²)      — Quadratic: nested loops (Bubble Sort, brute force)
+  O(2^n)     — Exponential: doubles with each new element
+  O(n!)      — Factorial: all permutations
+
+Why it matters:
+  For n = 1,000: O(n) = 1,000 operations, O(n²) = 1,000,000 operations
+  Choosing the right algorithm can mean seconds vs. hours of computation.
+
+Rules of Big O:
+  1. Drop constants: O(2n) → O(n)
+  2. Drop lower-order terms: O(n² + n) → O(n²)
+  3. Focus on the dominant term as n grows large`,
+
+      'recursion': `Recursion
+
+Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem. It's one of the most powerful concepts in computer science.
+
+Every recursive function needs two parts:
+  1. Base case — the condition that stops the recursion
+  2. Recursive case — the function calls itself with a smaller input
+
+How the call stack works:
+  - Each function call is pushed onto the call stack
+  - When a base case is reached, results propagate back up
+  - The stack unwinds as each call returns its result
+
+Common patterns:
+  - Factorial: n! = n × (n-1)!
+  - Fibonacci: F(n) = F(n-1) + F(n-2)
+  - Tree traversals: process node, then recurse on children
+  - Divide and conquer: split problem, solve halves, combine
+
+Pitfalls:
+  - Stack overflow: too many recursive calls exhaust memory
+  - Redundant computation: naive recursion can be exponential
+  - Solution: use memoization or convert to iteration
+
+Recursive algorithms in this visualizer:
+  Quick Sort, Merge Sort, DFS, N-Queens, Sudoku Solver, Tower of Hanoi`,
+
+      'stacks-queues': `Stacks & Queues
+
+Stacks and Queues are fundamental linear data structures used throughout computer science. They differ in how elements are added and removed.
+
+Stack (LIFO — Last In, First Out):
+  Think of a stack of plates: you always take from the top.
+  Operations:
+    push(item) — add to top      O(1)
+    pop()      — remove from top  O(1)
+    peek()     — view top         O(1)
+
+  Used in: undo/redo, browser back button, function call stack,
+           DFS traversal, expression evaluation, syntax parsing
+
+Queue (FIFO — First In, First Out):
+  Think of a line at a store: first person in line is served first.
+  Operations:
+    enqueue(item) — add to back      O(1)
+    dequeue()     — remove from front O(1)
+    front()       — view front        O(1)
+
+  Used in: task scheduling, BFS traversal, print queues,
+           message buffers, breadth-first algorithms
+
+Variants:
+  - Deque (double-ended queue): add/remove from both ends
+  - Priority Queue: elements have priorities, highest priority first
+  - Circular Queue: wraps around to reuse space`,
+
       'bubble-sort': `Bubble Sort
 
 Bubble Sort is a simple comparison-based sorting algorithm. It repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order.
@@ -751,6 +830,7 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
     distances: 'Distancias',
 
     categories: {
+      Concepts: 'Conceptos',
       Sorting: 'Ordenamiento',
       Searching: 'Búsqueda',
       Graphs: 'Grafos',
@@ -760,6 +840,84 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
     },
 
     algorithmDescriptions: {
+      'big-o-notation': `Notación Big O
+
+La Notación Big O describe cómo el tiempo de ejecución o los requisitos de espacio de un algoritmo crecen en relación al tamaño de la entrada. Se enfoca en el peor caso e ignora constantes y términos de menor orden.
+
+Complejidades comunes (de más rápida a más lenta):
+  O(1)       — Constante: mismo tiempo sin importar el tamaño de entrada
+  O(log n)   — Logarítmica: divide el problema a la mitad en cada paso (búsqueda binaria)
+  O(n)       — Lineal: procesa cada elemento una vez
+  O(n log n) — Linearítmica: ordenamiento eficiente (Merge Sort, Quick Sort)
+  O(n²)      — Cuadrática: bucles anidados (Bubble Sort, fuerza bruta)
+  O(2^n)     — Exponencial: se duplica con cada nuevo elemento
+  O(n!)      — Factorial: todas las permutaciones
+
+Por qué importa:
+  Para n = 1.000: O(n) = 1.000 operaciones, O(n²) = 1.000.000 operaciones
+  Elegir el algoritmo correcto puede significar segundos vs. horas de cómputo.
+
+Reglas de Big O:
+  1. Eliminar constantes: O(2n) → O(n)
+  2. Eliminar términos de menor orden: O(n² + n) → O(n²)
+  3. Enfocarse en el término dominante cuando n crece`,
+
+      'recursion': `Recursión
+
+La recursión es una técnica de programación donde una función se llama a sí misma para resolver instancias más pequeñas del mismo problema. Es uno de los conceptos más poderosos en las ciencias de la computación.
+
+Toda función recursiva necesita dos partes:
+  1. Caso base — la condición que detiene la recursión
+  2. Caso recursivo — la función se llama con una entrada más pequeña
+
+Cómo funciona la pila de llamadas:
+  - Cada llamada a función se apila en la pila de llamadas
+  - Cuando se alcanza un caso base, los resultados se propagan hacia arriba
+  - La pila se desenrolla a medida que cada llamada retorna su resultado
+
+Patrones comunes:
+  - Factorial: n! = n × (n-1)!
+  - Fibonacci: F(n) = F(n-1) + F(n-2)
+  - Recorridos de árboles: procesar nodo, luego recurrir en hijos
+  - Divide y vencerás: dividir problema, resolver mitades, combinar
+
+Errores comunes:
+  - Desbordamiento de pila: demasiadas llamadas recursivas agotan la memoria
+  - Cálculos redundantes: la recursión ingenua puede ser exponencial
+  - Solución: usar memoización o convertir a iteración
+
+Algoritmos recursivos en este visualizador:
+  Quick Sort, Merge Sort, DFS, N-Queens, Sudoku Solver, Torre de Hanoi`,
+
+      'stacks-queues': `Pilas y Colas
+
+Las Pilas y Colas son estructuras de datos lineales fundamentales usadas en toda la informática. Se diferencian en cómo se añaden y retiran los elementos.
+
+Pila (LIFO — Último en Entrar, Primero en Salir):
+  Piensa en una pila de platos: siempre tomas del de arriba.
+  Operaciones:
+    push(item) — añadir arriba      O(1)
+    pop()      — retirar de arriba   O(1)
+    peek()     — ver el de arriba    O(1)
+
+  Se usa en: deshacer/rehacer, botón atrás del navegador, pila de llamadas,
+             recorrido DFS, evaluación de expresiones, análisis sintáctico
+
+Cola (FIFO — Primero en Entrar, Primero en Salir):
+  Piensa en una fila en una tienda: el primero en la fila es atendido primero.
+  Operaciones:
+    enqueue(item) — añadir al final    O(1)
+    dequeue()     — retirar del frente O(1)
+    front()       — ver el frente      O(1)
+
+  Se usa en: planificación de tareas, recorrido BFS, colas de impresión,
+             buffers de mensajes, algoritmos de anchura
+
+Variantes:
+  - Deque (cola de doble extremo): añadir/retirar de ambos extremos
+  - Cola de Prioridad: elementos con prioridades, la más alta primero
+  - Cola Circular: se envuelve para reutilizar espacio`,
+
       'bubble-sort': `Bubble Sort (Ordenamiento Burbuja)
 
 Bubble Sort es un algoritmo de ordenamiento simple basado en comparaciones. Recorre repetidamente la lista, compara elementos adyacentes y los intercambia si están en el orden incorrecto.

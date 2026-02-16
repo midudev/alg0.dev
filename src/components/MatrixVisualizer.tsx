@@ -1,30 +1,7 @@
-import type { Step, HighlightType } from '../lib/types'
+import type { Step } from '../lib/types'
+import { highlightStyles } from '../lib/highlight-colors'
 
-const highlightStyles: Record<string, { bg: string; text: string; border: string }> = {
-  placed: { bg: 'rgba(34,197,94,0.12)', text: '#4ade80', border: 'rgba(34,197,94,0.25)' },
-  conflict: { bg: 'rgba(239,68,68,0.12)', text: '#f87171', border: 'rgba(239,68,68,0.25)' },
-  checking: { bg: 'rgba(234,179,8,0.10)', text: '#fbbf24', border: 'rgba(234,179,8,0.25)' },
-  found: { bg: 'rgba(34,197,94,0.18)', text: '#4ade80', border: 'rgba(34,197,94,0.35)' },
-  current: { bg: 'rgba(255,255,255,0.08)', text: '#fff', border: 'rgba(255,255,255,0.2)' },
-  comparing: { bg: 'rgba(96,165,250,0.12)', text: '#60a5fa', border: 'rgba(96,165,250,0.25)' },
-  selected: { bg: 'rgba(251,191,36,0.10)', text: '#fbbf24', border: 'rgba(251,191,36,0.25)' },
-  sorted: { bg: 'rgba(52,211,153,0.10)', text: '#34d399', border: 'rgba(52,211,153,0.25)' },
-  searching: { bg: 'rgba(56,189,248,0.10)', text: '#38bdf8', border: 'rgba(56,189,248,0.25)' },
-  wall: { bg: 'rgba(255,255,255,0.06)', text: '#888', border: 'rgba(255,255,255,0.1)' },
-  path: { bg: 'rgba(34,211,238,0.12)', text: '#22d3ee', border: 'rgba(34,211,238,0.25)' },
-  start: { bg: 'rgba(96,165,250,0.12)', text: '#60a5fa', border: 'rgba(96,165,250,0.25)' },
-  end: { bg: 'rgba(248,113,113,0.12)', text: '#f87171', border: 'rgba(248,113,113,0.25)' },
-  given: { bg: 'rgba(148,163,184,0.08)', text: '#cbd5e1', border: 'rgba(148,163,184,0.15)' },
-  active: { bg: 'rgba(255,255,255,0.08)', text: '#fff', border: 'rgba(255,255,255,0.2)' },
-  visited: { bg: 'rgba(167,139,250,0.10)', text: '#a78bfa', border: 'rgba(167,139,250,0.25)' },
-  left: { bg: 'rgba(96,165,250,0.10)', text: '#60a5fa', border: 'rgba(96,165,250,0.2)' },
-  right: { bg: 'rgba(244,114,182,0.10)', text: '#f472b6', border: 'rgba(244,114,182,0.2)' },
-  merged: { bg: 'rgba(129,140,248,0.10)', text: '#818cf8', border: 'rgba(129,140,248,0.25)' },
-  pivot: { bg: 'rgba(192,132,252,0.10)', text: '#c084fc', border: 'rgba(192,132,252,0.25)' },
-}
-
-// Symbols for special values
-const valueSymbols: Record<string, string> = {
+const VALUE_SYMBOLS: Record<string, string> = {
   Q: '♛',
   S: '▶',
   E: '◆',
@@ -84,7 +61,7 @@ export default function MatrixVisualizer({ step }: MatrixVisualizerProps) {
             const value = values[row]?.[col]
             const isDark = (row + col) % 2 === 1
             const styles = highlight ? highlightStyles[highlight] : null
-            const symbol = typeof value === 'string' ? valueSymbols[value] : undefined
+            const symbol = typeof value === 'string' ? VALUE_SYMBOLS[value] : undefined
 
             return (
               <div
