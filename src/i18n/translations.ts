@@ -22,6 +22,7 @@ export interface Translations {
   // Sidebar
   searchPlaceholder: string
   algorithmsCount: string // "{count} algorithms"
+  algorithmCountLabel: string // "{count} algorithms" for screen readers
   expandSidebar: string
   collapseSidebar: string
 
@@ -31,6 +32,7 @@ export interface Translations {
   selectAlgorithmCode: string
   expandCodePanel: string
   collapseCodePanel: string
+  variables: string
 
   // Controls
   speed: string
@@ -40,6 +42,13 @@ export interface Translations {
   stepForward: string
   skipToEnd: string
   step: string // "Step {n}:"
+  controlsLabel: string
+  progressStep: string // "Step {current} of {total}"
+  speedLevel: string // "Speed level {n} of 5"
+
+  // Drag handles
+  resizeSidebar: string
+  resizeCodePanel: string
 
   // Graph visualizer
   queue: string
@@ -68,6 +77,7 @@ export const translations: Record<Locale, Translations> = {
 
     searchPlaceholder: 'Search algorithms...',
     algorithmsCount: '{count} algorithms',
+    algorithmCountLabel: '{count} algorithms',
     expandSidebar: 'Expand sidebar',
     collapseSidebar: 'Collapse sidebar',
 
@@ -76,6 +86,7 @@ export const translations: Record<Locale, Translations> = {
     selectAlgorithmCode: 'Select an algorithm to view its code',
     expandCodePanel: 'Expand code panel',
     collapseCodePanel: 'Collapse code panel',
+    variables: 'Variables',
 
     speed: 'Speed',
     skipToStart: 'Skip to start',
@@ -84,6 +95,12 @@ export const translations: Record<Locale, Translations> = {
     stepForward: 'Step forward (→)',
     skipToEnd: 'Skip to end',
     step: 'Step {n}:',
+    controlsLabel: 'Playback controls',
+    progressStep: 'Step {current} of {total}',
+    speedLevel: 'Speed level {n} of 5',
+
+    resizeSidebar: 'Resize sidebar',
+    resizeCodePanel: 'Resize code panel',
 
     queue: 'Queue',
     stack: 'Stack',
@@ -192,7 +209,7 @@ Time Complexity:
   Average: O(n log n)
   Worst:   O(n²) — when pivot is always the smallest/largest
 
-Space Complexity: O(log n) — recursive call stack
+Space Complexity: O(log n) average, O(n) worst — recursive call stack
 
 Properties:
   - Not stable
@@ -504,7 +521,7 @@ How it works:
 
 Time Complexity:
   O(V²) with simple array
-  O((V + E) log V) with binary heap
+  O((V + E) log V) with min-heap
 
 Space Complexity: O(V)
 
@@ -703,6 +720,7 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
 
     searchPlaceholder: 'Buscar algoritmos...',
     algorithmsCount: '{count} algoritmos',
+    algorithmCountLabel: '{count} algoritmos',
     expandSidebar: 'Expandir barra lateral',
     collapseSidebar: 'Contraer barra lateral',
 
@@ -711,6 +729,7 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
     selectAlgorithmCode: 'Selecciona un algoritmo para ver su código',
     expandCodePanel: 'Expandir panel de código',
     collapseCodePanel: 'Contraer panel de código',
+    variables: 'Variables',
 
     speed: 'Velocidad',
     skipToStart: 'Ir al inicio',
@@ -719,6 +738,12 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
     stepForward: 'Paso siguiente (→)',
     skipToEnd: 'Ir al final',
     step: 'Paso {n}:',
+    controlsLabel: 'Controles de reproducción',
+    progressStep: 'Paso {current} de {total}',
+    speedLevel: 'Nivel de velocidad {n} de 5',
+
+    resizeSidebar: 'Redimensionar barra lateral',
+    resizeCodePanel: 'Redimensionar panel de código',
 
     queue: 'Cola',
     stack: 'Pila',
@@ -827,7 +852,7 @@ Complejidad Temporal:
   Promedio: O(n log n)
   Peor:     O(n²) — cuando el pivote siempre es el menor/mayor
 
-Complejidad Espacial: O(log n) — pila de llamadas recursivas
+Complejidad Espacial: O(log n) promedio, O(n) peor caso — pila de llamadas recursivas
 
 Propiedades:
   - No es estable
@@ -1026,7 +1051,7 @@ Propiedades:
 
 Counting Sort es ideal para ordenar enteros dentro de un rango conocido y pequeño. Se usa como subrutina en Radix Sort.`,
 
-      'radix-sort': `Radix Sort (Ordenamiento por Raíz)
+      'radix-sort': `Radix Sort (Ordenamiento por Base)
 
 Radix Sort ordena números dígito a dígito, desde el dígito menos significativo al más significativo (LSD Radix Sort). Usa un ordenamiento estable (como Counting Sort) como subrutina.
 
@@ -1139,7 +1164,7 @@ Cómo funciona:
 
 Complejidad Temporal:
   O(V²) con arreglo simple
-  O((V + E) log V) con min-heap
+  O((V + E) log V) con min-heap binario
 
 Complejidad Espacial: O(V)
 
@@ -1290,7 +1315,7 @@ Este algoritmo usa Búsqueda en Anchura para encontrar el camino más corto a tr
 Cómo funciona:
 1. Iniciar BFS desde la celda de inicio
 2. Explorar los 4 vecinos (arriba, abajo, izquierda, derecha)
-3. Saltar muros y celdas ya visitadas
+3. Omitir muros y celdas ya visitadas
 4. Marcar cada celda explorada y registrar su padre
 5. Cuando se alcanza el final, rastrear hacia atrás a través de los padres para encontrar el camino
 
