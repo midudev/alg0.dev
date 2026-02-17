@@ -374,12 +374,12 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
 
   generateSteps(locale = 'en') {
     const djNodes: GraphNode[] = [
-      { id: 0, label: 'A', x: 100, y: 50 },
-      { id: 1, label: 'B', x: 300, y: 50 },
-      { id: 2, label: 'C', x: 50, y: 170 },
-      { id: 3, label: 'D', x: 200, y: 170 },
-      { id: 4, label: 'E', x: 350, y: 170 },
-      { id: 5, label: 'F', x: 200, y: 290 },
+      { id: 0, label: 'A', x: 150, y: 50 },
+      { id: 1, label: 'B', x: 350, y: 50 },
+      { id: 2, label: 'C', x: 100, y: 170 },
+      { id: 3, label: 'D', x: 250, y: 170 },
+      { id: 4, label: 'E', x: 400, y: 170 },
+      { id: 5, label: 'F', x: 250, y: 290 },
     ]
     const djEdges: GraphEdge[] = [
       { from: 0, to: 1, weight: 4 },
