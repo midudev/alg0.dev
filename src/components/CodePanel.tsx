@@ -2,11 +2,19 @@ import { useRef, useEffect, useCallback, useMemo } from 'react'
 import Editor, { type Monaco, useMonaco } from '@monaco-editor/react'
 import type { Locale } from '@i18n/translations'
 import { translations } from '@i18n/translations'
+import type { Difficulty } from '@lib/types'
 import ComplexityChart from '@components/ComplexityChart'
+
+const DIFFICULTY_CONFIG: Record<Difficulty, { en: string; es: string; color: string; bg: string }> = {
+  easy: { en: 'Easy', es: 'Fácil', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/20' },
+  intermediate: { en: 'Intermediate', es: 'Intermedio', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/20' },
+  advanced: { en: 'Advanced', es: 'Avanzado', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/20' },
+}
 
 interface CodePanelProps {
   code: string
   description: string
+  difficulty?: Difficulty
   currentLine?: number
   variables?: Record<string, string | number | boolean | null>
   activeTab: 'code' | 'about'
@@ -34,6 +42,7 @@ function defineTheme(monaco: Monaco) {
 export default function CodePanel({
   code,
   description,
+  difficulty,
   currentLine,
   variables,
   activeTab,
@@ -322,9 +331,21 @@ export default function CodePanel({
 
                 if (i === 0 && line.trim()) {
                   elements.push(
-                    <h3 key={i} className="text-lg font-semibold text-white mb-4 font-heading">
-                      {line}
-                    </h3>,
+                    <div key={i} className="mb-4">
+                      <h3 className="text-lg font-semibold text-white font-heading">
+                        {line}
+                      </h3>
+                      {difficulty && (() => {
+                        const cfg = DIFFICULTY_CONFIG[difficulty]
+                        const label = locale === 'es' ? cfg.es : cfg.en
+                        return (
+                          <span className={`inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 text-[11px] font-semibold rounded-full border ${cfg.bg} ${cfg.color}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${difficulty === 'easy' ? 'bg-emerald-400' : difficulty === 'intermediate' ? 'bg-amber-400' : 'bg-red-400'}`} />
+                            {label}
+                          </span>
+                        )
+                      })()}
+                    </div>,
                   )
                 } else if (
                   line.match(
@@ -378,7 +399,7 @@ export default function CodePanel({
                 elements.splice(
                   1,
                   0,
-                  <ComplexityChart key="complexity-chart" description={description} />,
+                  <ComplexityChart key="complexity-chart" description={description} locale={locale} />,
                 )
               }
 

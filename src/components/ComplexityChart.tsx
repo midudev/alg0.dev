@@ -56,35 +56,41 @@ interface Entry {
 
 function parseTimeComplexity(description: string): Entry[] {
   const entries: Entry[] = []
-  const idx = description.indexOf('Time Complexity')
+
+  const idxEn = description.indexOf('Time Complexity')
+  const idxEs = description.indexOf('Complejidad Temporal')
+  const idx = idxEn !== -1 ? idxEn : idxEs
   if (idx === -1) return entries
 
+  const isSpanish = idxEs !== -1 && (idxEn === -1 || idxEs < idxEn)
+
   const rest = description.slice(idx)
-  const blockMatch = rest.match(
-    /Time Complexity[:\s]*([\s\S]*?)(?=\n\s*\nSpace|\n\s*\nProperties|\n\s*\n[A-Z]|$)/,
-  )
+  const blockRe = isSpanish
+    ? /Complejidad Temporal[:\s]*([\s\S]*?)(?=\n\s*\nComplejidad Espacial|\n\s*\nPropiedades|\n\s*\n[A-ZÁÉÍÓÚÑ]|$)/
+    : /Time Complexity[:\s]*([\s\S]*?)(?=\n\s*\nSpace|\n\s*\nProperties|\n\s*\n[A-Z]|$)/
+  const blockMatch = rest.match(blockRe)
   if (!blockMatch) return entries
   const block = blockMatch[0]
 
   const oRe = (prefix: string) =>
     new RegExp(`${prefix}:\\s*(O\\((?:[^()]+|\\([^)]*\\))*\\))`, 'i')
 
-  const best = block.match(oRe('Best'))
-  const avg = block.match(oRe('Average'))
-  const worst = block.match(oRe('Worst'))
+  const best = block.match(oRe(isSpanish ? 'Mejor' : 'Best'))
+  const avg = block.match(oRe(isSpanish ? 'Promedio' : 'Average'))
+  const worst = block.match(oRe(isSpanish ? 'Peor' : 'Worst'))
 
   if (best || avg || worst) {
     if (best) {
       const k = normalizeToKey(best[1])
-      if (k) entries.push({ label: 'Best', raw: best[1], key: k, color: '#34d399' })
+      if (k) entries.push({ label: isSpanish ? 'Mejor' : 'Best', raw: best[1], key: k, color: '#34d399' })
     }
     if (avg) {
       const k = normalizeToKey(avg[1])
-      if (k) entries.push({ label: 'Avg', raw: avg[1], key: k, color: '#fbbf24' })
+      if (k) entries.push({ label: isSpanish ? 'Prom' : 'Avg', raw: avg[1], key: k, color: '#fbbf24' })
     }
     if (worst) {
       const k = normalizeToKey(worst[1])
-      if (k) entries.push({ label: 'Worst', raw: worst[1], key: k, color: '#f87171' })
+      if (k) entries.push({ label: isSpanish ? 'Peor' : 'Worst', raw: worst[1], key: k, color: '#f87171' })
     }
   } else {
     const single = block.match(O_RE)
@@ -153,7 +159,7 @@ function resolveOverlaps(
   return sorted
 }
 
-export default function ComplexityChart({ description }: { description: string }) {
+export default function ComplexityChart({ description, locale = 'en' }: { description: string; locale?: string }) {
   const entries = useMemo(() => parseTimeComplexity(description), [description])
 
   if (entries.length === 0) return null
@@ -186,7 +192,7 @@ export default function ComplexityChart({ description }: { description: string }
   return (
     <div className="mt-5 mb-3">
       <div className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold mb-2">
-        Time Complexity
+        {locale === 'es' ? 'Complejidad Temporal' : 'Time Complexity'}
       </div>
 
       <svg
