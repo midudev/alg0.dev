@@ -10,7 +10,7 @@ interface SidebarProps {
   locale?: Locale
 }
 
-const categoryIcons: Record<string, JSX.Element> = {
+const categoryIcons: Record<string, React.ReactNode> = {
   Concepts: (
     <svg
       className="w-3.5 h-3.5"

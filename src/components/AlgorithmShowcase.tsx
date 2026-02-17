@@ -40,7 +40,10 @@ interface AlgorithmShowcaseProps {
   onSelectAlgorithm?: (algo: Algorithm) => void
 }
 
-export default function AlgorithmShowcase({ locale = 'en', onSelectAlgorithm }: AlgorithmShowcaseProps) {
+export default function AlgorithmShowcase({
+  locale = 'en',
+  onSelectAlgorithm,
+}: AlgorithmShowcaseProps) {
   const items = useMemo<ShowcaseItem[]>(
     () =>
       SHOWCASE_IDS.map((id) => algorithms.find((a) => a.id === id))
@@ -175,19 +178,6 @@ export default function AlgorithmShowcase({ locale = 'en', onSelectAlgorithm }: 
 
       {/* Algorithm info + indicators */}
       <div className="flex flex-col items-center gap-3">
-        {/* Name & category — fades with algorithm switch */}
-        <div
-          className="text-center transition-opacity ease-in-out"
-          style={{ opacity: fading ? 0 : 1, transitionDuration: `${FADE_MS}ms` }}
-        >
-          <h3 className="text-sm font-semibold text-white font-heading">
-            {current.algorithm.name}
-          </h3>
-          <p className="text-[11px] text-neutral-500 font-mono uppercase tracking-wider mt-0.5">
-            {current.algorithm.category}
-          </p>
-        </div>
-
         {/* Progress bar — fades too */}
         <div
           className="w-32 h-[2px] bg-white/[0.06] rounded-full overflow-hidden transition-opacity ease-in-out"
@@ -200,24 +190,6 @@ export default function AlgorithmShowcase({ locale = 'en', onSelectAlgorithm }: 
               transitionDuration: `${STEP_MS}ms`,
             }}
           />
-        </div>
-
-        {/* Dot navigation — always visible */}
-        <div className="flex gap-1.5" role="tablist" aria-label="Showcase algorithms">
-          {items.map((item, i) => (
-            <button
-              key={item.algorithm.id}
-              onClick={() => goToAlgo(i)}
-              role="tab"
-              aria-selected={i === algoIdx}
-              aria-label={item.algorithm.name}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === algoIdx
-                  ? 'bg-white/40 w-5'
-                  : 'bg-white/[0.10] w-1.5 hover:bg-white/20'
-              }`}
-            />
-          ))}
         </div>
       </div>
     </div>
