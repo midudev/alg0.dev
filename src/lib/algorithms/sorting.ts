@@ -8,6 +8,7 @@ const bubbleSort: Algorithm = {
   id: 'bubble-sort',
   name: 'Bubble Sort',
   category: 'Sorting',
+  difficulty: 'easy',
   visualization: 'array',
   code: `function bubbleSort(array) {
   const n = array.length;
@@ -111,6 +112,7 @@ const selectionSort: Algorithm = {
   id: 'selection-sort',
   name: 'Selection Sort',
   category: 'Sorting',
+  difficulty: 'easy',
   visualization: 'array',
   code: `function selectionSort(array) {
   const n = array.length;
@@ -243,6 +245,7 @@ const insertionSort: Algorithm = {
   id: 'insertion-sort',
   name: 'Insertion Sort',
   category: 'Sorting',
+  difficulty: 'easy',
   visualization: 'array',
   code: `function insertionSort(array) {
   const n = array.length;
@@ -371,6 +374,7 @@ const quickSort: Algorithm = {
   id: 'quick-sort',
   name: 'Quick Sort',
   category: 'Sorting',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function quickSort(arr, low = 0, high = arr.length - 1) {
   if (low < high) {
@@ -527,6 +531,7 @@ const mergeSort: Algorithm = {
   id: 'merge-sort',
   name: 'Merge Sort',
   category: 'Sorting',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function mergeSort(arr, start = 0, end = arr.length - 1) {
   if (start >= end) return;
@@ -690,6 +695,7 @@ const heapSort: Algorithm = {
   id: 'heap-sort',
   name: 'Heap Sort',
   category: 'Sorting',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function heapSort(array) {
   const n = array.length;
@@ -892,6 +898,7 @@ const countingSort: Algorithm = {
   id: 'counting-sort',
   name: 'Counting Sort',
   category: 'Sorting',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function countingSort(array) {
   const max = Math.max(...array);
@@ -1039,6 +1046,7 @@ const radixSort: Algorithm = {
   id: 'radix-sort',
   name: 'Radix Sort',
   category: 'Sorting',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function radixSort(array) {
   const max = Math.max(...array);
@@ -1189,6 +1197,7 @@ const shellSort: Algorithm = {
   id: 'shell-sort',
   name: 'Shell Sort',
   category: 'Sorting',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function shellSort(array) {
   const n = array.length;

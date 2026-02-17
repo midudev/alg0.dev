@@ -28,6 +28,7 @@ export const bigONotation: Algorithm = {
   id: 'big-o-notation',
   name: 'Big O Notation',
   category: 'Concepts',
+  difficulty: 'easy',
   visualization: 'concept',
   code: `// O(1) — Constant time
 function getFirst(arr) {
@@ -257,6 +258,7 @@ export const recursion: Algorithm = {
   id: 'recursion',
   name: 'Recursion',
   category: 'Concepts',
+  difficulty: 'easy',
   visualization: 'concept',
   code: `function factorial(n) {
   // Base case: factorial of 0 or 1 is 1
@@ -507,6 +509,7 @@ export const stack: Algorithm = {
   id: 'stack',
   name: 'Stack',
   category: 'Data Structures',
+  difficulty: 'easy',
   visualization: 'concept',
   code: `class Stack {
   constructor() { this.items = []; }
@@ -646,6 +649,7 @@ export const queue: Algorithm = {
   id: 'queue',
   name: 'Queue',
   category: 'Data Structures',
+  difficulty: 'easy',
   visualization: 'concept',
   code: `class Queue {
   constructor() { this.items = []; }
@@ -786,6 +790,7 @@ export const twoPointers: Algorithm = {
   id: 'two-pointers',
   name: 'Two Pointers',
   category: 'Concepts',
+  difficulty: 'intermediate',
   visualization: 'concept',
   code: `function twoSumSorted(arr, target) {
   let left = 0;
@@ -909,6 +914,7 @@ export const slidingWindow: Algorithm = {
   id: 'sliding-window',
   name: 'Sliding Window',
   category: 'Concepts',
+  difficulty: 'intermediate',
   visualization: 'concept',
   code: `function longestUniqueSubstring(s) {
   const seen = new Set();
@@ -1060,6 +1066,7 @@ export const spaceComplexity: Algorithm = {
   id: 'space-complexity',
   name: 'Space Complexity',
   category: 'Concepts',
+  difficulty: 'easy',
   visualization: 'concept',
   code: `// O(1) space — fixed variables
 function swap(arr, i, j) {
@@ -1185,6 +1192,7 @@ export const memoization: Algorithm = {
   id: 'memoization',
   name: 'Memoization',
   category: 'Concepts',
+  difficulty: 'intermediate',
   visualization: 'concept',
   code: `// Without memoization — O(2^n) time!
 function fib(n) {
@@ -1320,6 +1328,7 @@ export const greedyVsDp: Algorithm = {
   id: 'greedy-vs-dp',
   name: 'Greedy vs DP',
   category: 'Concepts',
+  difficulty: 'advanced',
   visualization: 'concept',
   code: `// GREEDY: always pick the largest coin first
 function greedyCoinChange(coins, amount) {

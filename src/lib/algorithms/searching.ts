@@ -5,6 +5,7 @@ const binarySearch: Algorithm = {
   id: 'binary-search',
   name: 'Binary Search',
   category: 'Searching',
+  difficulty: 'easy',
   visualization: 'array',
   code: `function binarySearch(array, target) {
   let low = 0;
@@ -132,6 +133,7 @@ const linearSearch: Algorithm = {
   id: 'linear-search',
   name: 'Linear Search',
   category: 'Searching',
+  difficulty: 'easy',
   visualization: 'array',
   code: `function linearSearch(array, target) {
   for (let i = 0; i < array.length; i++) {
@@ -223,6 +225,7 @@ const jumpSearch: Algorithm = {
   id: 'jump-search',
   name: 'Jump Search',
   category: 'Searching',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function jumpSearch(array, target) {
   const n = array.length;
@@ -367,6 +370,7 @@ const interpolationSearch: Algorithm = {
   id: 'interpolation-search',
   name: 'Interpolation Search',
   category: 'Searching',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function interpolationSearch(array, target) {
   let low = 0;

@@ -24,6 +24,7 @@ export const linkedList: Algorithm = {
   id: 'linked-list',
   name: 'Linked List',
   category: 'Data Structures',
+  difficulty: 'easy',
   visualization: 'concept',
   code: `class Node {
   constructor(value) {
@@ -307,6 +308,7 @@ export const hashTable: Algorithm = {
   id: 'hash-table',
   name: 'Hash Table',
   category: 'Data Structures',
+  difficulty: 'intermediate',
   visualization: 'concept',
   code: `class HashTable {
   constructor(size = 7) {
@@ -557,6 +559,7 @@ export const binarySearchTree: Algorithm = {
   id: 'binary-search-tree',
   name: 'Binary Search Tree',
   category: 'Data Structures',
+  difficulty: 'intermediate',
   visualization: 'concept',
   code: `class BSTNode {
   constructor(value) {
@@ -801,6 +804,7 @@ export const heap: Algorithm = {
   id: 'heap',
   name: 'Heap',
   category: 'Data Structures',
+  difficulty: 'intermediate',
   visualization: 'concept',
   code: `class MinHeap {
   constructor() { this.heap = []; }

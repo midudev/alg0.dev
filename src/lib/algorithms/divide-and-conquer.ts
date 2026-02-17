@@ -8,6 +8,7 @@ const towerOfHanoi: Algorithm = {
   id: 'tower-of-hanoi',
   name: 'Tower of Hanoi',
   category: 'Divide and Conquer',
+  difficulty: 'intermediate',
   visualization: 'matrix',
   code: `function hanoi(n, source, target, auxiliary) {
   if (n === 0) return;

@@ -8,6 +8,7 @@ const fibonacciDp: Algorithm = {
   id: 'fibonacci-dp',
   name: 'Fibonacci DP',
   category: 'Dynamic Programming',
+  difficulty: 'intermediate',
   visualization: 'array',
   code: `function fibonacci(n) {
   const dp = new Array(n + 1).fill(0);
@@ -91,6 +92,7 @@ const knapsack: Algorithm = {
   id: 'knapsack',
   name: 'Knapsack 0/1',
   category: 'Dynamic Programming',
+  difficulty: 'advanced',
   visualization: 'matrix',
   code: `function knapsack(weights, values, capacity) {
   const n = weights.length;
@@ -216,6 +218,7 @@ const lcs: Algorithm = {
   id: 'lcs',
   name: 'Longest Common Subsequence',
   category: 'Dynamic Programming',
+  difficulty: 'advanced',
   visualization: 'matrix',
   code: `function lcs(str1, str2) {
   const m = str1.length;

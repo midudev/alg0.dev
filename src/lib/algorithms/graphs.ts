@@ -5,6 +5,7 @@ const bfs: Algorithm = {
   id: 'bfs',
   name: 'Breadth-First Search',
   category: 'Graphs',
+  difficulty: 'intermediate',
   visualization: 'graph',
   code: `function bfs(graph, start) {
   const visited = new Set();
@@ -148,6 +149,7 @@ const dfs: Algorithm = {
   id: 'dfs',
   name: 'Depth-First Search',
   category: 'Graphs',
+  difficulty: 'intermediate',
   visualization: 'graph',
   code: `function dfs(graph, start) {
   const visited = new Set();
@@ -318,6 +320,7 @@ const dijkstra: Algorithm = {
   id: 'dijkstra',
   name: "Dijkstra's Algorithm",
   category: 'Graphs',
+  difficulty: 'advanced',
   visualization: 'graph',
   code: `function dijkstra(graph, start) {
   const n = graph.length;
@@ -545,6 +548,7 @@ const prim: Algorithm = {
   id: 'prim',
   name: "Prim's Algorithm",
   category: 'Graphs',
+  difficulty: 'advanced',
   visualization: 'graph',
   code: `function prim(graph, start) {
   const n = graph.length;
@@ -764,6 +768,7 @@ const topologicalSort: Algorithm = {
   id: 'topological-sort',
   name: 'Topological Sort',
   category: 'Graphs',
+  difficulty: 'advanced',
   visualization: 'graph',
   code: `function topologicalSort(graph, numNodes) {
   const inDegree = new Array(numNodes).fill(0);

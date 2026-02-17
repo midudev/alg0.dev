@@ -203,10 +203,13 @@ export interface Step {
   variables?: Record<string, string | number | boolean | null>
 }
 
+export type Difficulty = 'easy' | 'intermediate' | 'advanced'
+
 export interface Algorithm {
   id: string
   name: string
   category: string
+  difficulty: Difficulty
   description: string
   code: string
   visualization: VisualizationType

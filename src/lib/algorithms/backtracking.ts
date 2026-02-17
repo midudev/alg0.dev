@@ -5,6 +5,7 @@ const nQueens: Algorithm = {
   id: 'n-queens',
   name: 'N-Queens Problem',
   category: 'Backtracking',
+  difficulty: 'advanced',
   visualization: 'matrix',
   code: `function solveNQueens(n) {
   const board = Array(n).fill(null)
@@ -175,6 +176,7 @@ const sudokuSolver: Algorithm = {
   id: 'sudoku-solver',
   name: 'Sudoku Solver',
   category: 'Backtracking',
+  difficulty: 'advanced',
   visualization: 'matrix',
   code: `function solveSudoku(board) {
   function isValid(row, col, num) {
@@ -397,6 +399,7 @@ const mazePathfinding: Algorithm = {
   id: 'maze-pathfinding',
   name: 'Maze Pathfinding',
   category: 'Backtracking',
+  difficulty: 'intermediate',
   visualization: 'matrix',
   code: `function mazeBFS(maze, start, end) {
   const rows = maze.length;
