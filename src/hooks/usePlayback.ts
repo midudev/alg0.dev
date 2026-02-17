@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Algorithm, Step } from '@lib/types'
 import type { Locale } from '@i18n/translations'
 
-const SPEED_MAP: Record<number, number> = {
+export const SPEED_MAP: Record<number, number> = {
   1: 1500,
   2: 800,
   3: 400,
@@ -15,7 +15,7 @@ export function usePlayback(locale: Locale) {
   const [steps, setSteps] = useState<Step[]>([])
   const [currentStep, setCurrentStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [speed, setSpeed] = useState(3)
+  const [speed, setSpeed] = useState(2)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const selectAlgorithm = useCallback((algo: Algorithm) => {

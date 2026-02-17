@@ -1,5 +1,6 @@
 import type { Locale } from '@i18n/translations'
 import { translations } from '@i18n/translations'
+import { SPEED_MAP } from '@hooks/usePlayback'
 
 interface ControlsProps {
   currentStep: number
@@ -58,29 +59,59 @@ export default function Controls({
           </svg>
         </button>
 
-        {/* Play/Pause */}
-        <button
-          onClick={onTogglePlay}
-          disabled={disabled}
-          className="w-8 h-8 rounded-full bg-white hover:bg-neutral-200 disabled:bg-neutral-800 disabled:text-neutral-600 flex items-center justify-center transition-all active:scale-95 mx-1"
-          aria-label={isPlaying ? t.playPause : t.playPause}
-        >
-          {isPlaying ? (
-            <svg className="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <rect x="6" y="5" width="4" height="14" rx="1" />
-              <rect x="14" y="5" width="4" height="14" rx="1" />
-            </svg>
-          ) : (
-            <svg className="w-3 h-3 text-black" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M14.5528 7.77638C14.737 7.86851 14.737 8.13147 14.5528 8.2236L1.3618 14.8191C1.19558 14.9022 1 14.7813 1 14.5955L1 1.4045C1 1.21865 1.19558 1.09778 1.3618 1.18089L14.5528 7.77638Z"
-                fill="currentColor"
+        {/* Play/Pause with countdown ring */}
+        <div className="relative flex items-center justify-center mx-1">
+          {isPlaying && (
+            <svg
+              key={`${currentStep}-${speed}`}
+              className="absolute top-1/2 left-1/2 pointer-events-none"
+              style={{
+                width: '38px',
+                height: '38px',
+                transform: 'translate(-50%, -50%) rotate(-90deg)',
+              }}
+              viewBox="0 0 38 38"
+              aria-hidden="true"
+            >
+              <circle
+                cx="19"
+                cy="19"
+                r="17"
+                fill="none"
+                stroke="#eab308"
+                strokeWidth="2"
+                strokeLinecap="round"
+                style={{
+                  strokeDasharray: '106.81',
+                  strokeDashoffset: '106.81',
+                  animation: `step-countdown ${SPEED_MAP[speed] || 400}ms linear forwards`,
+                }}
               />
             </svg>
           )}
-        </button>
+          <button
+            onClick={onTogglePlay}
+            disabled={disabled}
+            className="w-8 h-8 rounded-full bg-white hover:bg-neutral-200 disabled:bg-neutral-800 disabled:text-neutral-600 flex items-center justify-center transition-all active:scale-95 relative z-10"
+            aria-label={isPlaying ? t.playPause : t.playPause}
+          >
+            {isPlaying ? (
+              <svg className="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="6" y="5" width="4" height="14" rx="1" />
+                <rect x="14" y="5" width="4" height="14" rx="1" />
+              </svg>
+            ) : (
+              <svg className="w-3 h-3 text-black" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M14.5528 7.77638C14.737 7.86851 14.737 8.13147 14.5528 8.2236L1.3618 14.8191C1.19558 14.9022 1 14.7813 1 14.5955L1 1.4045C1 1.21865 1.19558 1.09778 1.3618 1.18089L14.5528 7.77638Z"
+                  fill="currentColor"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
 
         {/* Step forward */}
         <button
