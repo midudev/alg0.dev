@@ -24,7 +24,7 @@ function defineTheme(monaco: Monaco) {
       'editor.background': '#000000',
       'editor.lineHighlightBackground': '#ffffff06',
       'editorLineNumber.foreground': '#333',
-      'editorLineNumber.activeForeground': '#63b3ed',
+      'editorLineNumber.activeForeground': '#facc15',
       'editor.selectionBackground': '#ffffff15',
       'editorCursor.foreground': '#fff',
     },

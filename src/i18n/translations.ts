@@ -109,6 +109,7 @@ export const translations: Record<Locale, Translations> = {
 
     categories: {
       Concepts: 'Concepts',
+      'Data Structures': 'Data Structures',
       Sorting: 'Sorting',
       Searching: 'Searching',
       Graphs: 'Graphs',
@@ -831,6 +832,7 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
 
     categories: {
       Concepts: 'Conceptos',
+      'Data Structures': 'Estructuras de Datos',
       Sorting: 'Ordenamiento',
       Searching: 'Búsqueda',
       Graphs: 'Grafos',
