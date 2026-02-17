@@ -195,10 +195,11 @@ export default function GraphVisualizer({ step, locale = 'en' }: GraphVisualizer
                 y={node.y}
                 textAnchor="middle"
                 dominantBaseline="central"
-                fill="white"
+                fill={isCurrent ? '#000' : '#fff'}
                 fontSize="13"
                 fontWeight="600"
                 fontFamily="Inter, system-ui, sans-serif"
+                style={{ transition: 'fill 0.3s ease' }}
               >
                 {node.label}
               </text>

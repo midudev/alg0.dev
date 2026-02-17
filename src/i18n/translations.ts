@@ -82,7 +82,7 @@ export const translations: Record<Locale, Translations> = {
     collapseSidebar: 'Collapse sidebar',
 
     tabCode: 'Code',
-    tabAbout: 'About',
+    tabAbout: 'Explanation',
     selectAlgorithmCode: 'Select an algorithm to view its code',
     expandCodePanel: 'Expand code panel',
     collapseCodePanel: 'Collapse code panel',
@@ -804,7 +804,7 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
     collapseSidebar: 'Contraer barra lateral',
 
     tabCode: 'Código',
-    tabAbout: 'Info',
+    tabAbout: 'Explicación',
     selectAlgorithmCode: 'Selecciona un algoritmo para ver su código',
     expandCodePanel: 'Expandir panel de código',
     collapseCodePanel: 'Contraer panel de código',
