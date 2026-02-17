@@ -5,11 +5,13 @@ interface UseResizablePanelOptions {
   collapseThreshold: number
   /** 'left' = sidebar style (drag right to expand), 'right' = code panel style (drag left to expand) */
   side: 'left' | 'right'
+  /** Start collapsed (default: false) */
+  initialCollapsed?: boolean
 }
 
-export function useResizablePanel({ maxWidth, collapseThreshold, side }: UseResizablePanelOptions) {
-  const [collapsed, setCollapsed] = useState(false)
-  const [width, setWidth] = useState(maxWidth)
+export function useResizablePanel({ maxWidth, collapseThreshold, side, initialCollapsed = false }: UseResizablePanelOptions) {
+  const [collapsed, setCollapsed] = useState(initialCollapsed)
+  const [width, setWidth] = useState(initialCollapsed ? 0 : maxWidth)
   const [isDragging, setIsDragging] = useState(false)
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null)
 

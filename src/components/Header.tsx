@@ -21,6 +21,10 @@ interface HeaderProps {
   onStepBackward: () => void
   onSpeedChange: (speed: number) => void
   onStepChange: (step: number) => void
+  // Mobile props
+  isMobile?: boolean
+  onToggleMobileSidebar?: () => void
+  onToggleMobileCodePanel?: () => void
 }
 
 function getLocaleUrl(targetLocale: Locale) {
@@ -44,15 +48,28 @@ export default function Header({
   onStepBackward,
   onSpeedChange,
   onStepChange,
+  isMobile = false,
+  onToggleMobileSidebar,
+  onToggleMobileCodePanel,
 }: HeaderProps) {
   return (
     <header
-      className="h-12 shrink-0 flex items-center justify-between px-5 border-b border-white/[0.08] bg-black z-10"
+      className="h-12 shrink-0 flex items-center justify-between px-3 md:px-5 border-b border-white/[0.08] bg-black z-10"
       role="banner"
     >
       {/* Left: Logo + Breadcrumb */}
-      <div className="flex items-center gap-3 min-w-[260px]">
-        {sidebarCollapsed && (
+      <div className="flex items-center gap-2 md:gap-3 min-w-0 md:min-w-[260px]">
+        {isMobile ? (
+          <button
+            onClick={onToggleMobileSidebar}
+            className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/[0.06] transition-colors text-neutral-400 hover:text-white shrink-0"
+            aria-label={locale === 'es' ? 'Abrir menú' : 'Open menu'}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        ) : sidebarCollapsed ? (
           <button
             onClick={onExpandSidebar}
             className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/[0.06] transition-colors text-neutral-400 hover:text-white"
@@ -73,13 +90,13 @@ export default function Header({
               />
             </svg>
           </button>
-        )}
+        ) : null}
         <a
           href={getLocaleUrl(locale)}
-          className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 md:gap-2.5 hover:opacity-80 transition-opacity min-w-0"
           aria-label="alg0.dev - Algorithm Visualizer — Home"
         >
-          <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center">
+          <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center shrink-0">
             <svg
               className="w-4 h-4 text-black"
               xmlns="http://www.w3.org/2000/svg"
@@ -101,44 +118,57 @@ export default function Header({
               </g>
             </svg>
           </div>
-          {!selectedAlgorithm && (
+          {!selectedAlgorithm && !isMobile && (
             <span className="font-semibold text-sm tracking-tight text-white font-heading">
               alg0.dev - Algorithm Visualizer
             </span>
           )}
         </a>
         {selectedAlgorithm && (
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 ml-2">
-            <span className="text-neutral-600">/</span>
-            <span className="text-xs text-neutral-500">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 min-w-0 overflow-hidden">
+            <span className="text-neutral-600 shrink-0">/</span>
+            <span className="text-xs text-neutral-500 hidden md:inline shrink-0">
               {getCategoryName(locale, selectedAlgorithm.category)}
             </span>
-            <span className="text-neutral-600">/</span>
-            <span className="text-xs font-medium text-neutral-300" aria-current="page">
+            <span className="text-neutral-600 hidden md:inline shrink-0">/</span>
+            <span className="text-xs font-medium text-neutral-300 truncate" aria-current="page">
               {selectedAlgorithm.name}
             </span>
           </nav>
         )}
       </div>
 
-      {/* Center: Controls */}
-      <Controls
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-        isPlaying={isPlaying}
-        speed={speed}
-        onTogglePlay={onTogglePlay}
-        onStepForward={onStepForward}
-        onStepBackward={onStepBackward}
-        onSpeedChange={onSpeedChange}
-        onStepChange={onStepChange}
-        disabled={totalSteps === 0}
-        locale={locale}
-      />
+      {/* Center: Controls (hidden on mobile, shown in bottom bar instead) */}
+      {!isMobile && (
+        <Controls
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+          isPlaying={isPlaying}
+          speed={speed}
+          onTogglePlay={onTogglePlay}
+          onStepForward={onStepForward}
+          onStepBackward={onStepBackward}
+          onSpeedChange={onSpeedChange}
+          onStepChange={onStepChange}
+          disabled={totalSteps === 0}
+          locale={locale}
+        />
+      )}
 
       {/* Right: Language switcher + code panel toggle */}
-      <div className="min-w-[260px] flex items-center justify-end gap-2">
-        {codePanelCollapsed && (
+      <div className="flex items-center justify-end gap-2 min-w-0 md:min-w-[260px]">
+        {isMobile && selectedAlgorithm && (
+          <button
+            onClick={onToggleMobileCodePanel}
+            className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/[0.06] transition-colors text-neutral-400 hover:text-white"
+            aria-label={locale === 'es' ? 'Ver código' : 'View code'}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+            </svg>
+          </button>
+        )}
+        {!isMobile && codePanelCollapsed && (
           <button
             onClick={onExpandCodePanel}
             className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/[0.06] transition-colors text-neutral-400 hover:text-white"
@@ -165,7 +195,7 @@ export default function Header({
             <a
               key={l}
               href={getLocaleUrl(l)}
-              className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-all ${
+              className={`px-2 md:px-2.5 py-1 text-[11px] font-medium rounded-md transition-all ${
                 l === locale
                   ? 'bg-white text-black'
                   : 'text-neutral-500 hover:text-white hover:bg-white/[0.06]'
