@@ -10,12 +10,12 @@ interface WelcomeScreenProps {
 
 export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeScreenProps) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-6 min-h-0">
+    <div className="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6 min-h-0">
       {/* Welcome header */}
-      <div className="text-center max-w-md shrink-0">
-        <div className="w-12 h-12 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] mx-auto mb-4">
+      <div className="text-center max-w-md shrink-0 px-4 md:px-0">
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] mx-auto mb-3 md:mb-4">
           <svg
-            className="w-6 h-6 text-white/60"
+            className="w-5 h-5 md:w-6 md:h-6 text-white/60"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -29,10 +29,10 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
             />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold text-white mb-2 text-balance font-heading">
+        <h2 className="text-lg md:text-xl font-semibold text-white mb-2 text-balance font-heading">
           {t.welcomeTitle}
         </h2>
-        <p className="text-sm text-neutral-500 leading-relaxed whitespace-pre-line text-balance">
+        <p className="text-xs md:text-sm text-neutral-500 leading-relaxed whitespace-pre-line text-balance">
           {t.welcomeDescription}
         </p>
       </div>
@@ -40,8 +40,8 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
       {/* Algorithm Showcase */}
       <AlgorithmShowcase locale={locale} onSelectAlgorithm={onSelectAlgorithm} />
 
-      {/* Keyboard shortcuts */}
-      <div className="flex items-center justify-center gap-3 text-xs text-neutral-600 shrink-0">
+      {/* Keyboard shortcuts — hidden on mobile (touch devices don't use keyboards) */}
+      <div className="hidden md:flex items-center justify-center gap-3 text-xs text-neutral-600 shrink-0">
         <div className="flex items-center gap-2">
           <kbd className="w-8 h-8 flex items-center justify-center bg-white/[0.06] rounded-lg border border-white/[0.10] text-white/80">
             <svg

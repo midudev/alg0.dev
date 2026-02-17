@@ -152,7 +152,7 @@ export default function CodePanel({
             aria-controls={`tabpanel-${tab}`}
             id={`tab-${tab}`}
             tabIndex={activeTab === tab ? 0 : -1}
-            className={`px-5 py-3 text-xs font-medium transition-all relative capitalize ${
+            className={`px-3 py-2.5 md:px-5 md:py-3 text-xs font-medium transition-all relative capitalize ${
               activeTab === tab ? 'text-white' : 'text-neutral-600 hover:text-neutral-400'
             }`}
           >
@@ -287,7 +287,7 @@ export default function CodePanel({
         </div>
       ) : (
         <div
-          className="flex-1 overflow-auto p-6"
+          className="flex-1 overflow-auto p-4 md:p-6"
           role="tabpanel"
           id="tabpanel-about"
           aria-labelledby="tab-about"

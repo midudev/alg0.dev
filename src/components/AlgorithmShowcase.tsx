@@ -133,15 +133,15 @@ export default function AlgorithmShowcase({ locale = 'en', onSelectAlgorithm }: 
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full">
+    <div className="flex flex-col items-center gap-3 md:gap-4 w-full px-4 md:px-0">
       {/* Visualization card */}
       <div
-        className="relative w-full max-w-2xl rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden group hover:border-white/[0.12] hover:bg-white/[0.04] transition-colors duration-300"
-        style={{ height: '360px' }}
+        className="relative w-full max-w-2xl rounded-xl md:rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden group hover:border-white/[0.12] hover:bg-white/[0.04] transition-colors duration-300"
+        style={{ height: 'clamp(240px, 45vw, 360px)' }}
       >
         {/* Visualization content */}
         <div
-          className="absolute inset-0 flex flex-col p-6 transition-opacity ease-in-out"
+          className="absolute inset-0 flex flex-col p-3 md:p-6 transition-opacity ease-in-out"
           style={{
             opacity: fading ? 0 : 1,
             transitionDuration: `${FADE_MS}ms`,

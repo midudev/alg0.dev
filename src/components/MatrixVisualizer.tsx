@@ -18,18 +18,18 @@ export default function MatrixVisualizer({ step }: MatrixVisualizerProps) {
 
   const { rows, cols, values, highlights = {} } = matrix
 
-  // Adaptive cell sizing
+  // Adaptive cell sizing — responsive for mobile
   const maxDim = Math.max(rows, cols)
   const cellSize =
     maxDim <= 5
-      ? 'w-14 h-14 text-2xl'
+      ? 'w-10 h-10 md:w-14 md:h-14 text-xl md:text-2xl'
       : maxDim <= 6
-        ? 'w-12 h-12 text-xl'
+        ? 'w-8 h-8 md:w-12 md:h-12 text-lg md:text-xl'
         : maxDim <= 8
-          ? 'w-10 h-10 text-lg'
-          : 'w-8 h-8 text-sm'
-  const gapSize = maxDim <= 6 ? 'gap-1.5' : 'gap-1'
-  const fontSize = maxDim <= 5 ? 'text-xs' : maxDim <= 8 ? 'text-[10px]' : 'text-[9px]'
+          ? 'w-7 h-7 md:w-10 md:h-10 text-base md:text-lg'
+          : 'w-6 h-6 md:w-8 md:h-8 text-xs md:text-sm'
+  const gapSize = maxDim <= 6 ? 'gap-1 md:gap-1.5' : 'gap-0.5 md:gap-1'
+  const fontSize = maxDim <= 5 ? 'text-[10px] md:text-xs' : maxDim <= 8 ? 'text-[9px] md:text-[10px]' : 'text-[8px] md:text-[9px]'
 
   // Build text description for screen readers
   const specialCells: string[] = []

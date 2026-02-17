@@ -376,10 +376,10 @@ function StackViz({
       )}
 
       {/* Stack container */}
-      <div className="relative w-48">
+      <div className="relative w-36 md:w-48">
         {/* TOP indicator */}
         {items.length > 0 && (
-          <div className="absolute -left-14 top-0 flex items-center h-11 text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
+          <div className="absolute -left-12 md:-left-14 top-0 flex items-center h-11 text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
             top →
           </div>
         )}

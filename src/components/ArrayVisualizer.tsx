@@ -27,7 +27,7 @@ export default function ArrayVisualizer({ step }: ArrayVisualizerProps) {
       {/* Bar chart */}
       <div
         className="flex items-end w-full max-w-3xl"
-        style={{ height: '300px', gap: `${barGap}px` }}
+        style={{ height: 'clamp(180px, 40vw, 300px)', gap: `${barGap}px` }}
         aria-hidden="true"
       >
         {array.map((value, index) => {
