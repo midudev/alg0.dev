@@ -32,7 +32,7 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
         <h2 className="text-lg md:text-xl font-semibold text-white mb-2 text-balance font-heading">
           {t.welcomeTitle}
         </h2>
-        <p className="text-xs md:text-sm text-neutral-500 leading-relaxed whitespace-pre-line text-balance">
+        <p className="text-xs md:text-sm text-neutral-500 leading-relaxed  max-w-lg text-balance inline-block">
           {t.welcomeDescription}
         </p>
       </div>
