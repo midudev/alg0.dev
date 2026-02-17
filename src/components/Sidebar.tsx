@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { Algorithm, Category } from '@lib/types'
 import type { Locale } from '@i18n/translations'
 import { translations, getCategoryName } from '@i18n/translations'
@@ -129,6 +129,20 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
   const t = translations[locale]
   const [expanded, setExpanded] = useState<Set<string>>(new Set(categories.map((c) => c.name)))
   const [search, setSearch] = useState('')
+  const [searchFocused, setSearchFocused] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (e.key === '/') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const toggle = (name: string) => {
     setExpanded((prev) => {
@@ -170,13 +184,38 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
             />
           </svg>
           <input
+            ref={searchInputRef}
             type="search"
             placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
             aria-label={t.searchPlaceholder}
-            className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg pl-9 pr-3 py-2 text-xs text-neutral-300 placeholder-neutral-600 outline-none focus:border-white/20 focus:bg-white/[0.05] transition-all"
+            className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg pl-9 pr-8 py-2 text-xs text-neutral-300 placeholder-neutral-600 outline-none focus:border-white/20 focus:bg-white/[0.05] transition-all"
           />
+          {search ? (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('')
+                searchInputRef.current?.focus()
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[18px] h-[18px] rounded border border-white/10 bg-white/[0.03] text-neutral-600 hover:text-neutral-300 hover:border-white/20 hover:bg-white/[0.06] transition-all"
+              aria-label={locale === 'es' ? 'Limpiar búsqueda' : 'Clear search'}
+            >
+              <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          ) : !searchFocused && (
+            <kbd
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[18px] h-[18px] text-[10px] font-mono rounded border border-white/10 text-neutral-600 bg-white/[0.03]"
+              aria-hidden="true"
+            >
+              /
+            </kbd>
+          )}
         </div>
       </div>
 

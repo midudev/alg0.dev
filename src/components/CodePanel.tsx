@@ -156,7 +156,19 @@ export default function CodePanel({
               activeTab === tab ? 'text-white' : 'text-neutral-600 hover:text-neutral-400'
             }`}
           >
-            {tab === 'code' ? t.tabCode : t.tabAbout}
+            <span className="flex items-center gap-2">
+              {tab === 'code' ? t.tabCode : t.tabAbout}
+              <kbd
+                className={`inline-flex items-center justify-center w-[18px] h-[18px] text-[10px] font-mono rounded border ${
+                  activeTab === tab
+                    ? 'border-white/20 text-white/60 bg-white/[0.06]'
+                    : 'border-white/10 text-neutral-600 bg-white/[0.03]'
+                }`}
+                aria-hidden="true"
+              >
+                {tab === 'code' ? 'C' : 'E'}
+              </kbd>
+            </span>
             {activeTab === tab && (
               <div className="absolute bottom-0 left-2 right-2 h-px bg-white" aria-hidden="true" />
             )}

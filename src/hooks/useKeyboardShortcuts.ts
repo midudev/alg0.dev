@@ -4,15 +4,16 @@ interface KeyboardShortcutHandlers {
   togglePlay: () => void
   stepForward: () => void
   stepBackward: () => void
+  onTabChange?: (tab: 'code' | 'about') => void
 }
 
-export function useKeyboardShortcuts({ togglePlay, stepForward, stepBackward }: KeyboardShortcutHandlers) {
+export function useKeyboardShortcuts({ togglePlay, stepForward, stepBackward, onTabChange }: KeyboardShortcutHandlers) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
 
-      switch (e.code) {
-        case 'Space':
+      switch (e.key) {
+        case ' ':
           e.preventDefault()
           togglePlay()
           break
@@ -24,10 +25,16 @@ export function useKeyboardShortcuts({ togglePlay, stepForward, stepBackward }: 
           e.preventDefault()
           stepBackward()
           break
+        case 'c':
+          if (onTabChange) onTabChange('code')
+          break
+        case 'e':
+          if (onTabChange) onTabChange('about')
+          break
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [togglePlay, stepForward, stepBackward])
+  }, [togglePlay, stepForward, stepBackward, onTabChange])
 }
