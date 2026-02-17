@@ -22,7 +22,7 @@
   "devDependencies": {
     "@types/react": "19.2.13",
     "@types/react-dom": "19.2.3",
-    "eslint": "10.0.0",
+    "eslint": "^9.18.0",
     "neostandard": "0.12.2",
     "prettier": "3.8.1"
   }
