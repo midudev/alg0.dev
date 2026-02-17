@@ -229,7 +229,11 @@ export default function CodePanel({
 
           {/* Variables panel */}
           {variables && Object.keys(variables).length > 0 && (
-            <div className="shrink-0 border-t border-white/[0.08]" role="region" aria-label={t.variables}>
+            <div
+              className="shrink-0 border-t border-white/[0.08]"
+              role="region"
+              aria-label={t.variables}
+            >
               <div className="px-4 py-2 flex items-center gap-2">
                 <div className="flex items-center gap-1.5">
                   <svg
@@ -258,7 +262,9 @@ export default function CodePanel({
                     className="inline-flex items-center gap-1.5 text-[12px] font-mono"
                   >
                     <span className="text-neutral-300">{name}</span>
-                    <span className="text-neutral-600" aria-hidden="true">=</span>
+                    <span className="text-neutral-600" aria-hidden="true">
+                      =
+                    </span>
                     <span className="sr-only">=</span>
                     <span
                       className={`font-medium ${
@@ -295,8 +301,8 @@ export default function CodePanel({
           <article className="text-[13px] text-neutral-400 leading-relaxed whitespace-pre-wrap font-[inherit]">
             {(() => {
               const lines = description.split('\n')
-              const elements: JSX.Element[] = []
-              let listItems: JSX.Element[] = []
+              const elements: React.ReactElement[] = []
+              let listItems: React.ReactElement[] = []
 
               const flushList = () => {
                 if (listItems.length > 0) {
@@ -320,7 +326,11 @@ export default function CodePanel({
                       {line}
                     </h3>,
                   )
-                } else if (line.match(/^[A-Z\u00C1-\u00DA][a-zA-Z\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\s]+:$/)) {
+                } else if (
+                  line.match(
+                    /^[A-Z\u00C1-\u00DA][a-zA-Z\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\s]+:$/,
+                  )
+                ) {
                   elements.push(
                     <h4
                       key={i}
@@ -365,7 +375,11 @@ export default function CodePanel({
 
               // Insert complexity chart right after the title
               if (elements.length > 0) {
-                elements.splice(1, 0, <ComplexityChart key="complexity-chart" description={description} />)
+                elements.splice(
+                  1,
+                  0,
+                  <ComplexityChart key="complexity-chart" description={description} />,
+                )
               }
 
               return elements

@@ -168,34 +168,221 @@ Pitfalls:
 Recursive algorithms in this visualizer:
   Quick Sort, Merge Sort, DFS, N-Queens, Sudoku Solver, Tower of Hanoi`,
 
-      'stacks-queues': `Stacks & Queues
+      'stack': `Stack
 
-Stacks and Queues are fundamental linear data structures used throughout computer science. They differ in how elements are added and removed.
+A Stack is a linear data structure that follows the LIFO principle — Last In, First Out. Like a stack of plates: you add and remove from the top only.
 
-Stack (LIFO — Last In, First Out):
-  Think of a stack of plates: you always take from the top.
-  Operations:
-    push(item) — add to top      O(1)
-    pop()      — remove from top  O(1)
-    peek()     — view top         O(1)
+Operations:
+  push(item) — add to top       O(1)
+  pop()      — remove from top   O(1)
+  peek()     — view top          O(1)
+  isEmpty()  — check if empty    O(1)
 
-  Used in: undo/redo, browser back button, function call stack,
-           DFS traversal, expression evaluation, syntax parsing
+Applications:
+  - Undo/redo functionality
+  - Browser history (back/forward)
+  - Function call stack
+  - Depth-First Search (DFS)
+  - Expression evaluation and parsing
+  - Balanced parentheses checking
 
-Queue (FIFO — First In, First Out):
-  Think of a line at a store: first person in line is served first.
-  Operations:
-    enqueue(item) — add to back      O(1)
-    dequeue()     — remove from front O(1)
-    front()       — view front        O(1)
+Space Complexity: O(n) for n elements`,
 
-  Used in: task scheduling, BFS traversal, print queues,
-           message buffers, breadth-first algorithms
+      'queue': `Queue
 
-Variants:
-  - Deque (double-ended queue): add/remove from both ends
-  - Priority Queue: elements have priorities, highest priority first
-  - Circular Queue: wraps around to reuse space`,
+A Queue is a linear data structure that follows the FIFO principle — First In, First Out. Like a line at a store: the first person in line is served first.
+
+Operations:
+  enqueue(item) — add to back       O(1)
+  dequeue()     — remove from front  O(1)
+  front()       — view front         O(1)
+  isEmpty()     — check if empty     O(1)
+
+Applications:
+  - Task scheduling (CPU, printer)
+  - Breadth-First Search (BFS)
+  - Message buffers and event queues
+  - Rate limiting
+  - Order processing systems
+
+Space Complexity: O(n) for n elements`,
+
+      'two-pointers': `Two Pointers
+
+Two Pointers is a technique where two indices move through a data structure (usually an array) to solve problems efficiently.
+
+Common patterns:
+  - Left & Right: start from both ends, move inward
+  - Slow & Fast: both start from beginning at different speeds
+
+Time Complexity: O(n) — each pointer moves at most n times
+Space Complexity: O(1) — only two variables
+
+Classic problems:
+  - Two Sum (sorted array)
+  - Container with most water
+  - Remove duplicates in-place
+  - Palindrome checking
+  - Linked list cycle detection (slow/fast)`,
+
+      'sliding-window': `Sliding Window
+
+Sliding Window maintains a dynamic range (window) over a sequence, expanding and contracting to solve substring/subarray problems efficiently.
+
+How it works:
+1. Expand the window by moving the right pointer
+2. If a condition is violated, shrink from the left
+3. Track the best result seen so far
+
+Time Complexity: O(n) — each character is visited at most twice
+Space Complexity: O(min(n, alphabet))
+
+Classic problems:
+  - Longest substring without repeating chars
+  - Minimum window substring
+  - Maximum sum subarray of size k
+  - Longest repeating character replacement`,
+
+      'space-complexity': `Space Complexity
+
+Space Complexity measures the amount of memory an algorithm uses relative to the input size. Like time complexity, we use Big O notation.
+
+Common space complexities:
+  O(1)     — Constant: fixed number of variables
+  O(log n) — Logarithmic: recursive call stack depth
+  O(n)     — Linear: one copy of the input
+  O(n²)    — Quadratic: 2D matrix of input size
+
+Important distinction:
+  - Auxiliary space: extra memory beyond the input
+  - Total space: input + auxiliary
+
+Examples:
+  O(1): in-place sorting (Bubble Sort), variable swaps
+  O(log n): recursive binary search (call stack)
+  O(n): Merge Sort (temporary arrays), hash tables
+  O(n²): DP tables, adjacency matrices`,
+
+      'memoization': `Memoization
+
+Memoization is an optimization technique that stores the results of expensive function calls and returns the cached result when the same inputs occur again.
+
+Without memoization (Fibonacci):
+  fib(5) calls fib(4) + fib(3)
+  fib(4) calls fib(3) + fib(2) — fib(3) computed AGAIN!
+  Exponential: O(2^n) time
+
+With memoization:
+  Each value is computed ONCE and cached
+  Subsequent calls with the same input return instantly
+  Linear: O(n) time, O(n) space
+
+Key insight: trade space for time
+  - Store results in a dictionary/array
+  - Before computing, check if result exists
+  - Dramatic speedup for overlapping subproblems`,
+
+      'greedy-vs-dp': `Greedy vs Dynamic Programming
+
+Both Greedy and DP solve optimization problems, but they differ fundamentally:
+
+Greedy:
+  - Makes the locally optimal choice at each step
+  - Fast: usually O(n log n) or O(n)
+  - Does NOT always find the global optimum
+  - Works when the "greedy choice property" holds
+
+Dynamic Programming:
+  - Considers ALL possible choices
+  - Finds the globally optimal solution — always
+  - Slower: usually O(n × m) time and space
+  - Works for problems with overlapping subproblems
+
+Example — Coin Change with coins [1, 4, 6], amount 8:
+  Greedy picks 6+1+1 = 3 coins (suboptimal!)
+  DP finds 4+4 = 2 coins (optimal!)`,
+
+      'linked-list': `Linked List
+
+A Linked List is a linear data structure where each element (node) contains a value and a pointer to the next node.
+
+Unlike arrays, elements are not in contiguous memory — each node can be anywhere, connected by pointers.
+
+Operations:
+  append:  add node at the end       — O(1) with tail pointer
+  prepend: add node at the beginning — O(1)
+  search:  traverse to find a value  — O(n)
+  delete:  remove a node by value    — O(n)
+  access:  traverse from head        — O(n)
+
+Advantages:
+  - O(1) insertion/deletion at known positions
+  - Dynamic size, no wasted memory
+
+Disadvantages:
+  - O(n) access by index (no random access)
+  - Extra memory for pointers
+  - Not cache-friendly`,
+
+      'hash-table': `Hash Table
+
+A Hash Table maps keys to values using a hash function. It provides near-constant time O(1) for insert, lookup, and delete operations.
+
+How it works:
+1. A hash function converts the key into an array index
+2. The value is stored at that index (bucket)
+3. If two keys hash to the same index → collision
+
+Collision handling (chaining):
+  Each bucket stores a list of entries.
+  Multiple keys can share the same bucket.
+
+Time Complexity:
+  Average: O(1) for set, get, delete
+  Worst:   O(n) when all keys collide
+
+Space Complexity: O(n)
+
+Applications: caches, databases, symbol tables, counting frequencies, deduplication`,
+
+      'binary-search-tree': `Binary Search Tree (BST)
+
+A BST is a tree where each node has at most two children, and for every node:
+  - Left subtree contains only values less than the node
+  - Right subtree contains only values greater than the node
+
+This ordering enables efficient search by halving the search space at each step.
+
+Operations:
+  insert: compare and go left/right — O(h)
+  search: compare and go left/right — O(h)
+  delete: find and restructure      — O(h)
+
+Where h = height of the tree:
+  Balanced tree: h = O(log n) — efficient!
+  Degenerate:    h = O(n) — like a linked list
+
+Applications: ordered data storage, range queries, priority queues (with balancing)`,
+
+      'heap': `Heap (Min Heap)
+
+A Heap is a complete binary tree where every parent is smaller (min-heap) or larger (max-heap) than its children. It's stored as an array.
+
+Array-to-tree mapping (0-indexed):
+  Parent of i:      Math.floor((i - 1) / 2)
+  Left child of i:  2 * i + 1
+  Right child of i: 2 * i + 2
+
+Operations:
+  insert:     add at end, bubble up   — O(log n)
+  extractMin: remove root, bubble down — O(log n)
+  peek:       return root             — O(1)
+
+Applications:
+  - Priority queues
+  - Heap Sort
+  - Dijkstra's algorithm
+  - Finding k-th smallest/largest`,
 
       'bubble-sort': `Bubble Sort
 
