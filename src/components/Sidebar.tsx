@@ -27,6 +27,22 @@ const categoryIcons: Record<string, React.ReactNode> = {
       />
     </svg>
   ),
+  'Data Structures': (
+    <svg
+      className="w-3.5 h-3.5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
+      />
+    </svg>
+  ),
   Sorting: (
     <svg
       className="w-3.5 h-3.5"
@@ -123,6 +139,64 @@ const categoryIcons: Record<string, React.ReactNode> = {
       />
     </svg>
   ),
+}
+
+const categoryColors: Record<string, { icon: string; badge: string; line: string; active: string }> = {
+  Concepts: {
+    icon: 'text-sky-400',
+    badge: 'bg-sky-500/10 text-sky-400/70',
+    line: 'border-sky-500/20',
+    active: 'border-l-sky-400',
+  },
+  'Data Structures': {
+    icon: 'text-violet-400',
+    badge: 'bg-violet-500/10 text-violet-400/70',
+    line: 'border-violet-500/20',
+    active: 'border-l-violet-400',
+  },
+  Sorting: {
+    icon: 'text-emerald-400',
+    badge: 'bg-emerald-500/10 text-emerald-400/70',
+    line: 'border-emerald-500/20',
+    active: 'border-l-emerald-400',
+  },
+  Searching: {
+    icon: 'text-amber-400',
+    badge: 'bg-amber-500/10 text-amber-400/70',
+    line: 'border-amber-500/20',
+    active: 'border-l-amber-400',
+  },
+  Graphs: {
+    icon: 'text-cyan-400',
+    badge: 'bg-cyan-500/10 text-cyan-400/70',
+    line: 'border-cyan-500/20',
+    active: 'border-l-cyan-400',
+  },
+  Backtracking: {
+    icon: 'text-rose-400',
+    badge: 'bg-rose-500/10 text-rose-400/70',
+    line: 'border-rose-500/20',
+    active: 'border-l-rose-400',
+  },
+  'Dynamic Programming': {
+    icon: 'text-orange-400',
+    badge: 'bg-orange-500/10 text-orange-400/70',
+    line: 'border-orange-500/20',
+    active: 'border-l-orange-400',
+  },
+  'Divide and Conquer': {
+    icon: 'text-indigo-400',
+    badge: 'bg-indigo-500/10 text-indigo-400/70',
+    line: 'border-indigo-500/20',
+    active: 'border-l-indigo-400',
+  },
+}
+
+const defaultCategoryColor = {
+  icon: 'text-neutral-400',
+  badge: 'bg-white/[0.04] text-neutral-600',
+  line: 'border-white/[0.08]',
+  active: 'border-l-neutral-400',
 }
 
 export default function Sidebar({ categories, selectedId, onSelect, locale = 'en' }: SidebarProps) {
@@ -233,6 +307,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
         {filtered.map((category) => {
           const isExpanded = expanded.has(category.name)
           const categoryId = `category-${category.name.toLowerCase().replace(/\s+/g, '-')}`
+          const colors = categoryColors[category.name] ?? defaultCategoryColor
 
           return (
             <div key={category.name} className="mb-1">
@@ -256,12 +331,14 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                     />
                   </svg>
                   <span className="flex items-center gap-1.5">
-                    {categoryIcons[category.name]}
+                    <span className={colors.icon}>
+                      {categoryIcons[category.name]}
+                    </span>
                     {getCategoryName(locale, category.name)}
                   </span>
                 </div>
                 <span
-                  className="text-[10px] font-normal text-neutral-600 bg-white/[0.04] px-1.5 py-0.5 rounded-full tabular-nums"
+                  className={`text-[10px] font-normal px-1.5 py-0.5 rounded-full tabular-nums ${colors.badge}`}
                   aria-label={t.algorithmCountLabel.replace(
                     '{count}',
                     String(category.algorithms.length),
@@ -281,7 +358,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                   opacity: isExpanded ? 1 : 0,
                 }}
               >
-                <div className="ml-4 mt-0.5 space-y-0.5 border-l border-white/[0.06] pl-2">
+                <div className={`ml-4 mt-0.5 space-y-0.5 border-l pl-2 ${colors.line}`}>
                   {category.algorithms.map((algo) => (
                     <a
                       key={algo.id}
@@ -291,10 +368,10 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                         onSelect(algo)
                       }}
                       aria-current={selectedId === algo.id ? 'page' : undefined}
-                      className={`block px-3 py-1.5 text-[13px] rounded-md transition-all duration-150 ${
+                      className={`block px-3 py-1.5 text-[13px] rounded-md transition-all duration-150 border-l-2 ${
                         selectedId === algo.id
-                          ? 'bg-white/[0.08] text-white font-medium'
-                          : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.04]'
+                          ? `${colors.active} bg-white/[0.08] text-white font-medium`
+                          : 'border-transparent text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.04]'
                       }`}
                     >
                       {algo.name}
