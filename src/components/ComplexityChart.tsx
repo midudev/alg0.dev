@@ -293,7 +293,7 @@ export default function ComplexityChart({ description, locale = 'en' }: { descri
         {entries.map((e, i) => (
           <div key={i} className="flex items-center gap-1.5">
             <div
-              className="w-3 h-[2px] rounded-full shrink-0"
+              className="w-3 h-0.5 rounded-full shrink-0"
               style={{ backgroundColor: e.color }}
             />
             <span className="text-[10px] text-neutral-500">

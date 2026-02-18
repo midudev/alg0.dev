@@ -139,7 +139,7 @@ export default function Controls({
       {/* Progress bar + counter */}
       <div className="flex items-center gap-3 min-w-0">
         <div className="relative w-20 lg:w-36 group cursor-pointer shrink-0">
-          <div className="h-0.5 bg-white/[0.08] rounded-full overflow-hidden" aria-hidden="true">
+          <div className="h-0.5 bg-white/8 rounded-full overflow-hidden" aria-hidden="true">
             <div
               className="h-full bg-white rounded-full transition-all duration-200"
               style={{

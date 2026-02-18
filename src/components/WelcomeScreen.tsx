@@ -13,7 +13,7 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
     <div className="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6 min-h-0">
       {/* Welcome header */}
       <div className="text-center max-w-md shrink-0 px-4 md:px-0">
-        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08] mx-auto mb-3 md:mb-4">
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/4 flex items-center justify-center border border-white/8 mx-auto mb-3 md:mb-4">
           <svg
             className="w-5 h-5 md:w-6 md:h-6 text-white/60"
             fill="none"
@@ -29,9 +29,9 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
             />
           </svg>
         </div>
-        <h2 className="text-lg md:text-xl font-semibold text-white mb-2 text-balance font-heading">
+        <h1 className="text-lg md:text-xl font-semibold text-white mb-2 text-balance font-heading">
           {t.welcomeTitle}
-        </h2>
+        </h1>
         <p className="text-xs md:text-sm text-neutral-500 leading-relaxed  max-w-lg text-balance inline-block">
           {t.welcomeDescription}
         </p>
@@ -43,7 +43,7 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
       {/* Keyboard shortcuts — hidden on mobile (touch devices don't use keyboards) */}
       <div className="hidden md:flex items-center justify-center gap-3 text-xs text-neutral-600 shrink-0">
         <div className="flex items-center gap-2">
-          <kbd className="w-8 h-8 flex items-center justify-center bg-white/[0.06] rounded-lg border border-white/[0.10] text-white/80">
+          <kbd className="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80">
             <svg
               width="24"
               height="24"
@@ -61,7 +61,7 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
-            <kbd className="w-8 h-8 flex items-center justify-center bg-white/[0.06] rounded-lg border border-white/[0.10] text-white/80">
+            <kbd className="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80">
               <svg
                 width="16"
                 height="16"
@@ -77,7 +77,7 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
                 />
               </svg>
             </kbd>
-            <kbd className="w-8 h-8 flex items-center justify-center bg-white/[0.06] rounded-lg border border-white/[0.10] text-white/80">
+            <kbd className="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80">
               <svg
                 width="16"
                 height="16"

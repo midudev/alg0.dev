@@ -23,6 +23,7 @@ const {
 } = Astro.props
 
 const siteName = "alg0.dev"
+const twitterAuthor = "@midudev"
 
 // Compute dynamic hreflang alternates
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/'
@@ -49,13 +50,17 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
     <meta name="description" content={description} />
     <meta name="theme-color" content="#000000" />
     <link rel="canonical" href={canonicalURL} />
-
+    <link rel="manifest" href="/site.webmanifest" />
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(ogImage, Astro.site).href} />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:locale" content={ogLocale} />
     <link rel="alternate" hreflang="en" href={enAlternateUrl} />
@@ -64,6 +69,7 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={twitterAuthor} />
     <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

@@ -222,7 +222,7 @@ export default function GraphVisualizer({ step, locale = 'en' }: GraphVisualizer
               graph.queue.map((nodeId, i) => (
                 <span
                   key={i}
-                  className="text-xs font-mono bg-white/[0.06] text-neutral-300 px-2.5 py-1 rounded-md border border-white/[0.08]"
+                  className="text-xs font-mono bg-white/6 text-neutral-300 px-2.5 py-1 rounded-md border border-white/8"
                 >
                   {nodeId}
                 </span>
@@ -246,7 +246,7 @@ export default function GraphVisualizer({ step, locale = 'en' }: GraphVisualizer
               graph.stack.map((nodeId, i) => (
                 <span
                   key={i}
-                  className="text-xs font-mono bg-white/[0.06] text-neutral-300 px-2.5 py-1 rounded-md border border-white/[0.08]"
+                  className="text-xs font-mono bg-white/6 text-neutral-300 px-2.5 py-1 rounded-md border border-white/8"
                 >
                   {nodeId}
                 </span>
@@ -271,7 +271,7 @@ export default function GraphVisualizer({ step, locale = 'en' }: GraphVisualizer
             {Object.entries(distances).map(([nodeId, dist]) => (
               <span
                 key={nodeId}
-                className="text-xs font-mono bg-white/[0.06] text-neutral-300 px-2 py-1 rounded-md border border-white/[0.08]"
+                className="text-xs font-mono bg-white/6 text-neutral-300 px-2 py-1 rounded-md border border-white/8"
               >
                 {nodes.find((n) => n.id === Number(nodeId))?.label ?? nodeId}:{' '}
                 {dist === Infinity ? '∞' : dist}

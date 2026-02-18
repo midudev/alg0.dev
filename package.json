@@ -1,7 +1,7 @@
 {
   "name": "alg0.dev",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/react": "19.2.13",
     "@types/react-dom": "19.2.3",
-    "eslint": "^9.18.0",
+    "eslint": "9.18.0",
     "neostandard": "0.12.2",
     "prettier": "3.8.1"
   }

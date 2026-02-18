@@ -266,7 +266,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
             aria-label={t.searchPlaceholder}
-            className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg pl-9 pr-8 py-2 text-xs text-neutral-300 placeholder-neutral-600 outline-none focus:border-white/20 focus:bg-white/[0.05] transition-all"
+            className="w-full bg-white/3 border border-white/8 rounded-lg pl-9 pr-8 py-2 text-xs text-neutral-300 placeholder-neutral-600 outline-none focus:border-white/20 focus:bg-white/5 transition-all"
           />
           {search ? (
             <button
@@ -275,7 +275,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                 setSearch('')
                 searchInputRef.current?.focus()
               }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[18px] h-[18px] rounded border border-white/10 bg-white/[0.03] text-neutral-600 hover:text-neutral-300 hover:border-white/20 hover:bg-white/[0.06] transition-all"
+              className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[18px] h-[18px] rounded border border-white/10 bg-white/3 text-neutral-600 hover:text-neutral-300 hover:border-white/20 hover:bg-white/6 transition-all"
               aria-label={locale === 'es' ? 'Limpiar búsqueda' : 'Clear search'}
             >
               <svg
@@ -292,7 +292,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
           ) : (
             !searchFocused && (
               <kbd
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[18px] h-[18px] text-[10px] font-mono rounded border border-white/10 text-neutral-600 bg-white/[0.03]"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[18px] h-[18px] text-[10px] font-mono rounded border border-white/10 text-neutral-600 bg-white/3"
                 aria-hidden="true"
               >
                 /
@@ -315,7 +315,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                 onClick={() => toggle(category.name)}
                 aria-expanded={isExpanded}
                 aria-controls={categoryId}
-                className="w-full flex items-center justify-between px-2.5 py-2 text-[11px] font-semibold text-neutral-500 hover:text-neutral-400 transition-colors rounded-md hover:bg-white/[0.03] uppercase tracking-widest"
+                className="w-full flex items-center justify-between px-2.5 py-2 text-[11px] font-semibold text-neutral-500 hover:text-neutral-400 transition-colors rounded-md hover:bg-white/3 uppercase tracking-widest"
               >
                 <div className="flex items-center gap-2">
                   <svg
@@ -370,8 +370,8 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                       aria-current={selectedId === algo.id ? 'page' : undefined}
                       className={`block px-3 py-1.5 text-[13px] rounded-md transition-all duration-150 border-l-2 ${
                         selectedId === algo.id
-                          ? `${colors.active} bg-white/[0.08] text-white font-medium`
-                          : 'border-transparent text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.04]'
+                          ? `${colors.active} bg-white/8 text-white font-medium`
+                          : 'border-transparent text-neutral-500 hover:text-neutral-300 hover:bg-white/4'
                       }`}
                     >
                       {algo.name}
@@ -385,7 +385,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-white/[0.06]">
+      <div className="p-3 border-t border-white/6">
         <div className="flex items-center justify-center gap-1.5 text-[10px] text-neutral-700">
           <span>
             {t.algorithmsCount.replace(
