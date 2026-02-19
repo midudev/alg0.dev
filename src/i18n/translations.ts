@@ -32,6 +32,8 @@ export interface Translations {
   selectAlgorithmCode: string
   expandCodePanel: string
   collapseCodePanel: string
+  codeLanguageLabel: string
+  codeLanguageWarning: string
   variables: string
 
   // Controls
@@ -86,6 +88,8 @@ export const translations: Record<Locale, Translations> = {
     selectAlgorithmCode: 'Select an algorithm to view its code',
     expandCodePanel: 'Expand code panel',
     collapseCodePanel: 'Collapse code panel',
+    codeLanguageLabel: 'Language',
+    codeLanguageWarning: 'Step-by-step highlighting is only synced with JavaScript right now.',
     variables: 'Variables',
 
     speed: 'Speed',
@@ -996,6 +1000,8 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
     selectAlgorithmCode: 'Selecciona un algoritmo para ver su código',
     expandCodePanel: 'Expandir panel de código',
     collapseCodePanel: 'Contraer panel de código',
+    codeLanguageLabel: 'Lenguaje',
+    codeLanguageWarning: 'El paso a paso solo se sincroniza con JavaScript por ahora.',
     variables: 'Variables',
 
     speed: 'Velocidad',

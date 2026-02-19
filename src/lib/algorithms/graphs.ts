@@ -349,6 +349,72 @@ const dijkstra: Algorithm = {
 
   return dist;
 }`,
+  codeSamples: [
+    {
+      language: 'cpp',
+      code: `#include <vector>
+    #include <queue>
+    #include <limits>
+    #include <functional>
+
+std::vector<int> dijkstra(const std::vector<std::vector<std::pair<int, int>>>& graph, int start) {
+  const int n = graph.size();
+  const int INF = std::numeric_limits<int>::max();
+  std::vector<int> dist(n, INF);
+  dist[start] = 0;
+  using Node = std::pair<int, int>; // {distance, node}
+  std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
+  pq.push({0, start});
+
+  while (!pq.empty()) {
+    auto [d, u] = pq.top();
+    pq.pop();
+    if (d != dist[u]) continue;
+
+    for (const auto& [v, w] : graph[u]) {
+      if (dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+        pq.push({dist[v], v});
+      }
+    }
+  }
+
+  return dist;
+}`,
+    },
+    {
+      language: 'java',
+      code: `import java.util.*;
+
+public static int[] dijkstra(List<List<int[]>> graph, int start) {
+  int n = graph.size();
+  int[] dist = new int[n];
+  Arrays.fill(dist, Integer.MAX_VALUE);
+  dist[start] = 0;
+
+  PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(edge -> edge[0]));
+  pq.offer(new int[] {0, start});
+
+  while (!pq.isEmpty()) {
+    int[] current = pq.poll();
+    int d = current[0];
+    int u = current[1];
+    if (d != dist[u]) continue;
+
+    for (int[] edge : graph.get(u)) {
+      int v = edge[0];
+      int w = edge[1];
+      if (dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+        pq.offer(new int[] {dist[v], v});
+      }
+    }
+  }
+
+  return dist;
+}`,
+    },
+  ],
   description: `Dijkstra's Algorithm
 
 Dijkstra's Algorithm finds the shortest path from a source node to all other nodes in a weighted graph with non-negative edge weights.

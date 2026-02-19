@@ -81,6 +81,128 @@ class LinkedList {
     }
   }
 }`,
+  codeSamples: [
+    {
+      language: 'cpp',
+      code: `struct Node {
+  int value;
+  Node* next;
+  explicit Node(int v) : value(v), next(nullptr) {}
+};
+
+class LinkedList {
+ public:
+  void append(int value) {
+    Node* node = new Node(value);
+    if (!head) {
+      head = tail = node;
+    } else {
+      tail->next = node;
+      tail = node;
+    }
+  }
+
+  void prepend(int value) {
+    Node* node = new Node(value);
+    node->next = head;
+    head = node;
+    if (!tail) tail = node;
+  }
+
+  Node* search(int value) const {
+    Node* current = head;
+    while (current) {
+      if (current->value == value) return current;
+      current = current->next;
+    }
+    return nullptr;
+  }
+
+  void remove(int value) {
+    if (!head) return;
+    if (head->value == value) {
+      Node* next = head->next;
+      delete head;
+      head = next;
+      if (!head) tail = nullptr;
+      return;
+    }
+    Node* current = head;
+    while (current->next) {
+      if (current->next->value == value) {
+        Node* victim = current->next;
+        current->next = victim->next;
+        if (victim == tail) tail = current;
+        delete victim;
+        return;
+      }
+      current = current->next;
+    }
+  }
+
+ private:
+  Node* head = nullptr;
+  Node* tail = nullptr;
+};`,
+    },
+    {
+      language: 'java',
+      code: `class LinkedList {
+  static class Node {
+    int value;
+    Node next;
+    Node(int value) { this.value = value; }
+  }
+
+  private Node head;
+  private Node tail;
+
+  void append(int value) {
+    Node node = new Node(value);
+    if (head == null) {
+      head = tail = node;
+    } else {
+      tail.next = node;
+      tail = node;
+    }
+  }
+
+  void prepend(int value) {
+    Node node = new Node(value);
+    node.next = head;
+    head = node;
+    if (tail == null) tail = node;
+  }
+
+  Node search(int value) {
+    Node current = head;
+    while (current != null) {
+      if (current.value == value) return current;
+      current = current.next;
+    }
+    return null;
+  }
+
+  void deleteValue(int value) {
+    if (head == null) return;
+    if (head.value == value) {
+      head = head.next;
+      if (head == null) tail = null;
+      return;
+    }
+    Node current = head;
+    while (current.next != null) {
+      if (current.next.value == value) {
+        current.next = current.next.next;
+        if (current.next == null) tail = current;
+        return;
+      }
+      current = current.next;
+    }
+  }
+}`,
+    },
+  ],
   description: `Linked List
 
 A Linked List is a linear data structure where each element (node) contains a value and a pointer (reference) to the next node.
@@ -601,6 +723,99 @@ class BST {
     return null;
   }
 }`,
+  codeSamples: [
+    {
+      language: 'cpp',
+      code: `struct Node {
+  int value;
+  Node* left;
+  Node* right;
+  explicit Node(int v) : value(v), left(nullptr), right(nullptr) {}
+};
+
+class BST {
+ public:
+  void insert(int value) {
+    if (!root) {
+      root = new Node(value);
+      return;
+    }
+    Node* current = root;
+    while (true) {
+      if (value < current->value) {
+        if (!current->left) {
+          current->left = new Node(value);
+          return;
+        }
+        current = current->left;
+      } else {
+        if (!current->right) {
+          current->right = new Node(value);
+          return;
+        }
+        current = current->right;
+      }
+    }
+  }
+
+  Node* search(int value) const {
+    Node* current = root;
+    while (current) {
+      if (value == current->value) return current;
+      current = value < current->value ? current->left : current->right;
+    }
+    return nullptr;
+  }
+
+ private:
+  Node* root = nullptr;
+};`,
+    },
+    {
+      language: 'java',
+      code: `class BinarySearchTree {
+  static class Node {
+    int value;
+    Node left, right;
+    Node(int value) { this.value = value; }
+  }
+
+  private Node root;
+
+  void insert(int value) {
+    if (root == null) {
+      root = new Node(value);
+      return;
+    }
+    Node current = root;
+    while (true) {
+      if (value < current.value) {
+        if (current.left == null) {
+          current.left = new Node(value);
+          return;
+        }
+        current = current.left;
+      } else {
+        if (current.right == null) {
+          current.right = new Node(value);
+          return;
+        }
+        current = current.right;
+      }
+    }
+  }
+
+  Node search(int value) {
+    Node current = root;
+    while (current != null) {
+      if (value == current.value) return current;
+      current = value < current.value ? current.left : current.right;
+    }
+    return null;
+  }
+}`,
+    },
+  ],
   description: `Binary Search Tree (BST)
 
 A BST is a tree where each node has at most two children, and for every node:

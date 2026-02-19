@@ -41,6 +41,72 @@ const nQueens: Algorithm = {
   solve(0);
   return board;
 }`,
+  codeSamples: [
+    {
+      language: 'cpp',
+      code: `#include <vector>
+#include <string>
+
+bool solve(int row, int n, std::vector<std::string>& board,
+           std::vector<bool>& cols,
+           std::vector<bool>& diag1,
+           std::vector<bool>& diag2) {
+  if (row == n) return true;
+  for (int col = 0; col < n; ++col) {
+    if (cols[col] || diag1[row + col] || diag2[row - col + n - 1]) continue;
+    board[row][col] = 'Q';
+    cols[col] = diag1[row + col] = diag2[row - col + n - 1] = true;
+    if (solve(row + 1, n, board, cols, diag1, diag2)) return true;
+    cols[col] = diag1[row + col] = diag2[row - col + n - 1] = false;
+    board[row][col] = '.';
+  }
+  return false;
+}
+
+std::vector<std::string> solveNQueens(int n) {
+  std::vector<std::string> board(n, std::string(n, '.'));
+  std::vector<bool> cols(n, false);
+  std::vector<bool> diag1(2 * n - 1, false);
+  std::vector<bool> diag2(2 * n - 1, false);
+  solve(0, n, board, cols, diag1, diag2);
+  return board;
+}`,
+    },
+    {
+      language: 'java',
+      code: `import java.util.Arrays;
+
+class NQueensSolver {
+  static char[][] solveNQueens(int n) {
+    char[][] board = new char[n][n];
+    for (char[] row : board) {
+      Arrays.fill(row, '.');
+    }
+    boolean[] cols = new boolean[n];
+    boolean[] diag1 = new boolean[2 * n - 1];
+    boolean[] diag2 = new boolean[2 * n - 1];
+    backtrack(0, n, board, cols, diag1, diag2);
+    return board;
+  }
+
+  private static boolean backtrack(int row, int n, char[][] board,
+                                   boolean[] cols,
+                                   boolean[] diag1,
+                                   boolean[] diag2) {
+    if (row == n) return true;
+    for (int col = 0; col < n; col++) {
+      if (cols[col] || diag1[row + col] || diag2[row - col + n - 1]) continue;
+      board[row][col] = 'Q';
+      cols[col] = diag1[row + col] = diag2[row - col + n - 1] = true;
+      if (backtrack(row + 1, n, board, cols, diag1, diag2)) return true;
+      board[row][col] = '.';
+      cols[col] = diag1[row + col] = diag2[row - col + n - 1] = false;
+    }
+    return false;
+  }
+}`,
+    },
+  ],
   description: `N-Queens Problem
 
 The N-Queens problem asks: how can N chess queens be placed on an N×N chessboard so that no two queens threaten each other?

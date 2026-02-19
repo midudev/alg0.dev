@@ -1,5 +1,13 @@
 export type VisualizationType = 'array' | 'graph' | 'matrix' | 'concept'
 
+export type CodeLanguage = 'javascript' | 'typescript' | 'python' | 'cpp' | 'java'
+
+export interface CodeSample {
+  language: CodeLanguage
+  label?: string
+  code: string
+}
+
 export type HighlightType =
   | 'comparing'
   | 'swapped'
@@ -213,6 +221,7 @@ export interface Algorithm {
   difficulty: Difficulty
   description: string
   code: string
+  codeSamples?: CodeSample[]
   visualization: VisualizationType
   generateSteps: (locale?: string) => Step[]
 }
