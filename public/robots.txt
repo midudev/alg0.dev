@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alg0.dev/sitemap-index.xml
