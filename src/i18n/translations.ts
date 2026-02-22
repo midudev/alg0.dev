@@ -61,6 +61,18 @@ export interface Translations {
 
   // Algorithm descriptions
   algorithmDescriptions: Record<string, string>
+
+  // Compare mode
+  compareButton: string
+  compareModeTitle: string
+  selectAlgorithm: string
+  selectLeftAlgorithm: string
+  selectRightAlgorithm: string
+  syncPlayback: string
+  exitCompare: string
+  vs: string
+  chooseAlgorithm: string
+  searchAlgorithms: string
 }
 
 export const translations: Record<Locale, Translations> = {
@@ -972,6 +984,17 @@ Properties:
 
 The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says monks in a temple are moving 64 golden disks — completing the puzzle would mark the end of the world (requiring 18,446,744,073,709,551,615 moves).`,
     },
+
+    compareButton: 'Compare',
+    compareModeTitle: 'Side-by-Side Comparison',
+    selectAlgorithm: 'Select algorithm',
+    selectLeftAlgorithm: 'Select left algorithm',
+    selectRightAlgorithm: 'Select right algorithm',
+    syncPlayback: 'Sync playback',
+    exitCompare: 'Exit comparison',
+    vs: 'vs',
+    chooseAlgorithm: 'Choose an algorithm to compare',
+    searchAlgorithms: 'Search algorithms...',
   },
 
   es: {
@@ -1882,6 +1905,17 @@ Propiedades:
 
 El rompecabezas fue inventado por el matemático Édouard Lucas en 1883. La leyenda dice que monjes en un templo están moviendo 64 discos dorados — completar el rompecabezas marcaría el fin del mundo (requiriendo 18.446.744.073.709.551.615 movimientos).`,
     },
+
+    compareButton: 'Comparar',
+    compareModeTitle: 'Comparación Lado a Lado',
+    selectAlgorithm: 'Seleccionar algoritmo',
+    selectLeftAlgorithm: 'Seleccionar algoritmo izquierdo',
+    selectRightAlgorithm: 'Seleccionar algoritmo derecho',
+    syncPlayback: 'Sincronizar reproducción',
+    exitCompare: 'Salir de comparación',
+    vs: 'vs',
+    chooseAlgorithm: 'Elige un algoritmo para comparar',
+    searchAlgorithms: 'Buscar algoritmos...',
   },
 }
 
