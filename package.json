@@ -11,11 +11,11 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "@astrojs/react": "4.4.2",
-    "@astrojs/sitemap": "^3.7.0",
+    "@astrojs/react": "5.0.0",
+    "@astrojs/sitemap": "3.7.1",
     "@monaco-editor/react": "4.7.0",
     "@tailwindcss/vite": "4.1.18",
-    "astro": "5.17.2",
+    "astro": "6.0.4",
     "geist": "1.7.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
