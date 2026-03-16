@@ -29,6 +29,7 @@ import {
   countingSort,
   radixSort,
   shellSort,
+  bucketSort,
 } from '@lib/algorithms/sorting'
 
 import {
@@ -86,6 +87,7 @@ export const algorithms: Algorithm[] = [
   countingSort,
   radixSort,
   shellSort,
+  bucketSort,
   // Searching
   binarySearch,
   linearSearch,

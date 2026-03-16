@@ -862,7 +862,7 @@ Useful when worst-case performance matters and stability is not required.`,
         variables: { i, max: arr[0] },
       })
 
-      ;[arr[0], arr[i]] = [arr[i], arr[0]]
+        ;[arr[0], arr[i]] = [arr[i], arr[0]]
       sortedIndices.push(i)
 
       steps.push({
@@ -1339,6 +1339,366 @@ A good general-purpose algorithm; much faster than Insertion Sort for medium-siz
   },
 }
 
+// ============================================================
+// BUCKET SORT
+// ============================================================
+const bucketSort: Algorithm = {
+  id: 'bucket-sort',
+  name: 'Bucket Sort',
+  category: 'Sorting',
+  difficulty: 'intermediate',
+  visualization: 'concept',
+  code: `function bucketSort(array, bucketSize = 5) {
+  if (array.length === 0) return array;
+
+  // 1. Find min and max values
+  let min = array[0];
+  let max = array[0];
+  for (let i = 1; i < array.length; i++) {
+    if (array[i] < min) min = array[i];
+    else if (array[i] > max) max = array[i];
+  }
+
+  // 2. Initialize buckets
+  const bucketCount = Math.floor((max - min) / bucketSize) + 1;
+  const buckets = new Array(bucketCount);
+  for (let i = 0; i < buckets.length; i++) {
+    buckets[i] = [];
+  }
+
+  // 3. Distribute elements into buckets
+  for (let i = 0; i < array.length; i++) {
+    const bucketIndex = Math.floor((array[i] - min) / bucketSize);
+    buckets[bucketIndex].push(array[i]);
+  }
+
+  // 4. Sort buckets and concatenate
+  array.length = 0;
+  for (let i = 0; i < buckets.length; i++) {
+    insertionSort(buckets[i]);
+    for (let j = 0; j < buckets[i].length; j++) {
+      array.push(buckets[i][j]);
+    }
+  }
+
+  return array;
+}`,
+  description: `Bucket Sort
+
+Bucket Sort is a distribution-based sorting algorithm that works by partitioning an array into a number of buckets. Each bucket is then sorted individually, either using a different sorting algorithm or by recursively applying bucket sort.
+
+How it works:
+1. Find the maximum and minimum values in the array
+2. Determine the number of buckets and initialize them
+3. Distribute each element into its corresponding bucket based on its value
+4. Sort each non-empty bucket (typically using Insertion Sort)
+5. Concatenate all sorted buckets back into the original array
+
+Time Complexity:
+  Best:    O(n + k) — when elements are uniformly distributed
+  Average: O(n + k)
+  Worst:   O(n²) — when elements are concentrated in one bucket
+
+Space Complexity: O(n + k) — where k is the number of buckets
+
+Properties:
+  - Stable sort (if the underlying sort is stable)
+  - Not in-place
+  - Efficiency depends on the distribution of input data
+
+Ideal for sorting floating-point numbers or data uniformly distributed over a range.`,
+
+  generateSteps(locale = 'en') {
+    const arr = [22, 45, 12, 8, 10, 6, 72, 81, 33, 18, 50, 14]
+    const steps: Step[] = []
+    const n = arr.length
+    const bucketSize = 20
+
+    // Phase 1: Range finding (Min/Max loop)
+    let min = arr[0]
+    let max = arr[0]
+
+    // Initial min/max step
+    steps.push({
+      array: [...arr],
+      highlights: { 0: 'comparing' },
+      concept: {
+        type: 'buckets',
+        array: [...arr],
+        buckets: [],
+        phase: 'initializing',
+        currentElementIndex: 0,
+        min,
+        max,
+        operation: d(locale, 'Step 1: Finding range (min & max)', 'Paso 1: Buscando el rango (mín y máx)'),
+      },
+      description: d(
+        locale,
+        `Starting with the first element: setting initial min and max to ${arr[0]}.`,
+        `Empezando con el primer elemento: estableciendo mín y máx inicial en ${arr[0]}.`
+      ),
+      codeLine: 5,
+      variables: { min, max },
+    })
+
+    for (let i = 1; i < n; i++) {
+      const isNewMin = arr[i] < min
+      const isNewMax = arr[i] > max
+
+      if (isNewMin) min = arr[i]
+      if (isNewMax) max = arr[i]
+
+      steps.push({
+        array: [...arr],
+        highlights: { [i]: 'comparing' },
+        concept: {
+          type: 'buckets',
+          array: [...arr],
+          buckets: [],
+          phase: 'initializing',
+          currentElementIndex: i,
+          min,
+          max,
+          operation: d(locale, `Checking element ${i}: ${arr[i]}`, `Verificando elemento ${i}: ${arr[i]}`),
+        },
+        description: d(
+          locale,
+          `Checking ${arr[i]}. ${isNewMin ? 'New min found!' : isNewMax ? 'New max found!' : 'Range remains same.'} Current min: ${min}, max: ${max}.`,
+          `Verificando ${arr[i]}. ${isNewMin ? '¡Nuevo mín!' : isNewMax ? '¡Nuevo máx!' : 'El rango se mantiene.'} Mín actual: ${min}, máx: ${max}.`
+        ),
+        codeLine: 5,
+        variables: { i, min, max, 'array[i]': arr[i] },
+      })
+    }
+
+    // Phase 2: Create buckets
+    const bucketCount = Math.floor((max - min) / bucketSize) + 1
+    const finalBuckets: number[][] = Array.from({ length: bucketCount }, () => [])
+
+    // Show empty buckets appearing
+    steps.push({
+      array: [...arr],
+      concept: {
+        type: 'buckets',
+        array: [...arr],
+        buckets: Array.from({ length: bucketCount }, () => []),
+        phase: 'initializing',
+        min,
+        max,
+        bucketSize,
+        operation: d(locale, `Step 2: Creating ${bucketCount} buckets`, `Paso 2: Creando ${bucketCount} cubetas`),
+      },
+      description: d(
+        locale,
+        `With range [${min}..${max}] and size ${bucketSize}, we create ${bucketCount} empty buckets.`,
+        `Con el rango [${min}..${max}] y tamaño ${bucketSize}, creamos ${bucketCount} cubetas vacías.`
+      ),
+      codeLine: 13,
+      variables: { min, max, bucketCount, bucketSize },
+    })
+
+    // Phase 3: Distribution
+    const buckets: number[][] = Array.from({ length: bucketCount }, () => [])
+    for (let i = 0; i < n; i++) {
+      const bucketIndex = Math.floor((arr[i] - min) / bucketSize)
+      buckets[bucketIndex].push(arr[i])
+
+      steps.push({
+        array: [...arr],
+        highlights: { [i]: 'active' },
+        concept: {
+          type: 'buckets',
+          array: [...arr],
+          buckets: buckets.map(b => [...b]),
+          range: { min, max },
+          min,
+          max,
+          bucketSize,
+          currentElementIndex: i,
+          activeBucketIndex: bucketIndex,
+          phase: 'distributing',
+          operation: d(locale, `Distributing ${arr[i]} → Bucket ${bucketIndex}`, `Distribuyendo ${arr[i]} → Cubeta ${bucketIndex}`),
+        },
+        description: d(
+          locale,
+          `Element ${arr[i]} belongs to bucket ${bucketIndex} (range ${min + bucketIndex * bucketSize}-${min + (bucketIndex + 1) * bucketSize - 1}).`,
+          `El elemento ${arr[i]} pertenece a la cubeta ${bucketIndex} (rango ${min + bucketIndex * bucketSize}-${min + (bucketIndex + 1) * bucketSize - 1}).`
+        ),
+        codeLine: 20,
+        variables: { i, 'array[i]': arr[i], bucketIndex },
+      })
+    }
+
+    // Phase 4: Selection and Sort
+    const collected: number[] = []
+
+    for (let i = 0; i < bucketCount; i++) {
+      if (buckets[i].length > 0) {
+        // Step-by-step Insertion Sort inside the bucket
+        const bucketArr = [...buckets[i]]
+        for (let k = 1; k < bucketArr.length; k++) {
+          let key = bucketArr[k]
+          let l = k - 1
+
+          steps.push({
+            array: [...arr],
+            concept: {
+              type: 'buckets',
+              array: [...arr],
+              buckets: buckets.map((b, idx) => idx === i ? [...bucketArr] : [...b]),
+              range: { min, max },
+              min,
+              max,
+              bucketSize,
+              activeBucketIndex: i,
+              innerHighlights: { [k]: 'current', [l]: 'comparing' },
+              phase: 'sorting',
+              operation: d(locale, `Bucket ${i}: Comparing ${bucketArr[k]} and ${bucketArr[l]}`, `Cubeta ${i}: Comparando ${bucketArr[k]} y ${bucketArr[l]}`),
+            },
+            description: d(
+              locale,
+              `Bucket ${i}: Checking if ${bucketArr[k]} should move before ${bucketArr[l]}.`,
+              `Cubeta ${i}: Verificando si ${bucketArr[k]} debe ir antes de ${bucketArr[l]}.`
+            ),
+            codeLine: 27,
+            variables: { bucketIndex: i, comparing: `${bucketArr[k]} < ${bucketArr[l]}` },
+          })
+
+          while (l >= 0 && bucketArr[l] > key) {
+            bucketArr[l + 1] = bucketArr[l]
+            l = l - 1
+
+            steps.push({
+              array: [...arr],
+              concept: {
+                type: 'buckets',
+                array: [...arr],
+                buckets: buckets.map((b, idx) => idx === i ? [...bucketArr] : [...b]),
+                range: { min, max },
+                min,
+                max,
+                bucketSize,
+                activeBucketIndex: i,
+                innerHighlights: { [l + 1]: 'active', [l + 2]: 'active' },
+                phase: 'sorting',
+                operation: d(locale, `Bucket ${i}: Shifting elements`, `Cubeta ${i}: Desplazando elementos`),
+              },
+              description: d(
+                locale,
+                `Bucket ${i}: Shifting ${bucketArr[l + 1]} to the right.`,
+                `Cubeta ${i}: Desplazando ${bucketArr[l + 1]} a la derecha.`
+              ),
+              codeLine: 27,
+              variables: { bucketIndex: i, key },
+            })
+          }
+          bucketArr[l + 1] = key
+
+          steps.push({
+            array: [...arr],
+            concept: {
+              type: 'buckets',
+              array: [...arr],
+              buckets: buckets.map((b, idx) => idx === i ? [...bucketArr] : [...b]),
+              range: { min, max },
+              min,
+              max,
+              bucketSize,
+              activeBucketIndex: i,
+              innerHighlights: { [l + 1]: 'found' },
+              phase: 'sorting',
+              operation: d(locale, `Bucket ${i}: Placed ${key}`, `Cubeta ${i}: Ubicado ${key}`),
+            },
+            description: d(
+              locale,
+              `Bucket ${i}: Placed ${key} in its sorted position.`,
+              `Cubeta ${i}: Ubicado ${key} en su posición ordenada.`
+            ),
+            codeLine: 27,
+            variables: { bucketIndex: i, position: l + 1 },
+          })
+        }
+
+        // Final update for this bucket
+        buckets[i] = [...bucketArr]
+
+        steps.push({
+          array: [...arr],
+          concept: {
+            type: 'buckets',
+            array: [...arr],
+            buckets: buckets.map(b => [...b]),
+            range: { min, max },
+            min,
+            max,
+            bucketSize,
+            activeBucketIndex: i,
+            phase: 'sorting',
+            operation: d(locale, `Bucket ${i} sorted`, `Cubeta ${i} ordenada`),
+          },
+          description: d(
+            locale,
+            `Bucket ${i} is now sorted: [${buckets[i].join(', ')}]`,
+            `La cubeta ${i} ahora está ordenada: [${buckets[i].join(', ')}]`
+          ),
+          codeLine: 27,
+          variables: { bucketIndex: i },
+        })
+
+        // Collect
+        for (let j = 0; j < buckets[i].length; j++) {
+          collected.push(buckets[i][j])
+          steps.push({
+            array: [...collected, ...arr.slice(collected.length)],
+            highlights: { [collected.length - 1]: 'found' },
+            concept: {
+              type: 'buckets',
+              array: [...collected, ...arr.slice(collected.length)],
+              buckets: buckets.map(b => [...b]),
+              range: { min, max },
+              min,
+              max,
+              bucketSize,
+              activeBucketIndex: i,
+              currentElementIndex: collected.length - 1,
+              innerHighlights: { [j]: 'found' },
+              phase: 'collecting',
+              operation: d(locale, `Step 4: Collecting ${buckets[i][j]}`, `Paso 4: Recolectando ${buckets[i][j]}`),
+            },
+            description: d(
+              locale,
+              `Collecting ${buckets[i][j]} from bucket ${i} into the final array.`,
+              `Recolectando ${buckets[i][j]} de la cubeta ${i} al arreglo final.`
+            ),
+            codeLine: 29,
+            variables: { bucketIndex: i, element: buckets[i][j] },
+          })
+        }
+      }
+    }
+
+    steps.push({
+      array: [...collected],
+      highlights: {},
+      sorted: Array.from({ length: n }, (_, i) => i),
+      concept: {
+        type: 'buckets',
+        array: [...collected],
+        buckets: buckets.map(b => [...b]),
+        min,
+        max,
+        phase: 'collecting',
+        operation: d(locale, 'Bucket Sort complete', 'Bucket Sort completado'),
+      },
+      description: d(locale, 'All buckets are collected. The array is now fully sorted!', 'Todas las cubetas han sido recolectadas. ¡El arreglo ahora está completamente ordenado!'),
+      codeLine: 1,
+      variables: { totalElements: collected.length },
+    })
+
+    return steps
+  },
+}
+
 export {
   bubbleSort,
   selectionSort,
@@ -1349,4 +1709,5 @@ export {
   countingSort,
   radixSort,
   shellSort,
+  bucketSort,
 }

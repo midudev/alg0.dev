@@ -10,6 +10,7 @@ import type {
   SlidingWindowState,
   MemoTableState,
   CoinChangeState,
+  BucketsState,
 } from '@lib/types'
 
 interface ConceptVisualizerProps {
@@ -41,6 +42,8 @@ export default function ConceptVisualizer({ step }: ConceptVisualizerProps) {
       return <MemoTableViz state={concept} />
     case 'coinChange':
       return <CoinChangeViz state={concept} />
+    case 'buckets':
+      return <BucketsViz state={concept} />
     default:
       return null
   }
@@ -1161,6 +1164,252 @@ function CoinChangeViz({ state }: { state: CoinChangeState }) {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════
+//  BUCKETS — Visualization for Bucket Sort
+// ════════════════════════════════════════════════════════════════
+
+function BucketsViz({ state }: { state: BucketsState }) {
+  const {
+    array,
+    buckets,
+    range,
+    min,
+    max,
+    bucketSize,
+    currentElementIndex,
+    activeBucketIndex,
+    innerHighlights,
+    phase,
+    operation,
+  } = state
+
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center gap-6 w-full py-4 scale-90 md:scale-100">
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Bucket Sort Visualization
+      </div>
+
+      {operation && (
+        <div className="font-mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
+          {operation}
+        </div>
+      )}
+
+      {/* Min/Max Status & Calculation during Initializing */}
+      {phase === 'initializing' && (min !== undefined || max !== undefined) && (
+        <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="flex gap-4">
+            <div className="flex flex-col items-center px-4 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg">
+              <span className="text-[9px] font-mono text-rose-400 uppercase font-bold">Current Min</span>
+              <span className="text-xl font-mono font-bold text-rose-500">{min ?? '—'}</span>
+            </div>
+            <div className="flex flex-col items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <span className="text-[9px] font-mono text-blue-400 uppercase font-bold">Current Max</span>
+              <span className="text-xl font-mono font-bold text-blue-500">{max ?? '—'}</span>
+            </div>
+          </div>
+
+          {/* Bucket Calculation Formula */}
+          {buckets.length > 0 && (
+            <div className="bg-neutral-900/50 border border-white/10 rounded-xl px-6 py-4 flex flex-col items-center gap-2 shadow-2xl">
+              <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Bucket Count Calculation</div>
+              <div className="flex items-center gap-3 font-mono">
+                <div className="flex flex-col items-center">
+                  <div className="text-xs text-neutral-400 mb-1">floor((max - min) / size) + 1</div>
+                  <div className="flex items-center text-lg">
+                    <span className="text-neutral-500">⌊</span>
+                    <div className="flex flex-col items-center px-2">
+                      <div className="border-b border-white/20 px-2 pb-0.5 mb-0.5">
+                        <span className="text-blue-400">{max}</span> - <span className="text-rose-400">{min}</span>
+                      </div>
+                      <div className="pt-0.5 text-amber-400 text-sm">{bucketSize}</div>
+                    </div>
+                    <span className="text-neutral-500">⌋</span>
+                    <span className="mx-2 text-white">+ 1</span>
+                    <span className="mx-2 text-neutral-400">=</span>
+                    <span className="text-2xl font-bold text-green-400">{buckets.length}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-[10px] text-neutral-500 italic mt-1">
+                Each bucket covers a range of {bucketSize} values
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Main Array Section */}
+      <div className="flex flex-col items-center gap-3 w-full max-w-2xl px-4 py-3 bg-white/2 rounded-xl border border-white/5">
+        <div className="flex items-center justify-between w-full mb-1">
+          <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
+            {phase === 'collecting' ? 'Result Array' : 'Input Array'}
+          </span>
+          {phase === 'distributing' && currentElementIndex !== undefined && (
+            <span className="text-[10px] font-mono text-blue-400">
+              Processing: <span className="font-bold">{array[currentElementIndex]}</span>
+            </span>
+          )}
+          {phase === 'initializing' && (
+            <span className="text-[10px] font-mono text-amber-400">
+              {buckets.length > 0 ? 'Creating Buckets...' : 'Scanning Range...'}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-wrap justify-center gap-1.5">
+          {array.map((val, i) => {
+            const isProcessing = i === currentElementIndex
+            const isCollected = phase === 'collecting' && i < currentElementIndex!
+            return (
+              <div
+                key={i}
+                className="relative group h-10 w-10"
+              >
+                <div
+                  className="absolute inset-0 rounded border flex items-center justify-center font-mono text-sm transition-all duration-500"
+                  style={{
+                    backgroundColor: isProcessing
+                      ? 'rgba(59,130,246,0.25)'
+                      : isCollected
+                        ? 'rgba(74,222,128,0.1)'
+                        : 'rgba(255,255,255,0.03)',
+                    borderColor: isProcessing
+                      ? '#3b82f6'
+                      : isCollected
+                        ? '#4ade8050'
+                        : 'rgba(255,255,255,0.1)',
+                    color: isProcessing ? '#fff' : isCollected ? '#4ade80' : '#888',
+                    transform: isProcessing ? 'translateY(-4px)' : 'none',
+                    boxShadow: isProcessing ? '0 4px 12px rgba(59,130,246,0.3)' : 'none',
+                    opacity: isCollected ? 0.6 : 1,
+                  }}
+                >
+                  {val}
+                </div>
+                {isProcessing && (
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-blue-400 animate-bounce">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                      <path d="M5 10L0 0H10L5 10Z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Buckets Section */}
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-8 mt-4 w-full px-4">
+        {buckets.map((bucket, bIdx) => {
+          const isActive = bIdx === activeBucketIndex
+          const rangeStart = range ? range.min + bIdx * (bucketSize ?? 1) : 0
+          const rangeEnd = range ? rangeStart + (bucketSize ?? 1) - 1 : 0
+
+          return (
+            <div key={bIdx} className="flex flex-col items-center min-w-[80px]">
+              {/* Range label */}
+              <div
+                className="mb-1.5 px-2 py-0.5 rounded-full text-[9px] font-mono transition-colors duration-300"
+                style={{
+                  backgroundColor: isActive ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.03)',
+                  color: isActive ? '#60a5fa' : '#555',
+                }}
+              >
+                {rangeStart}–{rangeEnd}
+              </div>
+
+              {/* Bucket container */}
+              <div className="relative group">
+                <div
+                  className="w-20 min-h-[120px] rounded-t-xl border-x-2 border-t-2 flex flex-col items-center p-2 gap-1.5 transition-all duration-500"
+                  style={{
+                    backgroundColor: isActive ? 'rgba(59,130,246,0.08)' : 'rgba(255,255,255,0.02)',
+                    borderColor: isActive ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.08)',
+                    boxShadow: isActive ? '0 -8px 20px rgba(59,130,246,0.15)' : 'none',
+                  }}
+                >
+                  {bucket.map((val, vIdx) => {
+                    const highlight = isActive ? innerHighlights?.[vIdx] : undefined
+                    const getHighlightStyles = () => {
+                      switch (highlight) {
+                        case 'comparing': return { bg: 'rgba(59,130,246,0.3)', border: '#3b82f6', text: '#fff' }
+                        case 'active': return { bg: 'rgba(234,179,8,0.3)', border: '#eab308', text: '#fff' }
+                        case 'current': return { bg: 'rgba(168,85,247,0.3)', border: '#a855f7', text: '#fff' }
+                        case 'found': return { bg: 'rgba(74,222,128,0.2)', border: '#4ade80', text: '#4ade80' }
+                        default: return { bg: 'rgba(38,38,38,1)', border: 'rgba(255,255,255,0.1)', text: '#60a5fa' }
+                      }
+                    }
+                    const styles = getHighlightStyles()
+
+                    return (
+                      <div
+                        key={vIdx}
+                        className="w-full h-8 flex items-center justify-center font-mono text-xs font-bold rounded shadow-sm transition-all duration-300 hover:scale-105"
+                        style={{
+                          backgroundColor: styles.bg,
+                          borderColor: styles.border,
+                          borderWidth: '1px',
+                          color: styles.text,
+                          animation: phase === 'distributing' && isActive && vIdx === bucket.length - 1 ? 'pop 0.3s ease-out' : 'none',
+                          transform: highlight ? 'scale(1.05)' : 'none',
+                          zIndex: highlight ? 10 : 1,
+                        }}
+                      >
+                        {val}
+                      </div>
+                    )
+                  })}
+
+                  {/* Empty state dots */}
+                  {bucket.length === 0 && (
+                    <div className="flex-1 flex flex-col items-center justify-center gap-2 opacity-20">
+                      <div className="w-1 h-1 rounded-full bg-white" />
+                      <div className="w-1 h-1 rounded-full bg-white" />
+                      <div className="w-1 h-1 rounded-full bg-white" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Bucket Bottom */}
+                <div
+                  className="w-20 h-3 rounded-b-xl border-x-2 border-b-2 transition-all duration-500"
+                  style={{
+                    backgroundColor: isActive ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.05)',
+                    borderColor: isActive ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.08)',
+                  }}
+                />
+
+                {/* Active indicator */}
+                {isActive && (
+                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                    <span className="text-[10px] font-bold text-blue-400 uppercase tracking-tighter animate-pulse">
+                      Active
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Bucket Index */}
+              <div className="mt-7 text-[10px] font-mono text-neutral-500 font-bold">
+                Bucket {bIdx}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <style>{`
+        @keyframes pop {
+          0% { transform: scale(0.8); opacity: 0; }
+          70% { transform: scale(1.1); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 }

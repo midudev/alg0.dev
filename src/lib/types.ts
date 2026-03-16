@@ -179,6 +179,21 @@ export interface CoinChangeState {
   operation?: string
 }
 
+export interface BucketsState {
+  type: 'buckets'
+  array: number[]
+  buckets: number[][]
+  range?: { min: number; max: number }
+  min?: number
+  max?: number
+  bucketSize?: number
+  currentElementIndex?: number
+  activeBucketIndex?: number
+  innerHighlights?: Record<number, HighlightType>
+  phase: 'initializing' | 'distributing' | 'sorting' | 'collecting'
+  operation?: string
+}
+
 export type ConceptState =
   | BigOState
   | CallStackState
@@ -190,6 +205,7 @@ export type ConceptState =
   | SlidingWindowState
   | MemoTableState
   | CoinChangeState
+  | BucketsState
 
 export interface Step {
   array?: number[]
