@@ -69,11 +69,15 @@ class LinkedList {
     if (!this.head) return;
     if (this.head.value === value) {
       this.head = this.head.next;
+      if (!this.head) this.tail = null;
       return;
     }
     let current = this.head;
     while (current.next) {
       if (current.next.value === value) {
+        if (current.next === this.tail) {
+          this.tail = current;
+        }
         current.next = current.next.next;
         return;
       }
