@@ -933,6 +933,58 @@ export const slidingWindow: Algorithm = {
   }
   return s.slice(bestStart, bestStart + best);
 }`,
+  codeSamples: [
+    {
+      language: 'cpp',
+      code: `#include <string>
+#include <unordered_set>
+
+std::string longestUniqueSubstring(const std::string& s) {
+  std::unordered_set<char> window;
+  std::size_t start = 0, bestStart = 0, bestLen = 0;
+
+  for (std::size_t end = 0; end < s.size(); ++end) {
+    while (window.count(s[end])) {
+      window.erase(s[start]);
+      ++start;
+    }
+    window.insert(s[end]);
+    if (end - start + 1 > bestLen) {
+      bestLen = end - start + 1;
+      bestStart = start;
+    }
+  }
+
+  return s.substr(bestStart, bestLen);
+}`,
+    },
+    {
+      language: 'java',
+      code: `import java.util.HashSet;
+import java.util.Set;
+
+class SlidingWindow {
+  static String longestUniqueSubstring(String s) {
+    Set<Character> window = new HashSet<>();
+    int start = 0, bestStart = 0, bestLen = 0;
+
+    for (int end = 0; end < s.length(); end++) {
+      while (window.contains(s.charAt(end))) {
+        window.remove(s.charAt(start));
+        start++;
+      }
+      window.add(s.charAt(end));
+      if (end - start + 1 > bestLen) {
+        bestLen = end - start + 1;
+        bestStart = start;
+      }
+    }
+
+    return s.substring(bestStart, bestStart + bestLen);
+  }
+}`,
+    },
+  ],
   description: `Sliding Window
 
 Sliding Window maintains a dynamic range (window) over a sequence, expanding and contracting to solve substring/subarray problems efficiently.
