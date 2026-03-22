@@ -64,6 +64,25 @@ function binarySearch(arr, target) {
     else hi = mid - 1;
   }
   return -1;
+}
+  
+
+// O(n log n) — Linearithmic time
+function mergeSort(arr) {
+  if (arr.length <= 1) return arr;
+  const mid = Math.floor(arr.length / 2);
+  const left = mergeSort(arr.slice(0, mid));
+  const right = mergeSort(arr.slice(mid));
+  return merge(left, right);
+}
+
+function merge(left, right) {
+  const result = [];
+  while (left.length && right.length) {
+    if (left[0] < right[0]) result.push(left.shift());
+    else result.push(right.shift());
+  }
+  return [...result, ...left, ...right];
 }`,
   description: `Big O Notation
 
@@ -95,6 +114,8 @@ The chart shows how each complexity's curve grows as the input size increases.`,
     //  7: function findMax(arr) {          25: // O(log n) — Logarithmic time
     //  9:   for (let i = 1; ...) {         26: function binarySearch(arr, target) {
     //                                      28:   while (lo <= hi) {
+    // 36: // O(n log n) — Linearithmic time
+    // 37: function mergeSort(arr) {
 
     // Step 1: Introduction — no curves yet
     steps.push({
@@ -175,7 +196,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(n log n) — Linearithmic. At small n it looks close to O(n). Let\'s see it diverge...',
         'O(n log n) — Linearítmico. Con n pequeño se parece a O(n). Veamos cómo diverge...',
       ),
-      codeLine: 9,
+      codeLine: 41,
       variables: { complexity: 'O(n log n)', 'ops(2)': 2, 'ops(4)': 8 },
     })
 
@@ -186,7 +207,7 @@ The chart shows how each complexity's curve grows as the input size increases.`,
         'O(n log n) at n=10: ~33 operations. Typical of Merge Sort and Quick Sort. It bends away from O(n) as n grows.',
         'O(n log n) con n=10: ~33 operaciones. Típico de Merge Sort y Quick Sort. Se curva alejándose de O(n) conforme n crece.',
       ),
-      codeLine: 9,
+      codeLine: 43,
       variables: { complexity: 'O(n log n)', 'ops(5)': '11.6', 'ops(10)': '33.2' },
     })
 
