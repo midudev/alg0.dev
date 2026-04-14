@@ -67,10 +67,21 @@ export default function Header({
           <button
             onClick={onToggleMobileSidebar}
             className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/6 transition-colors text-neutral-400 hover:text-white shrink-0"
-            aria-label={locale === 'es' ? 'Abrir menú' : 'Open menu'}
+            aria-label={t.openMenu}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
             </svg>
           </button>
         ) : sidebarCollapsed ? (
@@ -129,7 +140,10 @@ export default function Header({
           )}
         </a>
         {selectedAlgorithm && (
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 min-w-0 overflow-hidden">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 min-w-0 overflow-hidden"
+          >
             <span className="text-neutral-600 shrink-0">/</span>
             <span className="text-xs text-neutral-500 hidden md:inline shrink-0">
               {getCategoryName(locale, selectedAlgorithm.category)}
@@ -167,10 +181,21 @@ export default function Header({
           <button
             onClick={onToggleMobileCodePanel}
             className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/6 transition-colors text-neutral-400 hover:text-white"
-            aria-label={locale === 'es' ? 'Ver código' : 'View code'}
+            aria-label={t.viewCode}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+              />
             </svg>
           </button>
         )}
@@ -196,7 +221,10 @@ export default function Header({
             </svg>
           </button>
         )}
-        <nav aria-label={locale === 'es' ? 'Idioma' : 'Language'} className="flex items-center gap-0.5 bg-white/6 rounded-lg p-0.5 border border-white/8">
+        <nav
+          aria-label={t.languageLabel}
+          className="flex items-center gap-0.5 bg-white/6 rounded-lg p-0.5 border border-white/8"
+        >
           {locales.map((l) => (
             <a
               key={l}
