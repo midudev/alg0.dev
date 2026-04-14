@@ -50,6 +50,16 @@ export interface Translations {
   resizeSidebar: string
   resizeCodePanel: string
 
+  // Mobile / aria labels
+  sidebarAriaLabel: string
+  codePanelAriaLabel: string
+  mobileMenuTitle: string
+  openMenu: string
+  closeMenu: string
+  closePanel: string
+  viewCode: string
+  languageLabel: string
+
   // Graph visualizer
   queue: string
   stack: string
@@ -102,6 +112,15 @@ export const translations: Record<Locale, Translations> = {
     resizeSidebar: 'Resize sidebar',
     resizeCodePanel: 'Resize code panel',
 
+    sidebarAriaLabel: 'Algorithm categories',
+    codePanelAriaLabel: 'Code and details panel',
+    mobileMenuTitle: 'Algorithms',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    closePanel: 'Close panel',
+    viewCode: 'View code',
+    languageLabel: 'Language',
+
     queue: 'Queue',
     stack: 'Stack',
     empty: 'empty',
@@ -141,7 +160,7 @@ Rules of Big O:
   2. Drop lower-order terms: O(n² + n) → O(n²)
   3. Focus on the dominant term as n grows large`,
 
-      'recursion': `Recursion
+      recursion: `Recursion
 
 Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem. It's one of the most powerful concepts in computer science.
 
@@ -168,7 +187,7 @@ Pitfalls:
 Recursive algorithms in this visualizer:
   Quick Sort, Merge Sort, DFS, N-Queens, Sudoku Solver, Tower of Hanoi`,
 
-      'stack': `Stack
+      stack: `Stack
 
 A Stack is a linear data structure that follows the LIFO principle — Last In, First Out. Like a stack of plates: you add and remove from the top only.
 
@@ -188,7 +207,7 @@ Applications:
 
 Space Complexity: O(n) for n elements`,
 
-      'queue': `Queue
+      queue: `Queue
 
 A Queue is a linear data structure that follows the FIFO principle — First In, First Out. Like a line at a store: the first person in line is served first.
 
@@ -263,7 +282,7 @@ Examples:
   O(n): Merge Sort (temporary arrays), hash tables
   O(n²): DP tables, adjacency matrices`,
 
-      'memoization': `Memoization
+      memoization: `Memoization
 
 Memoization is an optimization technique that stores the results of expensive function calls and returns the cached result when the same inputs occur again.
 
@@ -364,7 +383,7 @@ Where h = height of the tree:
 
 Applications: ordered data storage, range queries, priority queues (with balancing)`,
 
-      'heap': `Heap (Min Heap)
+      heap: `Heap (Min Heap)
 
 A Heap is a complete binary tree where every parent is smaller (min-heap) or larger (max-heap) than its children. It's stored as an array.
 
@@ -1034,6 +1053,15 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
     resizeSidebar: 'Redimensionar barra lateral',
     resizeCodePanel: 'Redimensionar panel de código',
 
+    sidebarAriaLabel: 'Categorías de algoritmos',
+    codePanelAriaLabel: 'Panel de código y detalles',
+    mobileMenuTitle: 'Algoritmos',
+    openMenu: 'Abrir menú',
+    closeMenu: 'Cerrar menú',
+    closePanel: 'Cerrar panel',
+    viewCode: 'Ver código',
+    languageLabel: 'Idioma',
+
     queue: 'Cola',
     stack: 'Pila',
     empty: 'vacía',
@@ -1073,7 +1101,7 @@ Reglas de Big O:
   2. Eliminar términos de menor orden: O(n² + n) → O(n²)
   3. Enfocarse en el término dominante cuando n crece`,
 
-      'recursion': `Recursión
+      recursion: `Recursión
 
 La recursión es una técnica de programación donde una función se llama a sí misma para resolver instancias más pequeñas del mismo problema. Es uno de los conceptos más poderosos en las ciencias de la computación.
 
@@ -1100,7 +1128,7 @@ Errores comunes:
 Algoritmos recursivos en este visualizador:
   Quick Sort, Merge Sort, DFS, N-Queens, Sudoku Solver, Torre de Hanoi`,
 
-      'stack': `Pila (Stack)
+      stack: `Pila (Stack)
 
 Una Pila es una estructura de datos lineal que sigue el principio LIFO — Último en Entrar, Primero en Salir. Como una pila de platos: solo puedes añadir y quitar del tope.
 
@@ -1120,7 +1148,7 @@ Aplicaciones:
 
 Complejidad Espacial: O(n) para n elementos`,
 
-      'queue': `Cola (Queue)
+      queue: `Cola (Queue)
 
 Una Cola es una estructura de datos lineal que sigue el principio FIFO — Primero en Entrar, Primero en Salir. Como una fila en una tienda: el primero en llegar es atendido primero.
 
@@ -1195,7 +1223,7 @@ Ejemplos:
   O(n): Merge Sort (arreglos temporales), tablas hash
   O(n²): tablas de DP, matrices de adyacencia`,
 
-      'memoization': `Memoización
+      memoization: `Memoización
 
 La memoización es una técnica de optimización que almacena los resultados de llamadas a funciones costosas y devuelve el resultado cacheado cuando se repiten las mismas entradas.
 
@@ -1296,7 +1324,7 @@ Donde h = altura del árbol:
 
 Aplicaciones: almacenamiento de datos ordenados, consultas por rango, colas de prioridad (con balanceo)`,
 
-      'heap': `Montículo (Heap)
+      heap: `Montículo (Heap)
 
 Un Heap es un árbol binario completo donde cada padre es menor (min-heap) o mayor (max-heap) que sus hijos. Se almacena como un arreglo.
 
@@ -1941,7 +1969,11 @@ export function getCategoryName(locale: Locale, categoryKey: string): string {
   return translations[locale].categories[categoryKey] || categoryKey
 }
 
-export function getAlgorithmMetaTitle(locale: Locale, algorithmId: string, fallbackName: string): string {
+export function getAlgorithmMetaTitle(
+  locale: Locale,
+  algorithmId: string,
+  fallbackName: string,
+): string {
   const desc = translations[locale].algorithmDescriptions[algorithmId]
   if (!desc) return `${fallbackName} | alg0.dev`
   const firstLine = desc.split('\n')[0].trim()

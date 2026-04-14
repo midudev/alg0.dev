@@ -1,0 +1,20 @@
+---
+import Layout from "@layouts/Layout.astro"
+import AlgoViz from "@components/AlgoViz"
+import { locales, defaultLocale } from "@i18n/translations"
+import type { GetStaticPaths } from "astro"
+import type { Locale } from "@i18n/translations"
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return locales
+    .filter((lang) => lang !== defaultLocale)
+    .map((lang) => ({ params: { lang } }))
+}
+
+const { lang } = Astro.params as { lang: Locale }
+
+---
+
+<Layout locale={lang}>
+  <AlgoViz locale={lang} client:load />
+</Layout>
