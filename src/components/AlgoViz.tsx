@@ -68,8 +68,6 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
     ? (algorithms.find((a) => a.id === initialAlgorithmId) ?? null)
     : null
 
-  console.log('initialAlgorithm', initialAlgorithm)
-
   const {
     selectedAlgorithm,
     steps,
@@ -85,22 +83,6 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
     togglePlay,
     currentStepData,
   } = usePlayback(locale, initialAlgorithm)
-
-  console.log({
-    selectedAlgorithm,
-    steps,
-    currentStep,
-    setCurrentStep,
-    isPlaying,
-    speed,
-    setSpeed,
-    selectAlgorithm: selectAlgorithmBase,
-    clearSelection,
-    stepForward,
-    stepBackward,
-    togglePlay,
-    currentStepData,
-  })
 
   const sidebar = useResizablePanel({
     maxWidth: SIDEBAR_MAX,
