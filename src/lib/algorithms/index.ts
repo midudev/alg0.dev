@@ -61,6 +61,8 @@ import {
 
 import { towerOfHanoi } from '@lib/algorithms/divide-and-conquer'
 
+import { sieveOfEratosthenes } from '@lib/algorithms/math'
+
 export const algorithms: Algorithm[] = [
   // Concepts
   bigONotation,
@@ -109,6 +111,8 @@ export const algorithms: Algorithm[] = [
   mazePathfinding,
   // Divide and Conquer
   towerOfHanoi,
+  // Math
+  sieveOfEratosthenes,
 ]
 
 export const categories: Category[] = [
@@ -126,4 +130,5 @@ export const categories: Category[] = [
     name: 'Divide and Conquer',
     algorithms: algorithms.filter((a) => a.category === 'Divide and Conquer'),
   },
+  { name: 'Math', algorithms: algorithms.filter((a) => a.category === 'Math') },
 ]
