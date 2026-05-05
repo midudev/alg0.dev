@@ -5,6 +5,8 @@ import {
   getAlgorithmDescription,
   getAlgorithmMetaTitle,
   getAlgorithmMetaDescription,
+  defaultLocale,
+  locales,
 } from '@i18n/translations'
 import { algorithms, categories } from '@lib/algorithms'
 import { usePlayback } from '@hooks/usePlayback'
@@ -26,13 +28,16 @@ const COLLAPSE_THRESHOLD = 100
 const MOBILE_BREAKPOINT = 768
 
 function getAlgorithmUrl(locale: string, algoId: string): string {
-  return locale === 'es' ? `/es/${algoId}` : `/${algoId}`
+  return locale === defaultLocale ? `/${algoId}` : `/${locale}/${algoId}`
 }
 
 function getAlgorithmIdFromPath(pathname: string): string | null {
   const cleaned = pathname.replace(/\/$/, '')
-  if (cleaned === '' || cleaned === '/es') return null
-  if (cleaned.startsWith('/es/')) return cleaned.slice(4)
+  if (cleaned === '') return null
+  for (const locale of locales) {
+    if (cleaned === `/${locale}`) return null
+    if (cleaned.startsWith(`/${locale}/`)) return cleaned.slice(locale.length + 2)
+  }
   return cleaned.slice(1)
 }
 
@@ -231,7 +236,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
               style={{
                 width: sidebar.isDragging ? sidebar.width : sidebar.collapsed ? 0 : SIDEBAR_MAX,
               }}
-              aria-label={locale === 'es' ? 'Categorías de algoritmos' : 'Algorithm categories'}
+              aria-label={t.sidebarAriaLabel}
               aria-hidden={sidebar.collapsed}
               inert={sidebar.collapsed || undefined}
             >
@@ -296,19 +301,19 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
               className={`fixed top-0 left-0 bottom-0 w-[280px] bg-black z-50 border-r border-white/8 transition-transform duration-300 ease-in-out ${
                 mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
-              aria-label={locale === 'es' ? 'Categorías de algoritmos' : 'Algorithm categories'}
+              aria-label={t.sidebarAriaLabel}
               aria-hidden={!mobileSidebarOpen}
               inert={!mobileSidebarOpen || undefined}
             >
               <div className="h-full flex flex-col">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
                   <span className="text-sm font-semibold text-white font-heading">
-                    {locale === 'es' ? 'Algoritmos' : 'Algorithms'}
+                    {t.mobileMenuTitle}
                   </span>
                   <button
                     onClick={() => setMobileSidebarOpen(false)}
                     className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors"
-                    aria-label={locale === 'es' ? 'Cerrar menú' : 'Close menu'}
+                    aria-label={t.closeMenu}
                   >
                     <svg
                       className="w-4 h-4"
@@ -394,7 +399,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
                     ? 0
                     : CODEPANEL_MAX,
               }}
-              aria-label={locale === 'es' ? 'Panel de código y detalles' : 'Code and details panel'}
+              aria-label={t.codePanelAriaLabel}
               aria-hidden={codePanel.collapsed}
               inert={codePanel.collapsed || undefined}
             >
@@ -446,19 +451,17 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
               className={`fixed top-0 right-0 bottom-0 w-[min(360px,90vw)] bg-black z-50 border-l border-white/8 transition-transform duration-300 ease-in-out ${
                 mobileCodePanelOpen ? 'translate-x-0' : 'translate-x-full'
               }`}
-              aria-label={locale === 'es' ? 'Panel de código y detalles' : 'Code and details panel'}
+              aria-label={t.codePanelAriaLabel}
               aria-hidden={!mobileCodePanelOpen}
               inert={!mobileCodePanelOpen || undefined}
             >
               <div className="h-full flex flex-col">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
-                  <span className="text-sm font-semibold text-white font-heading">
-                    {locale === 'es' ? 'Código' : 'Code'}
-                  </span>
+                  <span className="text-sm font-semibold text-white font-heading">{t.tabCode}</span>
                   <button
                     onClick={() => setMobileCodePanelOpen(false)}
                     className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors"
-                    aria-label={locale === 'es' ? 'Cerrar panel' : 'Close panel'}
+                    aria-label={t.closePanel}
                   >
                     <svg
                       className="w-4 h-4"
@@ -501,7 +504,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
           <button
             onClick={() => setMobileSidebarOpen(true)}
             className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors shrink-0"
-            aria-label={locale === 'es' ? 'Abrir menú' : 'Open menu'}
+            aria-label={t.openMenu}
           >
             <svg
               className="w-4 h-4"
@@ -589,7 +592,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
           <button
             onClick={() => setMobileCodePanelOpen(true)}
             className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors shrink-0"
-            aria-label={locale === 'es' ? 'Ver código' : 'View code'}
+            aria-label={t.viewCode}
           >
             <svg
               className="w-4 h-4"
