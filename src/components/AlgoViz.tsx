@@ -18,6 +18,7 @@ import GraphVisualizer from '@components/GraphVisualizer'
 import MatrixVisualizer from '@components/MatrixVisualizer'
 import ConceptVisualizer from '@components/ConceptVisualizer'
 import CodePanel from '@components/CodePanel'
+import CompareView from '@components/CompareView'
 import type { Algorithm } from '@lib/types'
 
 const SIDEBAR_MAX = 260
@@ -63,6 +64,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
   const isMobile = useIsMobile()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [mobileCodePanelOpen, setMobileCodePanelOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'normal' | 'compare'>('normal')
 
   const initialAlgorithm = initialAlgorithmId
     ? (algorithms.find((a) => a.id === initialAlgorithmId) ?? null)
@@ -195,6 +197,14 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
     }
   }
 
+  if (viewMode === 'compare') {
+    return (
+      <div className="h-screen flex flex-col overflow-hidden">
+        <CompareView locale={locale} onExit={() => setViewMode('normal')} />
+      </div>
+    )
+  }
+
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <Header
@@ -217,6 +227,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
         isMobile={isMobile}
         onToggleMobileSidebar={() => setMobileSidebarOpen((v) => !v)}
         onToggleMobileCodePanel={() => setMobileCodePanelOpen((v) => !v)}
+        onCompare={() => setViewMode('compare')}
       />
 
       {/* Main Content */}
@@ -225,9 +236,8 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
         {!isMobile && (
           <div className="relative shrink-0 flex">
             <aside
-              className={`bg-black overflow-hidden ${
-                sidebar.isDragging ? '' : 'transition-all duration-300 ease-in-out'
-              }`}
+              className={`bg-black overflow-hidden ${sidebar.isDragging ? '' : 'transition-all duration-300 ease-in-out'
+                }`}
               style={{
                 width: sidebar.isDragging ? sidebar.width : sidebar.collapsed ? 0 : SIDEBAR_MAX,
               }}
@@ -257,9 +267,8 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
             </aside>
             {/* Drag handle */}
             <div
-              className={`w-px shrink-0 cursor-col-resize group relative select-none ${
-                sidebar.collapsed && !sidebar.isDragging ? 'hidden' : ''
-              }`}
+              className={`w-px shrink-0 cursor-col-resize group relative select-none ${sidebar.collapsed && !sidebar.isDragging ? 'hidden' : ''
+                }`}
               onMouseDown={sidebar.handleDragStart}
               role="separator"
               aria-orientation="vertical"
@@ -273,9 +282,8 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
               }}
             >
               <div
-                className={`absolute inset-y-0 -left-0.5 w-[5px] z-20 ${
-                  sidebar.isDragging ? 'bg-blue-500/50' : 'hover:bg-white/10'
-                } transition-colors`}
+                className={`absolute inset-y-0 -left-0.5 w-[5px] z-20 ${sidebar.isDragging ? 'bg-blue-500/50' : 'hover:bg-white/10'
+                  } transition-colors`}
               />
               <div className="h-full bg-white/8" />
             </div>
@@ -286,16 +294,14 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
         {isMobile && (
           <>
             <div
-              className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 ${
-                mobileSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}
+              className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 ${mobileSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
               onClick={() => setMobileSidebarOpen(false)}
               aria-hidden="true"
             />
             <aside
-              className={`fixed top-0 left-0 bottom-0 w-[280px] bg-black z-50 border-r border-white/8 transition-transform duration-300 ease-in-out ${
-                mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-              }`}
+              className={`fixed top-0 left-0 bottom-0 w-[280px] bg-black z-50 border-r border-white/8 transition-transform duration-300 ease-in-out ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                }`}
               aria-label={locale === 'es' ? 'Categorías de algoritmos' : 'Algorithm categories'}
               aria-hidden={!mobileSidebarOpen}
               inert={!mobileSidebarOpen || undefined}
@@ -361,9 +367,8 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
           <div className="relative shrink-0 flex">
             {/* Drag handle */}
             <div
-              className={`w-px shrink-0 cursor-col-resize group relative select-none ${
-                codePanel.collapsed && !codePanel.isDragging ? 'hidden' : ''
-              }`}
+              className={`w-px shrink-0 cursor-col-resize group relative select-none ${codePanel.collapsed && !codePanel.isDragging ? 'hidden' : ''
+                }`}
               onMouseDown={codePanel.handleDragStart}
               role="separator"
               aria-orientation="vertical"
@@ -377,16 +382,14 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
               }}
             >
               <div
-                className={`absolute inset-y-0 -right-0.5 w-[5px] z-20 ${
-                  codePanel.isDragging ? 'bg-blue-500/50' : 'hover:bg-white/10'
-                } transition-colors`}
+                className={`absolute inset-y-0 -right-0.5 w-[5px] z-20 ${codePanel.isDragging ? 'bg-blue-500/50' : 'hover:bg-white/10'
+                  } transition-colors`}
               />
               <div className="h-full bg-white/8" />
             </div>
             <aside
-              className={`bg-black overflow-hidden ${
-                codePanel.isDragging ? '' : 'transition-all duration-300 ease-in-out'
-              }`}
+              className={`bg-black overflow-hidden ${codePanel.isDragging ? '' : 'transition-all duration-300 ease-in-out'
+                }`}
               style={{
                 width: codePanel.isDragging
                   ? codePanel.width
@@ -436,16 +439,14 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
         {isMobile && (
           <>
             <div
-              className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 ${
-                mobileCodePanelOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}
+              className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 ${mobileCodePanelOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
               onClick={() => setMobileCodePanelOpen(false)}
               aria-hidden="true"
             />
             <aside
-              className={`fixed top-0 right-0 bottom-0 w-[min(360px,90vw)] bg-black z-50 border-l border-white/8 transition-transform duration-300 ease-in-out ${
-                mobileCodePanelOpen ? 'translate-x-0' : 'translate-x-full'
-              }`}
+              className={`fixed top-0 right-0 bottom-0 w-[min(360px,90vw)] bg-black z-50 border-l border-white/8 transition-transform duration-300 ease-in-out ${mobileCodePanelOpen ? 'translate-x-0' : 'translate-x-full'
+                }`}
               aria-label={locale === 'es' ? 'Panel de código y detalles' : 'Code and details panel'}
               aria-hidden={!mobileCodePanelOpen}
               inert={!mobileCodePanelOpen || undefined}
