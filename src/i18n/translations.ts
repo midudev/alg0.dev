@@ -60,6 +60,11 @@ export interface Translations {
   viewCode: string
   languageLabel: string
 
+  // 404
+  notFoundTitle: string
+  notFoundDescription: string
+  backToHome: string
+
   // Graph visualizer
   queue: string
   stack: string
@@ -120,6 +125,10 @@ export const translations: Record<Locale, Translations> = {
     closePanel: 'Close panel',
     viewCode: 'View code',
     languageLabel: 'Language',
+
+    notFoundTitle: '404 — Page not found',
+    notFoundDescription: "The page you're looking for doesn't exist or has been moved.",
+    backToHome: 'Back to home',
 
     queue: 'Queue',
     stack: 'Stack',
@@ -1061,6 +1070,10 @@ The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says mon
     closePanel: 'Cerrar panel',
     viewCode: 'Ver código',
     languageLabel: 'Idioma',
+
+    notFoundTitle: '404 — Página no encontrada',
+    notFoundDescription: 'Lo sentimos, no pudimos encontrar la página que estás buscando.',
+    backToHome: 'Volver al inicio',
 
     queue: 'Cola',
     stack: 'Pila',
