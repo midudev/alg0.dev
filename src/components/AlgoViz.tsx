@@ -418,6 +418,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
                 {selectedAlgorithm ? (
                   <CodePanel
                     code={selectedAlgorithm.code}
+                    codeSamples={selectedAlgorithm.codeSamples}
                     description={getLocalizedDescription(selectedAlgorithm)}
                     difficulty={selectedAlgorithm.difficulty}
                     currentLine={currentStepData?.codeLine}
@@ -478,6 +479,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
                 {selectedAlgorithm ? (
                   <CodePanel
                     code={selectedAlgorithm.code}
+                    codeSamples={selectedAlgorithm.codeSamples}
                     description={getLocalizedDescription(selectedAlgorithm)}
                     difficulty={selectedAlgorithm.difficulty}
                     currentLine={currentStepData?.codeLine}

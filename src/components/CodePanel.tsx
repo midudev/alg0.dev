@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } fro
 import type { Monaco } from '@monaco-editor/react'
 import type { Locale } from '@i18n/translations'
 import { translations } from '@i18n/translations'
-import type { Difficulty } from '@lib/types'
+import type { CodeLanguage, CodeSample, Difficulty } from '@lib/types'
 import ComplexityChart from '@components/ComplexityChart'
 
 const LazyEditor = lazy(() => import('@monaco-editor/react'))
@@ -29,8 +29,25 @@ const DIFFICULTY_CONFIG: Record<Difficulty, { en: string; es: string; color: str
     },
   }
 
+const LANGUAGE_PRESETS: Record<CodeLanguage, { label: string; short: string; monaco: string }> = {
+  javascript: { label: 'JavaScript', short: 'JS', monaco: 'javascript' },
+  typescript: { label: 'TypeScript', short: 'TS', monaco: 'typescript' },
+  python: { label: 'Python', short: 'Py', monaco: 'python' },
+  cpp: { label: 'C++', short: 'C++', monaco: 'cpp' },
+  java: { label: 'Java', short: 'Java', monaco: 'java' },
+}
+
+interface EnrichedSample {
+  language: CodeLanguage
+  label: string
+  shortLabel: string
+  monacoLanguage: string
+  code: string
+}
+
 interface CodePanelProps {
   code: string
+  codeSamples?: CodeSample[]
   description: string
   difficulty?: Difficulty
   currentLine?: number
@@ -60,6 +77,7 @@ function defineTheme(monaco: Monaco) {
 
 export default function CodePanel({
   code,
+  codeSamples,
   description,
   difficulty,
   currentLine,
@@ -75,6 +93,56 @@ export default function CodePanel({
   const editorRef = useRef<any>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const decorationsRef = useRef<string[]>([])
+  const samples = useMemo<EnrichedSample[]>(() => {
+    const seen = new Set<CodeLanguage>()
+    const enriched: EnrichedSample[] = []
+
+    const pushSample = (sample: { language: CodeLanguage; code: string; label?: string }) => {
+      if (seen.has(sample.language)) return
+      const preset = LANGUAGE_PRESETS[sample.language]
+      if (!preset) return
+      seen.add(sample.language)
+      enriched.push({
+        language: sample.language,
+        label: sample.label ?? preset.label,
+        shortLabel: preset.short,
+        monacoLanguage: preset.monaco,
+        code: sample.code,
+      })
+    }
+
+    pushSample({ language: 'javascript', code, label: LANGUAGE_PRESETS.javascript.label })
+    ;(codeSamples ?? []).forEach((sample) => pushSample(sample))
+
+    return enriched
+  }, [code, codeSamples])
+  const [selectedLanguage, setSelectedLanguage] = useState<CodeLanguage>('javascript')
+
+  useEffect(() => {
+    if (samples.length === 0) return
+    if (!samples.some((s) => s.language === selectedLanguage)) {
+      setSelectedLanguage(samples[0].language)
+    }
+  }, [samples, selectedLanguage])
+
+  const activeSample = useMemo(() => {
+    if (samples.length === 0) {
+      const preset = LANGUAGE_PRESETS.javascript
+      return {
+        language: 'javascript' as CodeLanguage,
+        label: preset.label,
+        shortLabel: preset.short,
+        monacoLanguage: preset.monaco,
+        code,
+      }
+    }
+    return samples.find((s) => s.language === selectedLanguage) ?? samples[0]
+  }, [samples, selectedLanguage, code])
+
+  const editorLanguage = activeSample.monacoLanguage
+  const editorCode = activeSample.code
+  const hasMultipleLanguages = samples.length > 1
+  const showLanguageWarning = hasMultipleLanguages && activeSample.language !== 'javascript'
 
   useEffect(() => {
     setIsMounted(true)
@@ -223,6 +291,66 @@ export default function CodePanel({
           id="tabpanel-code"
           aria-labelledby="tab-code"
         >
+          {hasMultipleLanguages && (
+            <div className="border-b border-white/8 px-4 py-2">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                  {t.codeLanguageLabel}
+                </span>
+                <span className="text-[11px] text-neutral-400 font-mono">
+                  {activeSample.label}
+                </span>
+              </div>
+              <div
+                className="flex flex-wrap gap-1.5"
+                role="radiogroup"
+                aria-label={t.codeLanguageLabel}
+              >
+                {samples.map((sample) => {
+                  const isActive = sample.language === selectedLanguage
+                  return (
+                    <button
+                      key={sample.language}
+                      type="button"
+                      role="radio"
+                      aria-checked={isActive}
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={() => setSelectedLanguage(sample.language)}
+                      className={`px-3 py-1.5 rounded-md border text-[11px] font-semibold tracking-wide transition-colors ${
+                        isActive
+                          ? 'bg-white/10 border-white/30 text-white'
+                          : 'border-white/10 text-neutral-500 hover:text-white/80 hover:border-white/20'
+                      }`}
+                    >
+                      <span className="font-mono mr-1 text-[10px] uppercase tracking-[0.3em]">
+                        {sample.shortLabel}
+                      </span>
+                      <span>{sample.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+              {showLanguageWarning && (
+                <div className="mt-3 flex items-start gap-2 text-[11px] text-amber-300/80">
+                  <svg
+                    className="w-3.5 h-3.5 shrink-0 mt-0.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v4m0 4h.01M10.29 3.86L2.82 17.25A1.5 1.5 0 004.12 19.5h15.76a1.5 1.5 0 001.3-2.25L13.71 3.86a1.5 1.5 0 00-2.42 0z"
+                    />
+                  </svg>
+                  <span className="leading-tight">{t.codeLanguageWarning}</span>
+                </div>
+              )}
+            </div>
+          )}
           <div
             className="flex-1 overflow-hidden transition-opacity duration-500 ease-in-out"
             style={{ opacity: editorReady ? 1 : 0 }}
@@ -230,8 +358,9 @@ export default function CodePanel({
             {isMounted && (
               <Suspense fallback={null}>
                 <LazyEditor
-                  defaultLanguage="javascript"
-                  value={code}
+                  language={editorLanguage}
+                  value={editorCode}
+                  path={`algorithm-${activeSample.language}`}
                   theme="vs-dark"
                   onMount={handleEditorDidMount}
                   loading={null}
@@ -274,7 +403,7 @@ export default function CodePanel({
             )}
           </div>
 
-          {/* Console output panel */}
+          {/* Console output panel asd */}
           {consoleOutput && consoleOutput.length > 0 && (
             <div
               className="shrink-0 border-t border-white/[0.08] max-h-[140px] flex flex-col"

@@ -24,6 +24,41 @@ const bubbleSort: Algorithm = {
 
   return array;
 }`,
+  codeSamples: [
+    {
+      language: 'cpp',
+      code: `#include <vector>
+#include <algorithm>
+
+std::vector<int> bubbleSort(std::vector<int> nums) {
+  const int n = nums.size();
+  for (int i = 0; i < n - 1; ++i) {
+    for (int j = 0; j < n - i - 1; ++j) {
+      if (nums[j] > nums[j + 1]) {
+        std::swap(nums[j], nums[j + 1]);
+      }
+    }
+  }
+  return nums;
+}`,
+    },
+    {
+      language: 'java',
+      code: `public static int[] bubbleSort(int[] arr) {
+  int n = arr.length;
+  for (int i = 0; i < n - 1; i++) {
+    for (int j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        int temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+      }
+    }
+  }
+  return arr;
+}`,
+    },
+  ],
   description: `Bubble Sort
 
 Bubble Sort is a simple comparison-based sorting algorithm. It repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order.
