@@ -142,4 +142,234 @@ The minimum number of moves for n disks is 2^n - 1. For 3 disks, that's 7 moves.
   },
 }
 
-export { towerOfHanoi }
+// ============================================================
+// BINARY EXPONENTIATION
+// ============================================================
+const binaryExponentiation: Algorithm = {
+  id: 'binary-exponentiation',
+  name: 'Binary Exponentiation',
+  category: 'Divide and Conquer',
+  difficulty: 'intermediate',
+  visualization: 'concept',
+  code: `function binPow(base, exp) {
+  if (exp === 0) return 1
+  const half = binPow(base, exp >> 1)
+  if (exp % 2 === 0) {
+    return half * half
+  }
+  return half * half * base
+}`,
+  description: `Binary Exponentiation
+
+Binary Exponentiation computes aⁿ in O(log n) time by halving the exponent at each recursive step, rather than multiplying a by itself n times.
+
+How it works:
+1. Base case: a⁰ = 1
+2. Divide: recursively compute half = binPow(base, exp >> 1)
+3. Conquer (even exp): return half × half
+4. Conquer (odd exp):  return half × half × a
+
+Example: 2¹⁰ uses only 4 recursive calls (10 → 5 → 2 → 1 → 0) instead of 9 naive multiplications.
+
+Time Complexity:  O(log n) — exponent halves each call
+Space Complexity: O(log n) — recursive call stack depth`,
+
+  generateSteps(locale = 'en') {
+    const steps: Step[] = []
+
+    // Code line references (1-indexed):
+    //  1: function binPow(base, exp) {
+    //  2:   if (exp === 0) return 1
+    //  3:   const half = binPow(base, exp >> 1)
+    //  4:   if (exp % 2 === 0) {
+    //  5:     return half * half
+    //  6:   }
+    //  7:   return half * half * base
+    //  8: }
+
+    // Example: binPow(2, 10) = 1024
+    // Descent: 10 → 5 → 2 → 1 → 0  (4 recursive calls, shows both even and odd cases)
+
+    steps.push({
+      concept: { type: 'callStack', frames: [] },
+      description: d(
+        locale,
+        "Let's compute 2¹⁰ = 1024 using binary exponentiation. Instead of 9 multiplications, we need only 4 recursive calls — one per bit in the exponent.",
+        'Calculemos 2¹⁰ = 1024 con exponenciación binaria. En lugar de 9 multiplicaciones, solo necesitamos 4 llamadas recursivas — una por bit del exponente.',
+      ),
+      codeLine: 1,
+      variables: { base: 2, exp: 10 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [{ label: 'binPow(2, 10)', detail: 'exp=10 is even → call binPow(2, 5)', state: 'active' }],
+      },
+      description: d(
+        locale,
+        'binPow(2, 10): exp=10, not the base case. Divide: call binPow(2, 10 >> 1) = binPow(2, 5).',
+        'binPow(2, 10): exp=10, no es caso base. Dividir: llamar binPow(2, 10 >> 1) = binPow(2, 5).',
+      ),
+      codeLine: 3,
+      variables: { base: 2, exp: 10 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'binPow(2, 10)', detail: 'waiting for binPow(2, 5)…', state: 'waiting' },
+          { label: 'binPow(2, 5)', detail: 'exp=5 is odd → call binPow(2, 2)', state: 'active' },
+        ],
+      },
+      description: d(
+        locale,
+        'binPow(2, 5): exp=5, not the base case. Divide: call binPow(2, 5 >> 1) = binPow(2, 2). Stack grows.',
+        'binPow(2, 5): exp=5, no es caso base. Dividir: llamar binPow(2, 5 >> 1) = binPow(2, 2). La pila crece.',
+      ),
+      codeLine: 3,
+      variables: { base: 2, exp: 5, stackDepth: 2 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'binPow(2, 10)', detail: 'waiting for binPow(2, 5)…', state: 'waiting' },
+          { label: 'binPow(2, 5)', detail: 'waiting for binPow(2, 2)…', state: 'waiting' },
+          { label: 'binPow(2, 2)', detail: 'exp=2 is even → call binPow(2, 1)', state: 'active' },
+        ],
+      },
+      description: d(
+        locale,
+        'binPow(2, 2): exp=2, not the base case. Divide: call binPow(2, 2 >> 1) = binPow(2, 1). Stack depth = 3.',
+        'binPow(2, 2): exp=2, no es caso base. Dividir: llamar binPow(2, 2 >> 1) = binPow(2, 1). Profundidad = 3.',
+      ),
+      codeLine: 3,
+      variables: { base: 2, exp: 2, stackDepth: 3 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'binPow(2, 10)', detail: 'waiting for binPow(2, 5)…', state: 'waiting' },
+          { label: 'binPow(2, 5)', detail: 'waiting for binPow(2, 2)…', state: 'waiting' },
+          { label: 'binPow(2, 2)', detail: 'waiting for binPow(2, 1)…', state: 'waiting' },
+          { label: 'binPow(2, 1)', detail: 'exp=1 is odd → call binPow(2, 0)', state: 'active' },
+        ],
+      },
+      description: d(
+        locale,
+        'binPow(2, 1): exp=1, not the base case. Divide: call binPow(2, 1 >> 1) = binPow(2, 0). Stack depth = 4.',
+        'binPow(2, 1): exp=1, no es caso base. Dividir: llamar binPow(2, 1 >> 1) = binPow(2, 0). Profundidad = 4.',
+      ),
+      codeLine: 3,
+      variables: { base: 2, exp: 1, stackDepth: 4 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'binPow(2, 10)', detail: 'waiting for binPow(2, 5)…', state: 'waiting' },
+          { label: 'binPow(2, 5)', detail: 'waiting for binPow(2, 2)…', state: 'waiting' },
+          { label: 'binPow(2, 2)', detail: 'waiting for binPow(2, 1)…', state: 'waiting' },
+          { label: 'binPow(2, 1)', detail: 'waiting for binPow(2, 0)…', state: 'waiting' },
+          { label: 'binPow(2, 0)', detail: 'BASE CASE: exp=0, return 1', state: 'base' },
+        ],
+      },
+      description: d(
+        locale,
+        "BASE CASE reached! exp=0, return 1. Stack depth = ⌈log₂ 10⌉ = 4 calls — that's O(log n). Now results propagate back up.",
+        '¡CASO BASE alcanzado! exp=0, retorna 1. Profundidad = ⌈log₂ 10⌉ = 4 llamadas — eso es O(log n). Ahora los resultados se propagan hacia arriba.',
+      ),
+      codeLine: 2,
+      variables: { base: 2, exp: 0, returns: 1, stackDepth: 4 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'binPow(2, 10)', detail: 'waiting for binPow(2, 5)…', state: 'waiting' },
+          { label: 'binPow(2, 5)', detail: 'waiting for binPow(2, 2)…', state: 'waiting' },
+          { label: 'binPow(2, 2)', detail: 'waiting for binPow(2, 1)…', state: 'waiting' },
+          { label: 'binPow(2, 1)', detail: 'half=1, 1 is odd → 1×1×2 = 2', state: 'active' },
+        ],
+      },
+      description: d(
+        locale,
+        'binPow(2, 1): half=1, exp=1 is odd → return half × half × base = 1×1×2 = 2. Frame popped.',
+        'binPow(2, 1): half=1, exp=1 es impar → retorna half × half × base = 1×1×2 = 2. Frame eliminado.',
+      ),
+      codeLine: 7,
+      variables: { base: 2, exp: 1, half: 1, returns: 2 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'binPow(2, 10)', detail: 'waiting for binPow(2, 5)…', state: 'waiting' },
+          { label: 'binPow(2, 5)', detail: 'waiting for binPow(2, 2)…', state: 'waiting' },
+          { label: 'binPow(2, 2)', detail: 'half=2, 2 is even → 2×2 = 4', state: 'active' },
+        ],
+      },
+      description: d(
+        locale,
+        'binPow(2, 2): half=2, exp=2 is even → return half × half = 2×2 = 4. Stack unwinding.',
+        'binPow(2, 2): half=2, exp=2 es par → retorna half × half = 2×2 = 4. La pila se desenrolla.',
+      ),
+      codeLine: 5,
+      variables: { base: 2, exp: 2, half: 2, returns: 4 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [
+          { label: 'binPow(2, 10)', detail: 'waiting for binPow(2, 5)…', state: 'waiting' },
+          { label: 'binPow(2, 5)', detail: 'half=4, 5 is odd → 4×4×2 = 32', state: 'active' },
+        ],
+      },
+      description: d(
+        locale,
+        'binPow(2, 5): half=4, exp=5 is odd → return half × half × base = 4×4×2 = 32. Almost done!',
+        'binPow(2, 5): half=4, exp=5 es impar → retorna half × half × base = 4×4×2 = 32. ¡Casi listo!',
+      ),
+      codeLine: 7,
+      variables: { base: 2, exp: 5, half: 4, returns: 32 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'callStack',
+        frames: [{ label: 'binPow(2, 10)', detail: 'half=32, 10 is even → 32×32 = 1024', state: 'resolved' }],
+      },
+      description: d(
+        locale,
+        'binPow(2, 10): half=32, exp=10 is even → return half × half = 32×32 = 1024. Final result!',
+        'binPow(2, 10): half=32, exp=10 es par → retorna half × half = 32×32 = 1024. ¡Resultado final!',
+      ),
+      codeLine: 5,
+      variables: { base: 2, exp: 10, half: 32, returns: 1024 },
+    })
+
+    steps.push({
+      concept: { type: 'callStack', frames: [] },
+      description: d(
+        locale,
+        "2¹⁰ = 1024, computed in just 4 calls instead of 9 multiplications. That's the power of O(log n).",
+        '2¹⁰ = 1024, calculado en solo 4 llamadas en lugar de 9 multiplicaciones. Ese es el poder de O(log n).',
+      ),
+      codeLine: 5,
+      variables: { result: 1024 },
+    })
+
+    return steps
+  },
+}
+
+export { towerOfHanoi, binaryExponentiation }

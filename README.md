@@ -27,14 +27,14 @@ A free, interactive web tool to learn algorithms through animated step-by-step v
 - **Variable tracking** — see the state of every variable in real time
 - **Contextual explanation** — understand the *why* behind each operation
 
-## 40+ algorithms across 8 categories
+## 41+ algorithms across 8 categories
 
 <table>
 <tr>
 <td width="25%" valign="top">
 
 ### Sorting
-Bubble Sort · Selection Sort · Insertion Sort · Quick Sort · Merge Sort · Heap Sort · Counting Sort · Radix Sort · Shell Sort
+Bubble Sort · Selection Sort · Insertion Sort · Quick Sort · Merge Sort · Heap Sort · Counting Sort · Radix Sort · Shell Sort · Bucket Sort
 
 </td>
 <td width="25%" valign="top">
@@ -72,7 +72,7 @@ N-Queens · Sudoku Solver · Maze Pathfinding
 <td width="25%" valign="top">
 
 ### Divide & Conquer
-Tower of Hanoi
+Tower of Hanoi · Binary Exponentiation
 
 </td>
 <td width="25%" valign="top">
