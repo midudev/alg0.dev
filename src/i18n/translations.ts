@@ -1021,6 +1021,30 @@ Properties:
   - Demonstrates the power of recursion
 
 The puzzle was invented by mathematician Édouard Lucas in 1883. Legend says monks in a temple are moving 64 golden disks — completing the puzzle would mark the end of the world (requiring 18,446,744,073,709,551,615 moves).`,
+
+      'binary-exponentiation': `Binary Exponentiation
+
+Binary Exponentiation computes aⁿ in O(log n) time by halving the exponent at each recursive step, rather than multiplying a by itself n times.
+
+How it works:
+1. Base case: a⁰ = 1
+2. Divide: recursively compute half = binPow(base, exp >> 1)
+3. Conquer (even exp): return half × half
+4. Conquer (odd exp):  return half × half × a
+
+Example: 2¹⁰ uses only 4 recursive calls (10 → 5 → 2 → 1 → 0) instead of 9 naive multiplications.
+
+Key insight — the exponent in binary:
+  10 = 1010₂  →  one recursive level per bit, ⌈log₂ n⌉ levels total
+  Each level decides: if exp is even, just square (half × half); if odd, also multiply by base
+
+Time Complexity:  O(log n) — exponent halves each call
+Space Complexity: O(log n) — recursive call stack depth
+
+Applications:
+  - Modular exponentiation (cryptography, RSA)
+  - Matrix exponentiation (Fibonacci in O(log n))
+  - Computing large powers in competitive programming`,
     },
   },
 
@@ -1966,6 +1990,30 @@ Propiedades:
   - Demuestra el poder de la recursión
 
 El rompecabezas fue inventado por el matemático Édouard Lucas en 1883. La leyenda dice que monjes en un templo están moviendo 64 discos dorados — completar el rompecabezas marcaría el fin del mundo (requiriendo 18.446.744.073.709.551.615 movimientos).`,
+
+      'binary-exponentiation': `Exponenciación Binaria
+
+La Exponenciación Binaria calcula aⁿ en tiempo O(log n) dividiendo el exponente a la mitad en cada llamada recursiva, en lugar de multiplicar a por sí mismo n veces.
+
+Cómo funciona:
+1. Caso base: a⁰ = 1
+2. Dividir: calcular recursivamente half = binPow(base, exp >> 1)
+3. Conquistar (exp par): retornar half × half
+4. Conquistar (exp impar): retornar half × half × a
+
+Ejemplo: 2¹⁰ usa solo 4 llamadas recursivas (10 → 5 → 2 → 1 → 0) en lugar de 9 multiplicaciones directas.
+
+Idea clave — el exponente en binario:
+  10 = 1010₂  →  un nivel recursivo por bit, ⌈log₂ n⌉ niveles en total
+  Cada nivel decide: si exp es par, solo elevar al cuadrado (half × half); si es impar, multiplicar también por la base
+
+Complejidad Temporal: O(log n) — el exponente se divide a la mitad en cada llamada
+Complejidad Espacial: O(log n) — profundidad de la pila de llamadas recursivas
+
+Aplicaciones:
+  - Exponenciación modular (criptografía, RSA)
+  - Exponenciación de matrices (Fibonacci en O(log n))
+  - Cálculo de grandes potencias en programación competitiva`,
     },
   },
 }

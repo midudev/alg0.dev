@@ -59,7 +59,7 @@ import {
   mazePathfinding,
 } from '@lib/algorithms/backtracking'
 
-import { towerOfHanoi } from '@lib/algorithms/divide-and-conquer'
+import { towerOfHanoi, binaryExponentiation } from '@lib/algorithms/divide-and-conquer'
 
 export const algorithms: Algorithm[] = [
   // Concepts
@@ -109,6 +109,7 @@ export const algorithms: Algorithm[] = [
   mazePathfinding,
   // Divide and Conquer
   towerOfHanoi,
+  binaryExponentiation,
 ]
 
 export const categories: Category[] = [
