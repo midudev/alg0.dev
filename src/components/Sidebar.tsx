@@ -139,6 +139,22 @@ const categoryIcons: Record<string, React.ReactNode> = {
       />
     </svg>
   ),
+  Math: (
+    <svg
+      className="w-3.5 h-3.5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M5 5h14M9 5c0 4-1.5 10-3 14M15 5c0 4 1.5 10 3 14"
+      />
+    </svg>
+  ),
 }
 
 const categoryColors: Record<string, { icon: string; badge: string; line: string; active: string }> = {
@@ -189,6 +205,12 @@ const categoryColors: Record<string, { icon: string; badge: string; line: string
     badge: 'bg-indigo-500/10 text-indigo-400/70',
     line: 'border-indigo-500/20',
     active: 'border-l-indigo-400',
+  },
+  Math: {
+    icon: 'text-fuchsia-400',
+    badge: 'bg-fuchsia-500/10 text-fuchsia-400/70',
+    line: 'border-fuchsia-500/20',
+    active: 'border-l-fuchsia-400',
   },
 }
 

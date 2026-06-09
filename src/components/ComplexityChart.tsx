@@ -5,6 +5,7 @@ type ComplexityKey =
   | 'O(log n)'
   | 'O(√n)'
   | 'O(n)'
+  | 'O(n log log n)'
   | 'O(n log n)'
   | 'O(n²)'
   | 'O(2^n)'
@@ -15,6 +16,7 @@ const COMPLEXITY_FNS: Record<ComplexityKey, (n: number) => number> = {
   'O(log n)': (n) => Math.log2(Math.max(1, n)),
   'O(√n)': (n) => Math.sqrt(n),
   'O(n)': (n) => n,
+  'O(n log log n)': (n) => n * Math.log2(Math.max(2, Math.log2(Math.max(2, n)))),
   'O(n log n)': (n) => n * Math.log2(Math.max(1, n)),
   'O(n²)': (n) => n * n,
   'O(2^n)': (n) => Math.pow(2, n),
@@ -37,6 +39,7 @@ function normalizeToKey(raw: string): ComplexityKey | null {
   if (/2\^|k\^/.test(s)) return 'O(2^n)'
   if (/√n|sqrt/.test(s)) return 'O(√n)'
   if (/n²|n\^2|v²/.test(s)) return 'O(n²)'
+  if (/nloglogn|n\*loglogn/.test(s)) return 'O(n log log n)'
   if (/nlogn|n\*logn|\(v\+e\)log|elog|n\^1\.25/.test(s)) return 'O(n log n)'
   if (/loglog/.test(s)) return 'O(log n)'
   if (/log/.test(s)) return 'O(log n)'
