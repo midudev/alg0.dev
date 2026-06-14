@@ -11,7 +11,9 @@ import type {
   MemoTableState,
   CoinChangeState,
   BucketsState,
+  AdjacencyMatrixState,
 } from '@lib/types'
+import { highlightStyles } from '@lib/highlight-colors'
 
 interface ConceptVisualizerProps {
   step: Step
@@ -44,6 +46,8 @@ export default function ConceptVisualizer({ step }: ConceptVisualizerProps) {
       return <CoinChangeViz state={concept} />
     case 'buckets':
       return <BucketsViz state={concept} />
+    case 'adjacencyMatrix':
+      return <AdjacencyMatrixViz state={concept} />
     default:
       return null
   }
@@ -114,7 +118,14 @@ function BigOChart({ state }: { state: BigOState }) {
         aria-label="Big O complexity chart"
       >
         {/* Background */}
-        <rect x={PAD.left} y={PAD.top} width={chartW} height={chartH} fill="rgba(255,255,255,0.02)" rx="4" />
+        <rect
+          x={PAD.left}
+          y={PAD.top}
+          width={chartW}
+          height={chartH}
+          fill="rgba(255,255,255,0.02)"
+          rx="4"
+        />
 
         {/* Horizontal grid lines */}
         {Array.from({ length: yTicks + 1 }, (_, i) => {
@@ -122,8 +133,22 @@ function BigOChart({ state }: { state: BigOState }) {
           const val = maxY - (i / yTicks) * maxY
           return (
             <g key={`yg-${i}`}>
-              <line x1={PAD.left} y1={y} x2={PAD.left + chartW} y2={y} stroke="rgba(255,255,255,0.06)" strokeDasharray="4,4" />
-              <text x={PAD.left - 8} y={y + 4} textAnchor="end" fill="rgba(255,255,255,0.35)" fontSize="10" fontFamily="monospace">
+              <line
+                x1={PAD.left}
+                y1={y}
+                x2={PAD.left + chartW}
+                y2={y}
+                stroke="rgba(255,255,255,0.06)"
+                strokeDasharray="4,4"
+              />
+              <text
+                x={PAD.left - 8}
+                y={y + 4}
+                textAnchor="end"
+                fill="rgba(255,255,255,0.35)"
+                fontSize="10"
+                fontFamily="monospace"
+              >
                 {val < 10 ? val.toFixed(1) : Math.round(val)}
               </text>
             </g>
@@ -136,8 +161,22 @@ function BigOChart({ state }: { state: BigOState }) {
           const x = toX(n)
           return (
             <g key={`xg-${i}`}>
-              <line x1={x} y1={PAD.top} x2={x} y2={PAD.top + chartH} stroke="rgba(255,255,255,0.06)" strokeDasharray="4,4" />
-              <text x={x} y={PAD.top + chartH + 16} textAnchor="middle" fill="rgba(255,255,255,0.35)" fontSize="10" fontFamily="monospace">
+              <line
+                x1={x}
+                y1={PAD.top}
+                x2={x}
+                y2={PAD.top + chartH}
+                stroke="rgba(255,255,255,0.06)"
+                strokeDasharray="4,4"
+              />
+              <text
+                x={x}
+                y={PAD.top + chartH + 16}
+                textAnchor="middle"
+                fill="rgba(255,255,255,0.35)"
+                fontSize="10"
+                fontFamily="monospace"
+              >
                 {Math.round(n)}
               </text>
             </g>
@@ -145,11 +184,30 @@ function BigOChart({ state }: { state: BigOState }) {
         })}
 
         {/* Axes */}
-        <line x1={PAD.left} y1={PAD.top} x2={PAD.left} y2={PAD.top + chartH} stroke="rgba(255,255,255,0.2)" />
-        <line x1={PAD.left} y1={PAD.top + chartH} x2={PAD.left + chartW} y2={PAD.top + chartH} stroke="rgba(255,255,255,0.2)" />
+        <line
+          x1={PAD.left}
+          y1={PAD.top}
+          x2={PAD.left}
+          y2={PAD.top + chartH}
+          stroke="rgba(255,255,255,0.2)"
+        />
+        <line
+          x1={PAD.left}
+          y1={PAD.top + chartH}
+          x2={PAD.left + chartW}
+          y2={PAD.top + chartH}
+          stroke="rgba(255,255,255,0.2)"
+        />
 
         {/* Axis labels */}
-        <text x={PAD.left + chartW / 2} y={H - 4} textAnchor="middle" fill="rgba(255,255,255,0.45)" fontSize="11" fontFamily="monospace">
+        <text
+          x={PAD.left + chartW / 2}
+          y={H - 4}
+          textAnchor="middle"
+          fill="rgba(255,255,255,0.45)"
+          fontSize="11"
+          fontFamily="monospace"
+        >
           n (input size)
         </text>
         <text
@@ -256,7 +314,9 @@ function CallStackViz({ state }: { state: CallStackState }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-3 w-full">
       {/* Stack label */}
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest mb-1">Call Stack</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest mb-1">
+        Call Stack
+      </div>
 
       {/* Frames — top of stack (last frame) is rendered first */}
       <div className="flex flex-col gap-1.5 w-full max-w-sm">
@@ -288,9 +348,10 @@ function CallStackViz({ state }: { state: CallStackState }) {
                   backgroundColor: colors.bg,
                   borderColor: colors.border,
                   color: colors.text,
-                  boxShadow: frame.state === 'active' || frame.state === 'base'
-                    ? `0 0 20px ${colors.border}`
-                    : 'none',
+                  boxShadow:
+                    frame.state === 'active' || frame.state === 'base'
+                      ? `0 0 20px ${colors.border}`
+                      : 'none',
                 }}
               >
                 {/* Pulse animation for active/base frame */}
@@ -303,15 +364,16 @@ function CallStackViz({ state }: { state: CallStackState }) {
 
                 <div className="relative flex items-center justify-between gap-2">
                   <span className="font-semibold">{frame.label}</span>
-                  {frame.detail && (
-                    <span className="text-xs opacity-75">{frame.detail}</span>
-                  )}
+                  {frame.detail && <span className="text-xs opacity-75">{frame.detail}</span>}
                 </div>
               </div>
 
               {/* TOP indicator */}
               {isTop && (
-                <div className="ml-2 text-[10px] font-mono uppercase tracking-wider transition-colors duration-300" style={{ color: colors.text }}>
+                <div
+                  className="ml-2 text-[10px] font-mono uppercase tracking-wider transition-colors duration-300"
+                  style={{ color: colors.text }}
+                >
                   ← top
                 </div>
               )}
@@ -362,7 +424,9 @@ function StackViz({
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-3 w-full">
       {/* Title */}
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">Stack · LIFO</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Stack · LIFO
+      </div>
 
       {/* Operation badge */}
       {operation && (
@@ -442,7 +506,9 @@ function QueueViz({
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-3 w-full">
       {/* Title */}
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">Queue · FIFO</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Queue · FIFO
+      </div>
 
       {/* Operation badge */}
       {operation && (
@@ -464,8 +530,12 @@ function QueueViz({
         <div className="flex justify-between mb-1 px-1">
           {items.length > 0 && (
             <>
-              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">front</span>
-              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">back</span>
+              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
+                front
+              </span>
+              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
+                back
+              </span>
             </>
           )}
         </div>
@@ -511,10 +581,20 @@ function QueueViz({
                 <path d="M0,0 L6,3 L0,6" fill="currentColor" />
               </marker>
             </defs>
-            <line x1="10" y1="7" x2="105" y2="7" stroke="currentColor" strokeWidth="1.5" markerEnd="url(#qArrow)" />
+            <line
+              x1="10"
+              y1="7"
+              x2="105"
+              y2="7"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              markerEnd="url(#qArrow)"
+            />
           </svg>
         </div>
-        <div className="text-center text-[10px] font-mono text-neutral-500 mt-0.5">processing direction</div>
+        <div className="text-center text-[10px] font-mono text-neutral-500 mt-0.5">
+          processing direction
+        </div>
       </div>
     </div>
   )
@@ -537,7 +617,9 @@ function LinkedListViz({ state }: { state: LinkedListState }) {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full">
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">Linked List</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Linked List
+      </div>
 
       {operation && (
         <div className="font-mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
@@ -551,9 +633,16 @@ function LinkedListViz({ state }: { state: LinkedListState }) {
         <div className="flex items-center gap-0 overflow-x-auto max-w-full px-4">
           {/* HEAD label */}
           <div className="flex flex-col items-center mr-1 shrink-0">
-            <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider mb-1">head</span>
+            <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider mb-1">
+              head
+            </span>
             <svg width="16" height="12" viewBox="0 0 16 12" className="text-neutral-400">
-              <path d="M0,6 L12,6 M8,2 L12,6 L8,10" stroke="currentColor" fill="none" strokeWidth="1.5" />
+              <path
+                d="M0,6 L12,6 M8,2 L12,6 L8,10"
+                stroke="currentColor"
+                fill="none"
+                strokeWidth="1.5"
+              />
             </svg>
           </div>
 
@@ -575,7 +664,13 @@ function LinkedListViz({ state }: { state: LinkedListState }) {
                   <span className="text-base font-bold">{node.value}</span>
                 </div>
                 {/* Arrow to next */}
-                <svg width="28" height="12" viewBox="0 0 28 12" className="shrink-0" style={{ color: isLast ? '#555' : colors.text }}>
+                <svg
+                  width="28"
+                  height="12"
+                  viewBox="0 0 28 12"
+                  className="shrink-0"
+                  style={{ color: isLast ? '#555' : colors.text }}
+                >
                   <line x1="2" y1="6" x2="22" y2="6" stroke="currentColor" strokeWidth="1.5" />
                   <polygon points="20,2 26,6 20,10" fill="currentColor" />
                 </svg>
@@ -616,7 +711,9 @@ function HashTableViz({ state }: { state: HashTableState }) {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-3 w-full">
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">Hash Table</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Hash Table
+      </div>
 
       {operation && (
         <div className="font-mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
@@ -627,7 +724,12 @@ function HashTableViz({ state }: { state: HashTableState }) {
       {hashingKey != null && (
         <div className="font-mono text-xs text-neutral-400">
           hash(<span className="text-sky-300">"{hashingKey}"</span>)
-          {hashResult != null && <span> = <span className="text-amber-300">{hashResult}</span></span>}
+          {hashResult != null && (
+            <span>
+              {' '}
+              = <span className="text-amber-300">{hashResult}</span>
+            </span>
+          )}
         </div>
       )}
 
@@ -670,14 +772,27 @@ function HashTableViz({ state }: { state: HashTableState }) {
                             backgroundColor: colors.bg,
                             borderColor: colors.border,
                             color: colors.text,
-                            boxShadow: entry.state !== 'normal' ? `0 0 12px ${colors.border}` : 'none',
+                            boxShadow:
+                              entry.state !== 'normal' ? `0 0 12px ${colors.border}` : 'none',
                           }}
                         >
                           {entry.key}:<span className="text-white/60">{entry.value}</span>
                         </div>
                         {ei < entries.length - 1 && (
-                          <svg width="14" height="8" viewBox="0 0 14 8" className="shrink-0 text-neutral-600 mx-0.5">
-                            <line x1="0" y1="4" x2="10" y2="4" stroke="currentColor" strokeWidth="1" />
+                          <svg
+                            width="14"
+                            height="8"
+                            viewBox="0 0 14 8"
+                            className="shrink-0 text-neutral-600 mx-0.5"
+                          >
+                            <line
+                              x1="0"
+                              y1="4"
+                              x2="10"
+                              y2="4"
+                              stroke="currentColor"
+                              strokeWidth="1"
+                            />
                             <polygon points="8,1.5 13,4 8,6.5" fill="currentColor" />
                           </svg>
                         )}
@@ -732,15 +847,16 @@ function BinaryTreeViz({ state }: { state: BinaryTreeState }) {
     return { x, y }
   }
 
-  const label = treeType === 'heap'
-    ? `${heapType === 'min' ? 'Min' : 'Max'} Heap`
-    : 'Binary Search Tree'
+  const label =
+    treeType === 'heap' ? `${heapType === 'min' ? 'Min' : 'Max'} Heap` : 'Binary Search Tree'
 
   const nonNullNodes = nodes.reduce((acc, n) => acc + (n ? 1 : 0), 0)
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-3 w-full">
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">{label}</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        {label}
+      </div>
 
       {operation && (
         <div className="font-mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
@@ -820,7 +936,9 @@ function BinaryTreeViz({ state }: { state: BinaryTreeState }) {
       {/* Heap array view */}
       {treeType === 'heap' && nonNullNodes > 0 && (
         <div className="flex flex-col items-center gap-1 mt-1">
-          <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">array view</div>
+          <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
+            array view
+          </div>
           <div className="flex gap-1">
             {nodes.map((node, idx) => {
               if (!node) return null
@@ -865,7 +983,9 @@ function TwoPointersViz({ state }: { state: TwoPointersState }) {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full">
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">Two Pointers</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Two Pointers
+      </div>
 
       {operation && (
         <div className="font-mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
@@ -881,8 +1001,12 @@ function TwoPointersViz({ state }: { state: TwoPointersState }) {
             const isRight = i === right
             return (
               <div key={`lbl-${i}`} className="w-14 flex justify-center">
-                {isLeft && <span className="text-[10px] font-mono font-bold text-blue-400">L ↓</span>}
-                {isRight && !isLeft && <span className="text-[10px] font-mono font-bold text-purple-400">R ↓</span>}
+                {isLeft && (
+                  <span className="text-[10px] font-mono font-bold text-blue-400">L ↓</span>
+                )}
+                {isRight && !isLeft && (
+                  <span className="text-[10px] font-mono font-bold text-purple-400">R ↓</span>
+                )}
               </div>
             )
           })}
@@ -901,7 +1025,8 @@ function TwoPointersViz({ state }: { state: TwoPointersState }) {
                   backgroundColor: colors.bg,
                   borderColor: colors.border,
                   color: colors.text,
-                  boxShadow: hl !== 'default' && hl !== 'checked' ? `0 0 12px ${colors.border}` : 'none',
+                  boxShadow:
+                    hl !== 'default' && hl !== 'checked' ? `0 0 12px ${colors.border}` : 'none',
                 }}
               >
                 {val}
@@ -913,7 +1038,12 @@ function TwoPointersViz({ state }: { state: TwoPointersState }) {
         {/* Index row */}
         <div className="flex gap-1">
           {array.map((_, i) => (
-            <div key={`idx-${i}`} className="w-13 text-center text-[9px] font-mono text-neutral-600">{i}</div>
+            <div
+              key={`idx-${i}`}
+              className="w-13 text-center text-[9px] font-mono text-neutral-600"
+            >
+              {i}
+            </div>
           ))}
         </div>
       </div>
@@ -921,8 +1051,16 @@ function TwoPointersViz({ state }: { state: TwoPointersState }) {
       {/* Sum display */}
       {sum != null && target != null && (
         <div className="font-mono text-sm text-neutral-400">
-          arr[{left}] + arr[{right}] = <span className="text-white">{array[left]}</span> + <span className="text-white">{array[right]}</span> = <span className={sum === target ? 'text-green-400 font-bold' : 'text-amber-300'}>{sum}</span>
-          {sum === target ? ' ✓' : sum < target ? ` < ${target} → move L →` : ` > ${target} → ← move R`}
+          arr[{left}] + arr[{right}] = <span className="text-white">{array[left]}</span> +{' '}
+          <span className="text-white">{array[right]}</span> ={' '}
+          <span className={sum === target ? 'text-green-400 font-bold' : 'text-amber-300'}>
+            {sum}
+          </span>
+          {sum === target
+            ? ' ✓'
+            : sum < target
+              ? ` < ${target} → move L →`
+              : ` > ${target} → ← move R`}
         </div>
       )}
     </div>
@@ -948,7 +1086,9 @@ function SlidingWindowViz({ state }: { state: SlidingWindowState }) {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full">
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">Sliding Window</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Sliding Window
+      </div>
 
       {operation && (
         <div className="font-mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
@@ -984,14 +1124,21 @@ function SlidingWindowViz({ state }: { state: SlidingWindowState }) {
         {/* Index row */}
         <div className="flex gap-0.5">
           {chars.map((_, i) => (
-            <div key={`idx-${i}`} className="w-10 text-center text-[9px] font-mono text-neutral-600">{i}</div>
+            <div
+              key={`idx-${i}`}
+              className="w-10 text-center text-[9px] font-mono text-neutral-600"
+            >
+              {i}
+            </div>
           ))}
         </div>
 
         {/* Window bracket */}
         {windowEnd >= windowStart && windowEnd >= 0 && (
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] font-mono text-blue-400">window [{windowStart}..{windowEnd}]</span>
+            <span className="text-[10px] font-mono text-blue-400">
+              window [{windowStart}..{windowEnd}]
+            </span>
             <span className="font-mono text-sm text-blue-300 font-bold">"{windowStr}"</span>
             <span className="text-[10px] font-mono text-neutral-500">len={windowStr.length}</span>
           </div>
@@ -1001,7 +1148,8 @@ function SlidingWindowViz({ state }: { state: SlidingWindowState }) {
       {/* Best so far */}
       {bestStr && (
         <div className="font-mono text-xs text-neutral-400">
-          best = "<span className="text-amber-300 font-bold">{bestStr}</span>" (length {bestStr.length})
+          best = "<span className="text-amber-300 font-bold">{bestStr}</span>" (length{' '}
+          {bestStr.length})
         </div>
       )}
     </div>
@@ -1024,7 +1172,9 @@ function MemoTableViz({ state }: { state: MemoTableState }) {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full">
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">Memoization</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Memoization
+      </div>
 
       {operation && (
         <div className="font-mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
@@ -1032,9 +1182,7 @@ function MemoTableViz({ state }: { state: MemoTableState }) {
         </div>
       )}
 
-      {currentCall && (
-        <div className="font-mono text-sm text-neutral-300">{currentCall}</div>
-      )}
+      {currentCall && <div className="font-mono text-sm text-neutral-300">{currentCall}</div>}
 
       {/* Memo table grid */}
       <div className="flex flex-col items-center gap-1">
@@ -1055,8 +1203,17 @@ function MemoTableViz({ state }: { state: MemoTableState }) {
                 >
                   {entry.value != null ? entry.value : '—'}
                 </div>
-                <div className="text-[8px] font-mono transition-colors duration-300" style={{ color: colors.text }}>
-                  {entry.state === 'hit' ? '↑ HIT' : entry.state === 'computing' ? '...' : entry.state === 'cached' ? '✓' : ''}
+                <div
+                  className="text-[8px] font-mono transition-colors duration-300"
+                  style={{ color: colors.text }}
+                >
+                  {entry.state === 'hit'
+                    ? '↑ HIT'
+                    : entry.state === 'computing'
+                      ? '...'
+                      : entry.state === 'cached'
+                        ? '✓'
+                        : ''}
                 </div>
               </div>
             )
@@ -1081,12 +1238,16 @@ function MemoTableViz({ state }: { state: MemoTableState }) {
 function CoinChangeViz({ state }: { state: CoinChangeState }) {
   const { coins, target, selected, remaining, approach, greedyResult, dpResult, operation } = state
 
-  const approachLabel = approach === 'greedy' ? 'Greedy' : approach === 'dp' ? 'Dynamic Programming' : 'Comparison'
-  const approachColor = approach === 'greedy' ? '#fb923c' : approach === 'dp' ? '#60a5fa' : '#c084fc'
+  const approachLabel =
+    approach === 'greedy' ? 'Greedy' : approach === 'dp' ? 'Dynamic Programming' : 'Comparison'
+  const approachColor =
+    approach === 'greedy' ? '#fb923c' : approach === 'dp' ? '#60a5fa' : '#c084fc'
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full">
-      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">Greedy vs DP</div>
+      <div className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest">
+        Greedy vs DP
+      </div>
 
       {operation && (
         <div className="font-mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
@@ -1095,14 +1256,25 @@ function CoinChangeViz({ state }: { state: CoinChangeState }) {
       )}
 
       {/* Approach label */}
-      <div className="font-mono text-xs font-bold px-3 py-1 rounded" style={{ color: approachColor, backgroundColor: `${approachColor}15`, border: `1px solid ${approachColor}30` }}>
+      <div
+        className="font-mono text-xs font-bold px-3 py-1 rounded"
+        style={{
+          color: approachColor,
+          backgroundColor: `${approachColor}15`,
+          border: `1px solid ${approachColor}30`,
+        }}
+      >
         {approachLabel}
       </div>
 
       {/* Target */}
       <div className="font-mono text-sm text-neutral-400">
         target = <span className="text-white font-bold text-lg">{target}</span>
-        {remaining > 0 && remaining < target && <span className="text-neutral-500 ml-2">remaining: <span className="text-amber-300">{remaining}</span></span>}
+        {remaining > 0 && remaining < target && (
+          <span className="text-neutral-500 ml-2">
+            remaining: <span className="text-amber-300">{remaining}</span>
+          </span>
+        )}
       </div>
 
       {/* Available coins */}
@@ -1110,7 +1282,10 @@ function CoinChangeViz({ state }: { state: CoinChangeState }) {
         <span className="text-[10px] font-mono text-neutral-500 uppercase">coins:</span>
         <div className="flex gap-1.5">
           {coins.map((c, i) => (
-            <div key={i} className="w-10 h-10 rounded-full border border-white/15 bg-white/5 flex items-center justify-center font-mono text-sm font-bold text-neutral-400">
+            <div
+              key={i}
+              className="w-10 h-10 rounded-full border border-white/15 bg-white/5 flex items-center justify-center font-mono text-sm font-bold text-neutral-400"
+            >
               {c}
             </div>
           ))}
@@ -1137,7 +1312,9 @@ function CoinChangeViz({ state }: { state: CoinChangeState }) {
               </div>
             ))}
           </div>
-          <span className="text-[10px] font-mono text-neutral-500">= {selected.reduce((a, b) => a + b, 0)} ({selected.length} coins)</span>
+          <span className="text-[10px] font-mono text-neutral-500">
+            = {selected.reduce((a, b) => a + b, 0)} ({selected.length} coins)
+          </span>
         </div>
       )}
 
@@ -1145,19 +1322,33 @@ function CoinChangeViz({ state }: { state: CoinChangeState }) {
       {approach === 'compare' && greedyResult && dpResult && (
         <div className="flex gap-6 mt-2">
           <div className="flex flex-col items-center gap-1 px-4 py-3 rounded-lg border border-orange-400/20 bg-orange-400/5">
-            <span className="text-[10px] font-mono text-orange-400 uppercase font-bold">Greedy</span>
+            <span className="text-[10px] font-mono text-orange-400 uppercase font-bold">
+              Greedy
+            </span>
             <div className="flex gap-1">
               {greedyResult.map((c, i) => (
-                <div key={i} className="w-8 h-8 rounded-full bg-orange-400/15 border border-orange-400/30 flex items-center justify-center font-mono text-xs font-bold text-orange-400">{c}</div>
+                <div
+                  key={i}
+                  className="w-8 h-8 rounded-full bg-orange-400/15 border border-orange-400/30 flex items-center justify-center font-mono text-xs font-bold text-orange-400"
+                >
+                  {c}
+                </div>
               ))}
             </div>
             <span className="font-mono text-xs text-orange-300">{greedyResult.length} coins</span>
           </div>
           <div className="flex flex-col items-center gap-1 px-4 py-3 rounded-lg border border-blue-400/20 bg-blue-400/5">
-            <span className="text-[10px] font-mono text-blue-400 uppercase font-bold">DP (optimal)</span>
+            <span className="text-[10px] font-mono text-blue-400 uppercase font-bold">
+              DP (optimal)
+            </span>
             <div className="flex gap-1">
               {dpResult.map((c, i) => (
-                <div key={i} className="w-8 h-8 rounded-full bg-blue-400/15 border border-blue-400/30 flex items-center justify-center font-mono text-xs font-bold text-blue-400">{c}</div>
+                <div
+                  key={i}
+                  className="w-8 h-8 rounded-full bg-blue-400/15 border border-blue-400/30 flex items-center justify-center font-mono text-xs font-bold text-blue-400"
+                >
+                  {c}
+                </div>
               ))}
             </div>
             <span className="font-mono text-xs text-blue-300">{dpResult.length} coins ✓</span>
@@ -1204,11 +1395,15 @@ function BucketsViz({ state }: { state: BucketsState }) {
         <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-500">
           <div className="flex gap-4">
             <div className="flex flex-col items-center px-4 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg">
-              <span className="text-[9px] font-mono text-rose-400 uppercase font-bold">Current Min</span>
+              <span className="text-[9px] font-mono text-rose-400 uppercase font-bold">
+                Current Min
+              </span>
               <span className="text-xl font-mono font-bold text-rose-500">{min ?? '—'}</span>
             </div>
             <div className="flex flex-col items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <span className="text-[9px] font-mono text-blue-400 uppercase font-bold">Current Max</span>
+              <span className="text-[9px] font-mono text-blue-400 uppercase font-bold">
+                Current Max
+              </span>
               <span className="text-xl font-mono font-bold text-blue-500">{max ?? '—'}</span>
             </div>
           </div>
@@ -1216,7 +1411,9 @@ function BucketsViz({ state }: { state: BucketsState }) {
           {/* Bucket Calculation Formula */}
           {buckets.length > 0 && (
             <div className="bg-neutral-900/50 border border-white/10 rounded-xl px-6 py-4 flex flex-col items-center gap-2 shadow-2xl">
-              <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Bucket Count Calculation</div>
+              <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">
+                Bucket Count Calculation
+              </div>
               <div className="flex items-center gap-3 font-mono">
                 <div className="flex flex-col items-center">
                   <div className="text-xs text-neutral-400 mb-1">floor((max - min) / size) + 1</div>
@@ -1224,7 +1421,8 @@ function BucketsViz({ state }: { state: BucketsState }) {
                     <span className="text-neutral-500">⌊</span>
                     <div className="flex flex-col items-center px-2">
                       <div className="border-b border-white/20 px-2 pb-0.5 mb-0.5">
-                        <span className="text-blue-400">{max}</span> - <span className="text-rose-400">{min}</span>
+                        <span className="text-blue-400">{max}</span> -{' '}
+                        <span className="text-rose-400">{min}</span>
                       </div>
                       <div className="pt-0.5 text-amber-400 text-sm">{bucketSize}</div>
                     </div>
@@ -1265,10 +1463,7 @@ function BucketsViz({ state }: { state: BucketsState }) {
             const isProcessing = i === currentElementIndex
             const isCollected = phase === 'collecting' && i < currentElementIndex!
             return (
-              <div
-                key={i}
-                className="relative group h-10 w-10"
-              >
+              <div key={i} className="relative group h-10 w-10">
                 <div
                   className="absolute inset-0 rounded border flex items-center justify-center font-mono text-sm transition-all duration-500"
                   style={{
@@ -1337,11 +1532,20 @@ function BucketsViz({ state }: { state: BucketsState }) {
                     const highlight = isActive ? innerHighlights?.[vIdx] : undefined
                     const getHighlightStyles = () => {
                       switch (highlight) {
-                        case 'comparing': return { bg: 'rgba(59,130,246,0.3)', border: '#3b82f6', text: '#fff' }
-                        case 'active': return { bg: 'rgba(234,179,8,0.3)', border: '#eab308', text: '#fff' }
-                        case 'current': return { bg: 'rgba(168,85,247,0.3)', border: '#a855f7', text: '#fff' }
-                        case 'found': return { bg: 'rgba(74,222,128,0.2)', border: '#4ade80', text: '#4ade80' }
-                        default: return { bg: 'rgba(38,38,38,1)', border: 'rgba(255,255,255,0.1)', text: '#60a5fa' }
+                        case 'comparing':
+                          return { bg: 'rgba(59,130,246,0.3)', border: '#3b82f6', text: '#fff' }
+                        case 'active':
+                          return { bg: 'rgba(234,179,8,0.3)', border: '#eab308', text: '#fff' }
+                        case 'current':
+                          return { bg: 'rgba(168,85,247,0.3)', border: '#a855f7', text: '#fff' }
+                        case 'found':
+                          return { bg: 'rgba(74,222,128,0.2)', border: '#4ade80', text: '#4ade80' }
+                        default:
+                          return {
+                            bg: 'rgba(38,38,38,1)',
+                            border: 'rgba(255,255,255,0.1)',
+                            text: '#60a5fa',
+                          }
                       }
                     }
                     const styles = getHighlightStyles()
@@ -1355,7 +1559,10 @@ function BucketsViz({ state }: { state: BucketsState }) {
                           borderColor: styles.border,
                           borderWidth: '1px',
                           color: styles.text,
-                          animation: phase === 'distributing' && isActive && vIdx === bucket.length - 1 ? 'pop 0.3s ease-out' : 'none',
+                          animation:
+                            phase === 'distributing' && isActive && vIdx === bucket.length - 1
+                              ? 'pop 0.3s ease-out'
+                              : 'none',
                           transform: highlight ? 'scale(1.05)' : 'none',
                           zIndex: highlight ? 10 : 1,
                         }}
@@ -1410,6 +1617,194 @@ function BucketsViz({ state }: { state: BucketsState }) {
           100% { transform: scale(1); opacity: 1; }
         }
       `}</style>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════
+//  ADJACENCY MATRIX — directed graph + labeled N×N matrix
+// ════════════════════════════════════════════════════════════════
+
+const AM_COLORS = {
+  nodeFill: 'rgba(96,165,250,0.12)',
+  nodeStroke: 'rgba(96,165,250,0.35)',
+  nodeText: '#60a5fa',
+  nodeCurrentFill: 'rgba(251,146,60,0.2)',
+  nodeCurrentStroke: 'rgba(251,146,60,0.6)',
+  nodeCurrentText: '#fb923c',
+  edge: 'rgba(255,255,255,0.18)',
+  edgeCurrent: '#fff',
+}
+
+function AdjacencyMatrixViz({ state }: { state: AdjacencyMatrixState }) {
+  const { nodes, edges, matrix, directed, currentEdge, highlightCells = [] } = state
+
+  const R = 18
+  const W = 360
+  const H = 220
+
+  const byId = (id: number) => nodes.find((n) => n.id === id) ?? nodes[id]
+
+  const isHighlightCell = (r: number, c: number) =>
+    highlightCells.some(([hr, hc]) => hr === r && hc === c)
+
+  // Screen-reader summary of the edges set so far
+  const setEdges: string[] = []
+  for (let r = 0; r < matrix.length; r++) {
+    for (let c = 0; c < (matrix[r]?.length ?? 0); c++) {
+      if (matrix[r][c]) setEdges.push(`${byId(r).label}→${byId(c).label}`)
+    }
+  }
+
+  return (
+    <div
+      className="flex-1 flex flex-col items-center justify-center gap-4 w-full"
+      role="img"
+      aria-label={`${directed ? 'Directed' : 'Undirected'} graph with ${nodes.length} nodes and its ${nodes.length}×${nodes.length} adjacency matrix.${setEdges.length > 0 ? ` Edges set: ${setEdges.join(', ')}.` : ' No edges set yet.'}`}
+    >
+      <div
+        className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest"
+        aria-hidden="true"
+      >
+        {directed ? 'Directed graph' : 'Undirected graph'}
+      </div>
+
+      {/* Graph */}
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full max-w-md"
+        style={{ maxHeight: `${H}px` }}
+        aria-hidden="true"
+      >
+        <defs>
+          <marker
+            id="am-arrow"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="7"
+            markerHeight="7"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill={AM_COLORS.edge} />
+          </marker>
+          <marker
+            id="am-arrow-current"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="7"
+            markerHeight="7"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill={AM_COLORS.edgeCurrent} />
+          </marker>
+        </defs>
+
+        {/* Edges */}
+        {edges.map((e) => {
+          const a = byId(e.from)
+          const b = byId(e.to)
+          const dx = b.x - a.x
+          const dy = b.y - a.y
+          const len = Math.hypot(dx, dy) || 1
+          const ux = dx / len
+          const uy = dy / len
+          const active = !!currentEdge && currentEdge[0] === e.from && currentEdge[1] === e.to
+          return (
+            <line
+              key={`e-${e.from}-${e.to}`}
+              x1={a.x + ux * R}
+              y1={a.y + uy * R}
+              x2={b.x - ux * (R + 4)}
+              y2={b.y - uy * (R + 4)}
+              stroke={active ? AM_COLORS.edgeCurrent : AM_COLORS.edge}
+              strokeWidth={active ? 2.5 : 1.5}
+              markerEnd={directed ? `url(#am-arrow${active ? '-current' : ''})` : undefined}
+              className="transition-all duration-300"
+            />
+          )
+        })}
+
+        {/* Nodes */}
+        {nodes.map((n) => {
+          const active = !!currentEdge && (currentEdge[0] === n.id || currentEdge[1] === n.id)
+          return (
+            <g key={`n-${n.id}`} className="transition-all duration-300">
+              <circle
+                cx={n.x}
+                cy={n.y}
+                r={R}
+                fill={active ? AM_COLORS.nodeCurrentFill : AM_COLORS.nodeFill}
+                stroke={active ? AM_COLORS.nodeCurrentStroke : AM_COLORS.nodeStroke}
+                strokeWidth="1.5"
+              />
+              <text
+                x={n.x}
+                y={n.y + 1}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill={active ? AM_COLORS.nodeCurrentText : AM_COLORS.nodeText}
+                fontSize="13"
+                fontFamily="monospace"
+                fontWeight="bold"
+              >
+                {n.label}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+
+      {/* Matrix */}
+      <div className="flex flex-col items-center gap-1" aria-hidden="true">
+        <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
+          adjacency matrix
+        </div>
+        <div
+          className="grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${nodes.length + 1}, minmax(0, 1fr))` }}
+        >
+          <div key="corner" className="w-7 h-7 md:w-9 md:h-9" />
+          {nodes.map((n) => (
+            <div
+              key={`ch-${n.id}`}
+              className="w-7 h-7 md:w-9 md:h-9 flex items-center justify-center font-mono text-[10px] md:text-xs font-bold text-neutral-400"
+            >
+              {n.label}
+            </div>
+          ))}
+          {nodes.flatMap((rowNode, r) => [
+            <div
+              key={`rh-${r}`}
+              className="w-7 h-7 md:w-9 md:h-9 flex items-center justify-center font-mono text-[10px] md:text-xs font-bold text-neutral-400"
+            >
+              {rowNode.label}
+            </div>,
+            ...(matrix[r] ?? []).map((value, c) => {
+              const highlighted = isHighlightCell(r, c)
+              const styles = highlighted
+                ? highlightStyles.current
+                : value
+                  ? highlightStyles.placed
+                  : null
+              return (
+                <div
+                  key={`cell-${r}-${c}`}
+                  className="w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-md border font-mono text-xs md:text-sm font-semibold transition-all duration-300"
+                  style={{
+                    backgroundColor: styles?.bg || 'rgba(255,255,255,0.02)',
+                    borderColor: styles?.border || 'rgba(255,255,255,0.06)',
+                    color: value ? styles?.text || '#4ade80' : '#444',
+                  }}
+                >
+                  {value}
+                </div>
+              )
+            }),
+          ])}
+        </div>
+      </div>
     </div>
   )
 }

@@ -899,6 +899,32 @@ Applications:
 
 Topological Sort is only possible for DAGs (Directed Acyclic Graphs). If the graph has a cycle, no valid ordering exists.`,
 
+      'adjacency-matrix': `Adjacency Matrix
+
+An adjacency matrix represents a graph as a V×V grid, where the cell at row u, column v is 1 (or the edge weight) when there is an edge from u to v, and 0 otherwise.
+
+How it works:
+1. Create a V×V matrix filled with 0
+2. For every edge u → v, set matrix[u][v] = 1
+3. For an undirected graph, also set matrix[v][u] = 1 (the matrix becomes symmetric)
+4. For a directed graph the matrix is generally asymmetric: matrix[u][v] ≠ matrix[v][u]
+
+Time Complexity:
+  Edge lookup: O(1)
+  Iterate a node's neighbors: O(V)
+  Build the matrix: O(V²)
+
+Space Complexity: O(V²) — independent of the number of edges
+
+Adjacency matrix vs adjacency list:
+  - Matrix: O(1) edge lookup, O(V²) space — best for dense graphs
+  - List: O(V + E) space, fast neighbor iteration — best for sparse graphs
+
+Applications:
+  - Dense graphs where most pairs of nodes are connected
+  - Algorithms needing constant-time edge checks (e.g. Floyd–Warshall)
+  - Weighted graphs (store the weight instead of 1)`,
+
       'fibonacci-dp': `Fibonacci (Dynamic Programming)
 
 The Fibonacci sequence is a classic example of dynamic programming. Each number is the sum of the two preceding ones: F(n) = F(n-1) + F(n-2).
@@ -1870,6 +1896,32 @@ Aplicaciones:
   - Resolución de dependencias de paquetes
 
 El Ordenamiento Topológico solo es posible para DAGs (Grafos Acíclicos Dirigidos). Si el grafo tiene un ciclo, no existe un ordenamiento válido.`,
+
+      'adjacency-matrix': `Matriz de Adyacencia
+
+Una matriz de adyacencia representa un grafo como una cuadrícula V×V, donde la celda en la fila u, columna v vale 1 (o el peso de la arista) cuando existe una arista de u a v, y 0 en caso contrario.
+
+Cómo funciona:
+1. Crear una matriz V×V llena de 0
+2. Para cada arista u → v, asignar matrix[u][v] = 1
+3. En un grafo no dirigido, asignar también matrix[v][u] = 1 (la matriz se vuelve simétrica)
+4. En un grafo dirigido la matriz suele ser asimétrica: matrix[u][v] ≠ matrix[v][u]
+
+Complejidad Temporal:
+  Consulta de arista: O(1)
+  Recorrer los vecinos de un nodo: O(V)
+  Construir la matriz: O(V²)
+
+Complejidad Espacial: O(V²) — independiente del número de aristas
+
+Matriz de adyacencia vs lista de adyacencia:
+  - Matriz: consulta de arista O(1), espacio O(V²) — ideal para grafos densos
+  - Lista: espacio O(V + E), recorrido de vecinos rápido — ideal para grafos dispersos
+
+Aplicaciones:
+  - Grafos densos donde la mayoría de los pares de nodos están conectados
+  - Algoritmos que necesitan comprobar aristas en tiempo constante (p. ej. Floyd–Warshall)
+  - Grafos ponderados (almacenar el peso en lugar de 1)`,
 
       'fibonacci-dp': `Fibonacci (Programación Dinámica)
 

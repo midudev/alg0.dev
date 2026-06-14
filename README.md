@@ -25,7 +25,7 @@ A free, interactive web tool to learn algorithms through animated step-by-step v
 - **Animated visualization** — watch how the data structure transforms at each step
 - **Active line highlighting** — code highlights in sync with the animation
 - **Variable tracking** — see the state of every variable in real time
-- **Contextual explanation** — understand the *why* behind each operation
+- **Contextual explanation** — understand the _why_ behind each operation
 
 ## 40+ algorithms across 8 categories
 
@@ -34,24 +34,28 @@ A free, interactive web tool to learn algorithms through animated step-by-step v
 <td width="25%" valign="top">
 
 ### Sorting
+
 Bubble Sort · Selection Sort · Insertion Sort · Quick Sort · Merge Sort · Heap Sort · Counting Sort · Radix Sort · Shell Sort
 
 </td>
 <td width="25%" valign="top">
 
 ### Data Structures
+
 Stack · Queue · Linked List · Hash Table · Binary Search Tree · Heap
 
 </td>
 <td width="25%" valign="top">
 
 ### Graphs
-BFS · DFS · Dijkstra · Prim · Topological Sort
+
+Adjacency Matrix · BFS · DFS · Dijkstra · Prim · Topological Sort
 
 </td>
 <td width="25%" valign="top">
 
 ### Searching
+
 Binary Search · Linear Search · Jump Search · Interpolation Search
 
 </td>
@@ -60,24 +64,28 @@ Binary Search · Linear Search · Jump Search · Interpolation Search
 <td width="25%" valign="top">
 
 ### Dynamic Programming
+
 Fibonacci · 0/1 Knapsack · LCS (Longest Common Subsequence)
 
 </td>
 <td width="25%" valign="top">
 
 ### Backtracking
+
 N-Queens · Sudoku Solver · Maze Pathfinding
 
 </td>
 <td width="25%" valign="top">
 
 ### Divide & Conquer
+
 Tower of Hanoi
 
 </td>
 <td width="25%" valign="top">
 
 ### Concepts
+
 Big O · Recursion · Two Pointers · Sliding Window · Memoization · Greedy vs DP · Space Complexity
 
 </td>
@@ -86,13 +94,13 @@ Big O · Recursion · Two Pointers · Sliding Window · Memoization · Greedy vs
 
 ## Keyboard shortcuts
 
-| Key | Action |
-|:---:|:---|
-| `Space` | Play / Pause |
-| `→` | Next step |
-| `←` | Previous step |
-| `C` | Code tab |
-| `E` | Explanation tab |
+|   Key   | Action          |
+| :-----: | :-------------- |
+| `Space` | Play / Pause    |
+|   `→`   | Next step       |
+|   `←`   | Previous step   |
+|   `C`   | Code tab        |
+|   `E`   | Explanation tab |
 
 Plus: speed control (5 levels), skip to start/end, and resizable panels.
 
