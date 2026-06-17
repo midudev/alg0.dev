@@ -53,6 +53,7 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
               strokeWidth={1}
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <path d="M4 10v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1 -1v-3" />
             </svg>
@@ -68,6 +69,7 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
                 strokeLinejoin="round"
                 viewBox="0 0 16 16"
                 style={{ color: 'currentcolor' }}
+                aria-hidden="true"
               >
                 <path
                   fillRule="evenodd"
@@ -84,6 +86,7 @@ export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeS
                 strokeLinejoin="round"
                 viewBox="0 0 16 16"
                 style={{ color: 'currentcolor' }}
+                aria-hidden="true"
               >
                 <path
                   fillRule="evenodd"

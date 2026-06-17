@@ -5,6 +5,7 @@ import {
   getAlgorithmDescription,
   getAlgorithmMetaTitle,
   getAlgorithmMetaDescription,
+  getCategoryName,
   defaultLocale,
   locales,
 } from '@i18n/translations'
@@ -342,8 +343,15 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
         <main
           id="main-content"
           className="flex-1 flex flex-col overflow-hidden min-w-0"
-          aria-label="Algorithm visualization"
+          aria-label={t.visualizationLabel}
         >
+          {/* Screen-reader page heading — reflects the current algorithm.
+              The WelcomeScreen renders its own visible <h1> when nothing is selected. */}
+          {selectedAlgorithm && (
+            <h1 className="sr-only">
+              {selectedAlgorithm.name} — {getCategoryName(locale, selectedAlgorithm.category)}
+            </h1>
+          )}
           <div className="flex-1 flex flex-col p-4 md:p-8 overflow-auto">
             {renderVisualization()}
           </div>

@@ -111,7 +111,11 @@ function BigOChart({ state }: { state: BigOState }) {
         className="w-full max-w-2xl"
         style={{ maxHeight: '340px' }}
         role="img"
-        aria-label="Big O complexity chart"
+        aria-label={`Big O complexity chart${
+          visibleCurves.length > 0
+            ? `: ${visibleCurves.map((c) => c.name).join(', ')}`
+            : ''
+        }`}
       >
         {/* Background */}
         <rect x={PAD.left} y={PAD.top} width={chartW} height={chartH} fill="rgba(255,255,255,0.02)" rx="4" />

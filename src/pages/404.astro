@@ -3,12 +3,13 @@ import Layout from '@layouts/Layout.astro'
 import { translations, defaultLocale, type Locale, locales } from '@i18n/translations'
 
 const pathName = Astro.url.pathname
-const locale = pathName.split('/')[1] as Locale
-const t = locales.includes(locale) ? translations[locale] : translations[defaultLocale]
-const pathnameToRedirect = locales.includes(locale) && locale !== defaultLocale ? `/${locale}` : `/`
+const maybeLocale = pathName.split('/')[1] as Locale
+const locale = locales.includes(maybeLocale) ? maybeLocale : defaultLocale
+const t = translations[locale]
+const pathnameToRedirect = locale === defaultLocale ? `/` : `/${locale}`
 ---
 
-<Layout title="404 — Page not found">
+<Layout locale={locale} title={t.notFoundTitle}>
   <div class="h-screen flex flex-col items-center justify-center gap-6 bg-black text-white px-4">
     <div
       class="w-12 h-12 rounded-xl bg-white/4 flex items-center justify-center border border-white/8"

@@ -61,6 +61,17 @@ export default function AlgorithmShowcase({
   const pausingRef = useRef(false)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
+  // Respect the user's reduced-motion preference: pause the auto-cycling demo
+  // (WCAG 2.2.2 — give users control over moving / auto-updating content).
+  const [reducedMotion, setReducedMotion] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
+    setReducedMotion(mq.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
   const current = items[algoIdx]
 
   const clearTimers = useCallback(() => {
@@ -69,6 +80,7 @@ export default function AlgorithmShowcase({
   }, [])
 
   useEffect(() => {
+    if (reducedMotion) return
     pausingRef.current = false
 
     const interval = setInterval(() => {
@@ -97,7 +109,7 @@ export default function AlgorithmShowcase({
       clearInterval(interval)
       clearTimers()
     }
-  }, [algoIdx, current.steps.length, items.length, clearTimers])
+  }, [algoIdx, current.steps.length, items.length, clearTimers, reducedMotion])
 
   const goToAlgo = useCallback(
     (idx: number) => {

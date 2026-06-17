@@ -53,6 +53,7 @@ export interface Translations {
   // Mobile / aria labels
   sidebarAriaLabel: string
   codePanelAriaLabel: string
+  visualizationLabel: string
   mobileMenuTitle: string
   openMenu: string
   closeMenu: string
@@ -119,6 +120,7 @@ export const translations: Record<Locale, Translations> = {
 
     sidebarAriaLabel: 'Algorithm categories',
     codePanelAriaLabel: 'Code and details panel',
+    visualizationLabel: 'Algorithm visualization',
     mobileMenuTitle: 'Algorithms',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
@@ -1091,6 +1093,7 @@ Named after the Greek mathematician Eratosthenes of Cyrene (~276–194 BCE), thi
 
     sidebarAriaLabel: 'Categorías de algoritmos',
     codePanelAriaLabel: 'Panel de código y detalles',
+    visualizationLabel: 'Visualización del algoritmo',
     mobileMenuTitle: 'Algoritmos',
     openMenu: 'Abrir menú',
     closeMenu: 'Cerrar menú',

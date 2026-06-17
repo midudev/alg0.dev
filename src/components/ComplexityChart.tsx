@@ -192,6 +192,11 @@ export default function ComplexityChart({ description, locale = 'en' }: { descri
   }
   const resolvedLabels = resolveOverlaps(labels, 11)
 
+  const chartTitle = locale === 'es' ? 'Complejidad temporal' : 'Time complexity'
+  const chartLabel = `${chartTitle}: ${entries
+    .map((e) => (e.label ? `${e.label} ${e.raw}` : e.raw))
+    .join(', ')}`
+
   return (
     <div className="mt-5 mb-3">
       <div className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold mb-2">
@@ -203,7 +208,7 @@ export default function ComplexityChart({ description, locale = 'en' }: { descri
         className="w-full"
         style={{ maxHeight: 150 }}
         role="img"
-        aria-label="Time complexity growth chart"
+        aria-label={chartLabel}
       >
         {/* Gradient definitions for area fills */}
         <defs>
