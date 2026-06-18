@@ -39,25 +39,11 @@ import {
   interpolationSearch,
 } from '@lib/algorithms/searching'
 
-import {
-  bfs,
-  dfs,
-  dijkstra,
-  prim,
-  topologicalSort,
-} from '@lib/algorithms/graphs'
+import { bfs, dfs, dijkstra, prim, topologicalSort, adjacencyMatrix } from '@lib/algorithms/graphs'
 
-import {
-  fibonacciDp,
-  knapsack,
-  lcs,
-} from '@lib/algorithms/dynamic-programming'
+import { fibonacciDp, knapsack, lcs } from '@lib/algorithms/dynamic-programming'
 
-import {
-  nQueens,
-  sudokuSolver,
-  mazePathfinding,
-} from '@lib/algorithms/backtracking'
+import { nQueens, sudokuSolver, mazePathfinding } from '@lib/algorithms/backtracking'
 
 import { towerOfHanoi } from '@lib/algorithms/divide-and-conquer'
 
@@ -96,6 +82,7 @@ export const algorithms: Algorithm[] = [
   jumpSearch,
   interpolationSearch,
   // Graphs
+  adjacencyMatrix,
   bfs,
   dfs,
   dijkstra,
@@ -117,7 +104,10 @@ export const algorithms: Algorithm[] = [
 
 export const categories: Category[] = [
   { name: 'Concepts', algorithms: algorithms.filter((a) => a.category === 'Concepts') },
-  { name: 'Data Structures', algorithms: algorithms.filter((a) => a.category === 'Data Structures') },
+  {
+    name: 'Data Structures',
+    algorithms: algorithms.filter((a) => a.category === 'Data Structures'),
+  },
   { name: 'Sorting', algorithms: algorithms.filter((a) => a.category === 'Sorting') },
   { name: 'Searching', algorithms: algorithms.filter((a) => a.category === 'Searching') },
   { name: 'Graphs', algorithms: algorithms.filter((a) => a.category === 'Graphs') },

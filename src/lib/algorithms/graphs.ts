@@ -70,7 +70,11 @@ BFS guarantees finding the shortest path (fewest edges) between two nodes in an 
         currentEdge: null,
         queue: [0],
       },
-      description: d(locale, 'Starting BFS from node 0. Added to queue.', 'Iniciando BFS desde el nodo 0. Agregado a la cola.'),
+      description: d(
+        locale,
+        'Starting BFS from node 0. Added to queue.',
+        'Iniciando BFS desde el nodo 0. Agregado a la cola.',
+      ),
       codeLine: 3,
       variables: { start: 0, queue: '[0]', visited: '{0}', result: '[]' },
     })
@@ -89,7 +93,11 @@ BFS guarantees finding the shortest path (fewest edges) between two nodes in an 
           currentEdge: null,
           queue: [...queue],
         },
-        description: d(locale, `Dequeued node ${node}. Processing neighbors...`, `Nodo ${node} desencolado. Procesando vecinos...`),
+        description: d(
+          locale,
+          `Dequeued node ${node}. Processing neighbors...`,
+          `Nodo ${node} desencolado. Procesando vecinos...`,
+        ),
         codeLine: 8,
         variables: { node, queue: `[${queue.join(', ')}]`, result: `[${visitedNodes.join(', ')}]` },
       })
@@ -110,7 +118,11 @@ BFS guarantees finding the shortest path (fewest edges) between two nodes in an 
               currentEdge: [node, neighbor],
               queue: [...queue],
             },
-            description: d(locale, `Discovered node ${neighbor} via edge ${node}→${neighbor}. Added to queue.`, `Nodo ${neighbor} descubierto por arista ${node}→${neighbor}. Agregado a la cola.`),
+            description: d(
+              locale,
+              `Discovered node ${neighbor} via edge ${node}→${neighbor}. Added to queue.`,
+              `Nodo ${neighbor} descubierto por arista ${node}→${neighbor}. Agregado a la cola.`,
+            ),
             codeLine: 13,
             variables: {
               node,
@@ -133,7 +145,11 @@ BFS guarantees finding the shortest path (fewest edges) between two nodes in an 
         currentEdge: null,
         queue: [],
       },
-      description: d(locale, `BFS complete! Visit order: ${visitedNodes.join(' → ')}`, `¡BFS completado! Orden de visita: ${visitedNodes.join(' → ')}`),
+      description: d(
+        locale,
+        `BFS complete! Visit order: ${visitedNodes.join(' → ')}`,
+        `¡BFS completado! Orden de visita: ${visitedNodes.join(' → ')}`,
+      ),
       codeLine: 19,
       variables: { result: `[${visitedNodes.join(', ')}]` },
     })
@@ -230,7 +246,11 @@ DFS explores deep paths first, which makes it useful for topological sorting and
           currentEdge: null,
           stack: [...stack],
         },
-        description: d(locale, `Visiting node ${node}. Exploring its neighbors...`, `Visitando nodo ${node}. Explorando sus vecinos...`),
+        description: d(
+          locale,
+          `Visiting node ${node}. Exploring its neighbors...`,
+          `Visitando nodo ${node}. Explorando sus vecinos...`,
+        ),
         codeLine: 6,
         variables: {
           node,
@@ -254,7 +274,11 @@ DFS explores deep paths first, which makes it useful for topological sorting and
               currentEdge: [node, neighbor],
               stack: [...stack],
             },
-            description: d(locale, `Exploring edge ${node} → ${neighbor}`, `Explorando arista ${node} → ${neighbor}`),
+            description: d(
+              locale,
+              `Exploring edge ${node} → ${neighbor}`,
+              `Explorando arista ${node} → ${neighbor}`,
+            ),
             codeLine: 9,
             variables: {
               node,
@@ -281,7 +305,11 @@ DFS explores deep paths first, which makes it useful for topological sorting and
             currentEdge: null,
             stack: [...stack],
           },
-          description: d(locale, `Backtracking from node ${node} to node ${stack[stack.length - 1]}`, `Retrocediendo del nodo ${node} al nodo ${stack[stack.length - 1]}`),
+          description: d(
+            locale,
+            `Backtracking from node ${node} to node ${stack[stack.length - 1]}`,
+            `Retrocediendo del nodo ${node} al nodo ${stack[stack.length - 1]}`,
+          ),
           codeLine: 12,
           variables: {
             node,
@@ -304,7 +332,11 @@ DFS explores deep paths first, which makes it useful for topological sorting and
         currentEdge: null,
         stack: [],
       },
-      description: d(locale, `DFS complete! Visit order: ${visitedNodes.join(' → ')}`, `¡DFS completado! Orden de visita: ${visitedNodes.join(' → ')}`),
+      description: d(
+        locale,
+        `DFS complete! Visit order: ${visitedNodes.join(' → ')}`,
+        `¡DFS completado! Orden de visita: ${visitedNodes.join(' → ')}`,
+      ),
       codeLine: 17,
       variables: { result: `[${visitedNodes.join(', ')}]` },
     })
@@ -427,7 +459,11 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
         currentEdge: null,
         distances: { ...dist },
       },
-      description: d(locale, 'Starting Dijkstra from node A. All distances set to ∞ except source (0).', 'Iniciando Dijkstra desde el nodo A. Todas las distancias en ∞ excepto el origen (0).'),
+      description: d(
+        locale,
+        'Starting Dijkstra from node A. All distances set to ∞ except source (0).',
+        'Iniciando Dijkstra desde el nodo A. Todas las distancias en ∞ excepto el origen (0).',
+      ),
       codeLine: 1,
       variables: { start: 'A', distances: distStr() },
     })
@@ -457,7 +493,11 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
           currentEdge: null,
           distances: { ...dist },
         },
-        description: d(locale, `Pick node ${djNodes[minNode].label} (distance ${dist[minNode]}). Relaxing its neighbors...`, `Seleccionado nodo ${djNodes[minNode].label} (distancia ${dist[minNode]}). Relajando sus vecinos...`),
+        description: d(
+          locale,
+          `Pick node ${djNodes[minNode].label} (distance ${dist[minNode]}). Relaxing its neighbors...`,
+          `Seleccionado nodo ${djNodes[minNode].label} (distancia ${dist[minNode]}). Relajando sus vecinos...`,
+        ),
         codeLine: 8,
         variables: {
           node: djNodes[minNode].label,
@@ -487,7 +527,11 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
               currentEdge: [minNode, neighbor],
               distances: { ...dist },
             },
-            description: d(locale, `Relaxed ${djNodes[minNode].label}→${djNodes[neighbor].label} (weight ${weight}). Distance to ${djNodes[neighbor].label}: ${oldDist} → ${newDist}`, `Relajado ${djNodes[minNode].label}→${djNodes[neighbor].label} (peso ${weight}). Distancia a ${djNodes[neighbor].label}: ${oldDist} → ${newDist}`),
+            description: d(
+              locale,
+              `Relaxed ${djNodes[minNode].label}→${djNodes[neighbor].label} (weight ${weight}). Distance to ${djNodes[neighbor].label}: ${oldDist} → ${newDist}`,
+              `Relajado ${djNodes[minNode].label}→${djNodes[neighbor].label} (peso ${weight}). Distancia a ${djNodes[neighbor].label}: ${oldDist} → ${newDist}`,
+            ),
             codeLine: 20,
             variables: {
               from: djNodes[minNode].label,
@@ -508,7 +552,11 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
               currentEdge: [minNode, neighbor],
               distances: { ...dist },
             },
-            description: d(locale, `Edge ${djNodes[minNode].label}→${djNodes[neighbor].label} (weight ${weight}): ${newDist} ≥ ${oldDist}. No improvement.`, `Arista ${djNodes[minNode].label}→${djNodes[neighbor].label} (peso ${weight}): ${newDist} ≥ ${oldDist}. Sin mejora.`),
+            description: d(
+              locale,
+              `Edge ${djNodes[minNode].label}→${djNodes[neighbor].label} (weight ${weight}): ${newDist} ≥ ${oldDist}. No improvement.`,
+              `Arista ${djNodes[minNode].label}→${djNodes[neighbor].label} (peso ${weight}): ${newDist} ≥ ${oldDist}. Sin mejora.`,
+            ),
             codeLine: 20,
             variables: {
               from: djNodes[minNode].label,
@@ -532,7 +580,11 @@ Dijkstra's is one of the most important graph algorithms and guarantees optimal 
         currentEdge: null,
         distances: { ...dist },
       },
-      description: d(locale, `Dijkstra complete! Shortest distances from A: ${distStr()}`, `¡Dijkstra completado! Distancias más cortas desde A: ${distStr()}`),
+      description: d(
+        locale,
+        `Dijkstra complete! Shortest distances from A: ${distStr()}`,
+        `¡Dijkstra completado! Distancias más cortas desde A: ${distStr()}`,
+      ),
       codeLine: 26,
       variables: { distances: distStr() },
     })
@@ -659,7 +711,11 @@ Prim's Algorithm is a greedy algorithm that always picks the locally optimal edg
         currentEdge: null,
         distances: { ...key },
       },
-      description: d(locale, "Starting Prim's MST from node A. All key values set to ∞ except source (0).", 'Iniciando MST de Prim desde el nodo A. Todos los valores clave en ∞ excepto el origen (0).'),
+      description: d(
+        locale,
+        "Starting Prim's MST from node A. All key values set to ∞ except source (0).",
+        'Iniciando MST de Prim desde el nodo A. Todos los valores clave en ∞ excepto el origen (0).',
+      ),
       codeLine: 1,
       variables: { start: 'A', keys: keyStr() },
     })
@@ -696,8 +752,16 @@ Prim's Algorithm is a greedy algorithm that always picks the locally optimal edg
         },
         description:
           parent[minNode] !== null
-            ? d(locale, `Added ${prNodes[minNode].label} to MST via edge ${prNodes[parent[minNode]!].label}→${prNodes[minNode].label} (weight ${key[minNode]})`, `${prNodes[minNode].label} agregado al MST por arista ${prNodes[parent[minNode]!].label}→${prNodes[minNode].label} (peso ${key[minNode]})`)
-            : d(locale, `Starting MST from node ${prNodes[minNode].label}`, `Iniciando MST desde el nodo ${prNodes[minNode].label}`),
+            ? d(
+                locale,
+                `Added ${prNodes[minNode].label} to MST via edge ${prNodes[parent[minNode]!].label}→${prNodes[minNode].label} (weight ${key[minNode]})`,
+                `${prNodes[minNode].label} agregado al MST por arista ${prNodes[parent[minNode]!].label}→${prNodes[minNode].label} (peso ${key[minNode]})`,
+              )
+            : d(
+                locale,
+                `Starting MST from node ${prNodes[minNode].label}`,
+                `Iniciando MST desde el nodo ${prNodes[minNode].label}`,
+              ),
         codeLine: 8,
         variables: { node: prNodes[minNode].label, key: key[minNode] as number, keys: keyStr() },
       })
@@ -721,7 +785,11 @@ Prim's Algorithm is a greedy algorithm that always picks the locally optimal edg
               currentEdge: [minNode, neighbor],
               distances: { ...key },
             },
-            description: d(locale, `Updated key of ${prNodes[neighbor].label}: ${oldKey} → ${weight} (via ${prNodes[minNode].label})`, `Clave de ${prNodes[neighbor].label} actualizada: ${oldKey} → ${weight} (vía ${prNodes[minNode].label})`),
+            description: d(
+              locale,
+              `Updated key of ${prNodes[neighbor].label}: ${oldKey} → ${weight} (via ${prNodes[minNode].label})`,
+              `Clave de ${prNodes[neighbor].label} actualizada: ${oldKey} → ${weight} (vía ${prNodes[minNode].label})`,
+            ),
             codeLine: 21,
             variables: {
               from: prNodes[minNode].label,
@@ -752,7 +820,11 @@ Prim's Algorithm is a greedy algorithm that always picks the locally optimal edg
         currentEdge: null,
         distances: { ...key },
       },
-      description: d(locale, `Prim's complete! MST total weight: ${totalWeight}. Edges: ${visitedEdges.map(([f, t]) => `${prNodes[f].label}-${prNodes[t].label}`).join(', ')}`, `¡Prim completado! Peso total del MST: ${totalWeight}. Aristas: ${visitedEdges.map(([f, t]) => `${prNodes[f].label}-${prNodes[t].label}`).join(', ')}`),
+      description: d(
+        locale,
+        `Prim's complete! MST total weight: ${totalWeight}. Edges: ${visitedEdges.map(([f, t]) => `${prNodes[f].label}-${prNodes[t].label}`).join(', ')}`,
+        `¡Prim completado! Peso total del MST: ${totalWeight}. Aristas: ${visitedEdges.map(([f, t]) => `${prNodes[f].label}-${prNodes[t].label}`).join(', ')}`,
+      ),
       codeLine: 28,
       variables: { totalWeight, mstEdges: visitedEdges.length },
     })
@@ -878,7 +950,11 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
         currentEdge: null,
         queue: [],
       },
-      description: d(locale, `DAG with ${tsNodes.length} nodes. Computing in-degrees for Kahn's algorithm.`, `DAG con ${tsNodes.length} nodos. Calculando grados de entrada para el algoritmo de Kahn.`),
+      description: d(
+        locale,
+        `DAG with ${tsNodes.length} nodes. Computing in-degrees for Kahn's algorithm.`,
+        `DAG con ${tsNodes.length} nodos. Calculando grados de entrada para el algoritmo de Kahn.`,
+      ),
       codeLine: 1,
       variables: { inDegrees: inDegStr() },
     })
@@ -898,7 +974,11 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
         currentEdge: null,
         queue: [...queue],
       },
-      description: d(locale, `Nodes with in-degree 0: [${queue.map((id) => tsNodes[id].label).join(', ')}]. Added to queue.`, `Nodos con grado de entrada 0: [${queue.map((id) => tsNodes[id].label).join(', ')}]. Agregados a la cola.`),
+      description: d(
+        locale,
+        `Nodes with in-degree 0: [${queue.map((id) => tsNodes[id].label).join(', ')}]. Added to queue.`,
+        `Nodos con grado de entrada 0: [${queue.map((id) => tsNodes[id].label).join(', ')}]. Agregados a la cola.`,
+      ),
       codeLine: 12,
       variables: {
         queue: `[${queue.map((id) => tsNodes[id].label).join(', ')}]`,
@@ -921,7 +1001,11 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
           currentEdge: null,
           queue: [...queue],
         },
-        description: d(locale, `Dequeued ${tsNodes[node].label}. Order: [${order.map((id) => tsNodes[id].label).join(', ')}]`, `${tsNodes[node].label} desencolado. Orden: [${order.map((id) => tsNodes[id].label).join(', ')}]`),
+        description: d(
+          locale,
+          `Dequeued ${tsNodes[node].label}. Order: [${order.map((id) => tsNodes[id].label).join(', ')}]`,
+          `${tsNodes[node].label} desencolado. Orden: [${order.map((id) => tsNodes[id].label).join(', ')}]`,
+        ),
         codeLine: 18,
         variables: {
           node: tsNodes[node].label,
@@ -948,7 +1032,11 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
             currentEdge: [node, neighbor],
             queue: [...queue],
           },
-          description: d(locale, `Reduced in-degree of ${tsNodes[neighbor].label} to ${inDegree[neighbor]}${inDegree[neighbor] === 0 ? ' → added to queue' : ''}`, `Grado de entrada de ${tsNodes[neighbor].label} reducido a ${inDegree[neighbor]}${inDegree[neighbor] === 0 ? ' → agregado a la cola' : ''}`),
+          description: d(
+            locale,
+            `Reduced in-degree of ${tsNodes[neighbor].label} to ${inDegree[neighbor]}${inDegree[neighbor] === 0 ? ' → added to queue' : ''}`,
+            `Grado de entrada de ${tsNodes[neighbor].label} reducido a ${inDegree[neighbor]}${inDegree[neighbor] === 0 ? ' → agregado a la cola' : ''}`,
+          ),
           codeLine: 22,
           variables: {
             from: tsNodes[node].label,
@@ -970,7 +1058,11 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
         currentEdge: null,
         queue: [],
       },
-      description: d(locale, `Topological sort complete! Order: ${order.map((id) => tsNodes[id].label).join(' → ')}`, `¡Ordenamiento topológico completado! Orden: ${order.map((id) => tsNodes[id].label).join(' → ')}`),
+      description: d(
+        locale,
+        `Topological sort complete! Order: ${order.map((id) => tsNodes[id].label).join(' → ')}`,
+        `¡Ordenamiento topológico completado! Orden: ${order.map((id) => tsNodes[id].label).join(' → ')}`,
+      ),
       codeLine: 30,
       variables: { order: `[${order.map((id) => tsNodes[id].label).join(', ')}]` },
     })
@@ -979,10 +1071,158 @@ If the graph has a cycle, a topological ordering is not possible (not all nodes 
   },
 }
 
-export {
-  bfs,
-  dfs,
-  dijkstra,
-  prim,
-  topologicalSort,
+// ============================================================
+// ADJACENCY MATRIX (graph representation)
+// ============================================================
+const adjacencyMatrix: Algorithm = {
+  id: 'adjacency-matrix',
+  name: 'Adjacency Matrix',
+  category: 'Graphs',
+  difficulty: 'easy',
+  visualization: 'concept',
+  code: `function buildAdjacencyMatrix(numNodes, edges) {
+  // Initialize an N×N matrix filled with 0
+  const matrix = Array.from({ length: numNodes }, () =>
+    new Array(numNodes).fill(0)
+  );
+
+  // For each directed edge u → v, set matrix[u][v] = 1
+  for (const [u, v] of edges) {
+    matrix[u][v] = 1;
+  }
+
+  return matrix;
+}`,
+  description: `Adjacency Matrix
+
+An adjacency matrix is a way to represent a graph as a 2D grid. For a graph with V vertices, it is a V×V matrix where the cell at row u, column v is 1 (or the edge weight) when there is an edge from u to v, and 0 otherwise.
+
+How it works:
+1. Create a V×V matrix filled with 0
+2. For every edge u→v, set matrix[u][v] = 1
+3. For an undirected graph you also set matrix[v][u] = 1, which makes the matrix symmetric
+4. For a directed graph the matrix is generally asymmetric: matrix[u][v] ≠ matrix[v][u]
+
+Time Complexity:
+  Edge lookup: O(1) — just read matrix[u][v]
+  Iterate a node's neighbors: O(V)
+  Build the matrix: O(V²)
+
+Space Complexity: O(V²) — independent of the number of edges
+
+Adjacency matrix vs adjacency list:
+  - Matrix: O(1) edge lookup, but O(V²) space — best for dense graphs
+  - List: O(V + E) space and fast neighbor iteration — best for sparse graphs
+
+Applications:
+  - Dense graphs where most pairs of nodes are connected
+  - Algorithms that need constant-time edge checks (e.g. Floyd–Warshall)
+  - Weighted graphs (store the weight instead of 1)`,
+
+  generateSteps(locale = 'en') {
+    const amNodes: GraphNode[] = [
+      { id: 0, label: 'A', x: 60, y: 50 },
+      { id: 1, label: 'B', x: 300, y: 50 },
+      { id: 2, label: 'C', x: 60, y: 170 },
+      { id: 3, label: 'D', x: 300, y: 170 },
+      { id: 4, label: 'E', x: 180, y: 110 },
+    ]
+    const amEdges: GraphEdge[] = [
+      { from: 0, to: 1 },
+      { from: 0, to: 2 },
+      { from: 1, to: 3 },
+      { from: 2, to: 3 },
+      { from: 2, to: 4 },
+      { from: 3, to: 4 },
+      { from: 4, to: 0 },
+    ]
+
+    const n = amNodes.length
+    const matrix: number[][] = amNodes.map(() => new Array(n).fill(0))
+    const labelOf = (id: number) => amNodes[id].label
+
+    const steps: Step[] = []
+    const snapshot = () => matrix.map((row) => [...row])
+
+    steps.push({
+      concept: {
+        type: 'adjacencyMatrix',
+        nodes: amNodes,
+        edges: amEdges,
+        matrix: snapshot(),
+        directed: true,
+      },
+      description: d(
+        locale,
+        `A directed graph with ${n} nodes and ${amEdges.length} edges. Let's represent it as a ${n}×${n} adjacency matrix.`,
+        `Un grafo dirigido con ${n} nodos y ${amEdges.length} aristas. Vamos a representarlo como una matriz de adyacencia de ${n}×${n}.`,
+      ),
+      codeLine: 1,
+      variables: { nodes: n, edges: amEdges.length },
+    })
+
+    steps.push({
+      concept: {
+        type: 'adjacencyMatrix',
+        nodes: amNodes,
+        edges: amEdges,
+        matrix: snapshot(),
+        directed: true,
+      },
+      description: d(
+        locale,
+        `Initialize a ${n}×${n} matrix filled with 0 — no edges recorded yet.`,
+        `Inicializa una matriz de ${n}×${n} llena de 0 — todavía sin aristas registradas.`,
+      ),
+      codeLine: 3,
+      variables: { matrix: `${n}×${n} of 0` },
+    })
+
+    for (const e of amEdges) {
+      matrix[e.from][e.to] = 1
+
+      steps.push({
+        concept: {
+          type: 'adjacencyMatrix',
+          nodes: amNodes,
+          edges: amEdges,
+          matrix: snapshot(),
+          directed: true,
+          currentEdge: [e.from, e.to],
+          highlightCells: [[e.from, e.to]],
+        },
+        description: d(
+          locale,
+          `Edge ${labelOf(e.from)}→${labelOf(e.to)}: set matrix[${e.from}][${e.to}] = 1.`,
+          `Arista ${labelOf(e.from)}→${labelOf(e.to)}: asigna matrix[${e.from}][${e.to}] = 1.`,
+        ),
+        codeLine: 9,
+        variables: {
+          edge: `${labelOf(e.from)}→${labelOf(e.to)}`,
+          [`matrix[${e.from}][${e.to}]`]: 1,
+        },
+      })
+    }
+
+    steps.push({
+      concept: {
+        type: 'adjacencyMatrix',
+        nodes: amNodes,
+        edges: amEdges,
+        matrix: snapshot(),
+        directed: true,
+      },
+      description: d(
+        locale,
+        'Matrix complete. Because the graph is directed, it is asymmetric: matrix[u][v] does not always equal matrix[v][u]. Edge lookup is now O(1).',
+        'Matriz completa. Como el grafo es dirigido, es asimétrica: matrix[u][v] no siempre es igual a matrix[v][u]. La consulta de aristas ahora es O(1).',
+      ),
+      codeLine: 12,
+      variables: { space: 'O(V²)', lookup: 'O(1)' },
+    })
+
+    return steps
+  },
 }
+
+export { bfs, dfs, dijkstra, prim, topologicalSort, adjacencyMatrix }

@@ -194,6 +194,18 @@ export interface BucketsState {
   operation?: string
 }
 
+// ── Graph representation visualization types ──
+
+export interface AdjacencyMatrixState {
+  type: 'adjacencyMatrix'
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+  matrix: number[][] // N×N, 0/1; rows = "from", cols = "to"
+  directed: boolean
+  currentEdge?: [number, number] | null // edge being processed (graph highlight)
+  highlightCells?: [number, number][] // matrix cells [row, col] to highlight
+}
+
 export type ConceptState =
   | BigOState
   | CallStackState
@@ -206,6 +218,7 @@ export type ConceptState =
   | MemoTableState
   | CoinChangeState
   | BucketsState
+  | AdjacencyMatrixState
 
 export interface Step {
   array?: number[]
