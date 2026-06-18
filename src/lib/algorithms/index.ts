@@ -39,29 +39,17 @@ import {
   interpolationSearch,
 } from '@lib/algorithms/searching'
 
-import {
-  bfs,
-  dfs,
-  dijkstra,
-  prim,
-  topologicalSort,
-} from '@lib/algorithms/graphs'
+import { bfs, dfs, dijkstra, prim, topologicalSort } from '@lib/algorithms/graphs'
 
-import {
-  fibonacciDp,
-  knapsack,
-  lcs,
-} from '@lib/algorithms/dynamic-programming'
+import { fibonacciDp, knapsack, lcs } from '@lib/algorithms/dynamic-programming'
 
-import {
-  nQueens,
-  sudokuSolver,
-  mazePathfinding,
-} from '@lib/algorithms/backtracking'
+import { nQueens, sudokuSolver, mazePathfinding } from '@lib/algorithms/backtracking'
 
 import { towerOfHanoi } from '@lib/algorithms/divide-and-conquer'
 
 import { sieveOfEratosthenes } from '@lib/algorithms/math'
+
+import { huffmanCoding } from '@lib/algorithms/compression'
 
 export const algorithms: Algorithm[] = [
   // Concepts
@@ -113,11 +101,16 @@ export const algorithms: Algorithm[] = [
   towerOfHanoi,
   // Math
   sieveOfEratosthenes,
+  // Compression
+  huffmanCoding,
 ]
 
 export const categories: Category[] = [
   { name: 'Concepts', algorithms: algorithms.filter((a) => a.category === 'Concepts') },
-  { name: 'Data Structures', algorithms: algorithms.filter((a) => a.category === 'Data Structures') },
+  {
+    name: 'Data Structures',
+    algorithms: algorithms.filter((a) => a.category === 'Data Structures'),
+  },
   { name: 'Sorting', algorithms: algorithms.filter((a) => a.category === 'Sorting') },
   { name: 'Searching', algorithms: algorithms.filter((a) => a.category === 'Searching') },
   { name: 'Graphs', algorithms: algorithms.filter((a) => a.category === 'Graphs') },
@@ -131,4 +124,5 @@ export const categories: Category[] = [
     algorithms: algorithms.filter((a) => a.category === 'Divide and Conquer'),
   },
   { name: 'Math', algorithms: algorithms.filter((a) => a.category === 'Math') },
+  { name: 'Compression', algorithms: algorithms.filter((a) => a.category === 'Compression') },
 ]
