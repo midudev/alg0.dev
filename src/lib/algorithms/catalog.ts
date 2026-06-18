@@ -295,6 +295,14 @@ export const algorithmCatalog: AlgorithmSummary[] = [
     difficulty: 'intermediate',
     visualization: 'matrix',
   },
+  // Compression
+  {
+    id: 'huffman-coding',
+    name: 'Huffman Coding',
+    category: 'Compression',
+    difficulty: 'advanced',
+    visualization: 'concept',
+  },
 ]
 
 const CATEGORY_ORDER = [
@@ -307,6 +315,7 @@ const CATEGORY_ORDER = [
   'Backtracking',
   'Divide and Conquer',
   'Math',
+  'Compression',
 ] as const
 
 export const catalogCategories: CategorySummary[] = CATEGORY_ORDER.map((name) => ({

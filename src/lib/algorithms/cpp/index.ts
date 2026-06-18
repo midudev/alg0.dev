@@ -9,6 +9,7 @@ import { dynamicProgrammingCpp } from '@lib/algorithms/cpp/dynamic-programming'
 import { backtrackingCpp } from '@lib/algorithms/cpp/backtracking'
 import { divideAndConquerCpp } from '@lib/algorithms/cpp/divide-and-conquer'
 import { mathCpp } from '@lib/algorithms/cpp/math'
+import { compressionCpp } from '@lib/algorithms/cpp/compression'
 
 /** C++ translations keyed by algorithm id. */
 export const cppImplementations: Record<string, CodeImplementation> = {
@@ -21,4 +22,5 @@ export const cppImplementations: Record<string, CodeImplementation> = {
   ...backtrackingCpp,
   ...divideAndConquerCpp,
   ...mathCpp,
+  ...compressionCpp,
 }
