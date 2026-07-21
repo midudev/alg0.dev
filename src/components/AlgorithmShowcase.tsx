@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { algorithms } from '@lib/algorithms'
-import type { Algorithm, Step } from '@lib/types'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { loadAlgorithm } from '@lib/algorithms/loaders'
+import type { Algorithm, AlgorithmSummary, Step } from '@lib/types'
 import type { Locale } from '@i18n/translations'
 import ArrayVisualizer from '@components/ArrayVisualizer'
 import GraphVisualizer from '@components/GraphVisualizer'
@@ -37,24 +37,14 @@ function sampleSteps(allSteps: Step[], max: number): Step[] {
 
 interface AlgorithmShowcaseProps {
   locale?: Locale
-  onSelectAlgorithm?: (algo: Algorithm) => void
+  onSelectAlgorithm?: (algo: AlgorithmSummary) => void
 }
 
 export default function AlgorithmShowcase({
   locale = 'en',
   onSelectAlgorithm,
 }: AlgorithmShowcaseProps) {
-  const items = useMemo<ShowcaseItem[]>(
-    () =>
-      SHOWCASE_IDS.map((id) => algorithms.find((a) => a.id === id))
-        .filter((a): a is Algorithm => a != null)
-        .map((algo) => ({
-          algorithm: algo,
-          steps: sampleSteps(algo.generateSteps(locale), MAX_STEPS),
-        })),
-    [locale],
-  )
-
+  const [items, setItems] = useState<ShowcaseItem[]>([])
   const [algoIdx, setAlgoIdx] = useState(0)
   const [stepIdx, setStepIdx] = useState(0)
   const [fading, setFading] = useState(false)
@@ -72,6 +62,27 @@ export default function AlgorithmShowcase({
     return () => mq.removeEventListener('change', handler)
   }, [])
 
+  // Load only the showcase algorithms (not the whole library)
+  useEffect(() => {
+    let cancelled = false
+    Promise.all(SHOWCASE_IDS.map((id) => loadAlgorithm(id)))
+      .then((algos) => {
+        if (cancelled) return
+        setItems(
+          algos.map((algo) => ({
+            algorithm: algo,
+            steps: sampleSteps(algo.generateSteps(locale), MAX_STEPS),
+          })),
+        )
+      })
+      .catch((error) => {
+        console.error('Failed to load showcase algorithms', error)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [locale])
+
   const current = items[algoIdx]
 
   const clearTimers = useCallback(() => {
@@ -79,60 +90,54 @@ export default function AlgorithmShowcase({
     timersRef.current = []
   }, [])
 
+  const schedule = useCallback((fn: () => void, ms: number) => {
+    const id = setTimeout(fn, ms)
+    timersRef.current.push(id)
+    return id
+  }, [])
+
+  const advance = useCallback(() => {
+    if (pausingRef.current || items.length === 0) return
+    setStepIdx((prev) => {
+      const item = items[algoIdx]
+      if (!item) return prev
+      if (prev < item.steps.length - 1) return prev + 1
+
+      // End of algorithm — pause, fade, switch
+      pausingRef.current = true
+      schedule(() => {
+        setFading(true)
+        schedule(() => {
+          setAlgoIdx((i) => (i + 1) % items.length)
+          setStepIdx(0)
+          setFading(false)
+          pausingRef.current = false
+        }, FADE_MS)
+      }, END_PAUSE_MS)
+      return prev
+    })
+  }, [algoIdx, items, schedule])
+
   useEffect(() => {
-    if (reducedMotion) return
-    pausingRef.current = false
-
-    const interval = setInterval(() => {
-      if (pausingRef.current) return
-
-      setStepIdx((prev) => {
-        if (prev + 1 >= current.steps.length) {
-          pausingRef.current = true
-          const t1 = setTimeout(() => {
-            setFading(true)
-            const t2 = setTimeout(() => {
-              setAlgoIdx((i) => (i + 1) % items.length)
-              setStepIdx(0)
-              setFading(false)
-            }, FADE_MS)
-            timersRef.current.push(t2)
-          }, END_PAUSE_MS)
-          timersRef.current.push(t1)
-          return prev
-        }
-        return prev + 1
-      })
-    }, STEP_MS)
-
+    if (reducedMotion || items.length === 0) return
+    clearTimers()
+    const id = setInterval(advance, STEP_MS)
     return () => {
-      clearInterval(interval)
+      clearInterval(id)
       clearTimers()
     }
-  }, [algoIdx, current.steps.length, items.length, clearTimers, reducedMotion])
+  }, [advance, clearTimers, reducedMotion, items.length])
 
-  const goToAlgo = useCallback(
-    (idx: number) => {
-      if (idx === algoIdx || fading) return
-      clearTimers()
-      pausingRef.current = true
-      setFading(true)
-      const t = setTimeout(() => {
-        setAlgoIdx(idx)
-        setStepIdx(0)
-        setFading(false)
-      }, FADE_MS)
-      timersRef.current.push(t)
-    },
-    [algoIdx, fading, clearTimers],
-  )
+  if (!current) {
+    return (
+      <div className="relative w-full max-w-2xl rounded-xl md:rounded-2xl border border-white/6 bg-white/2 h-[clamp(240px,45vw,360px)]" />
+    )
+  }
 
-  const step = current?.steps[stepIdx]
-  if (!step || !current) return null
+  const step = current.steps[stepIdx] ?? current.steps[0]
+  const progress = current.steps.length > 1 ? stepIdx / (current.steps.length - 1) : 1
 
-  const progress = current.steps.length > 1 ? stepIdx / (current.steps.length - 1) : 0
-
-  const renderVisualization = () => {
+  const renderVisualizer = () => {
     switch (current.algorithm.visualization) {
       case 'array':
         return <ArrayVisualizer step={step} />
@@ -148,61 +153,51 @@ export default function AlgorithmShowcase({
   }
 
   return (
-    <div className="flex flex-col items-center gap-3 md:gap-4 w-full px-4 md:px-0">
-      {/* Visualization card */}
+    <div
+      className="relative w-full max-w-2xl rounded-xl md:rounded-2xl border border-white/6 bg-white/2 overflow-hidden group hover:border-white/12 hover:bg-white/4 transition-colors duration-300"
+      style={{ height: 'clamp(240px, 45vw, 360px)' }}
+    >
       <div
-        className="relative w-full max-w-2xl rounded-xl md:rounded-2xl border border-white/6 bg-white/2 overflow-hidden group hover:border-white/12 hover:bg-white/4 transition-colors duration-300"
-        style={{ height: 'clamp(240px, 45vw, 360px)' }}
+        className="absolute inset-0 flex flex-col p-3 md:p-6 transition-opacity ease-in-out"
+        style={{
+          opacity: fading ? 0 : 1,
+          transitionDuration: `${FADE_MS}ms`,
+        }}
       >
-        {/* Visualization content */}
-        <div
-          className="absolute inset-0 flex flex-col p-3 md:p-6 transition-opacity ease-in-out"
-          style={{
-            opacity: fading ? 0 : 1,
-            transitionDuration: `${FADE_MS}ms`,
-          }}
-        >
-          {renderVisualization()}
-        </div>
-
-        {/* Click target overlay */}
-        <div
-          onClick={() => onSelectAlgorithm?.(current.algorithm)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              onSelectAlgorithm?.(current.algorithm)
-            }
-          }}
-          role="button"
-          tabIndex={0}
-          className="absolute inset-0 z-10 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 focus-visible:ring-inset"
-          aria-label={`${current.algorithm.name} — click to explore`}
-        />
-
-        {/* Hover CTA overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-14 z-20 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3 pointer-events-none">
-          <span className="text-[11px] text-white/50 font-mono tracking-wide">
-            {locale === 'es' ? 'Click para explorar →' : 'Click to explore →'}
+        <div className="text-center mb-2 shrink-0">
+          <span className="text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
+            {current.algorithm.category}
           </span>
+          <h3 className="text-sm font-semibold text-white font-heading mt-0.5">
+            {current.algorithm.name}
+          </h3>
+        </div>
+        <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
+          {renderVisualizer()}
         </div>
       </div>
 
-      {/* Algorithm info + indicators */}
-      <div className="flex flex-col items-center gap-3">
-        {/* Progress bar — fades too */}
-        <div
-          className="w-32 h-0.5 bg-white/6 rounded-full overflow-hidden transition-opacity ease-in-out"
-          style={{ opacity: fading ? 0 : 1, transitionDuration: `${FADE_MS}ms` }}
+      <div className="absolute inset-x-0 bottom-0 h-14 z-20 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3 pointer-events-none">
+        <button
+          type="button"
+          onClick={() => onSelectAlgorithm?.(current.algorithm)}
+          className="pointer-events-auto px-3 py-1.5 text-[11px] font-medium rounded-md bg-white text-black hover:bg-neutral-200 transition-colors"
         >
-          <div
-            className="h-full bg-white/20 rounded-full transition-all ease-linear"
-            style={{
-              width: `${progress * 100}%`,
-              transitionDuration: `${STEP_MS}ms`,
-            }}
-          />
-        </div>
+          Open
+        </button>
+      </div>
+
+      <div
+        className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-white/6 rounded-full overflow-hidden transition-opacity ease-in-out"
+        style={{ opacity: fading ? 0 : 1, transitionDuration: `${FADE_MS}ms` }}
+      >
+        <div
+          className="h-full bg-white/20 rounded-full transition-all ease-linear"
+          style={{
+            width: `${progress * 100}%`,
+            transitionDuration: `${STEP_MS}ms`,
+          }}
+        />
       </div>
     </div>
   )

@@ -2,7 +2,14 @@ import { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } fro
 import type { Monaco } from '@monaco-editor/react'
 import type { Locale } from '@i18n/translations'
 import { translations } from '@i18n/translations'
-import type { Difficulty } from '@lib/types'
+import type { Algorithm, CodeImplementation, CodeLanguage, Difficulty } from '@lib/types'
+import {
+  getAvailableLanguages,
+  getCode,
+  getCodeLanguageMeta,
+  getCodeLine,
+} from '@lib/code-languages'
+import { loadLanguageImplementation } from '@lib/algorithms/loaders'
 import ComplexityChart from '@components/ComplexityChart'
 
 const LazyEditor = lazy(() => import('@monaco-editor/react'))
@@ -30,14 +37,18 @@ const DIFFICULTY_CONFIG: Record<Difficulty, { en: string; es: string; color: str
   }
 
 interface CodePanelProps {
-  code: string
+  algorithm: Algorithm
   description: string
   difficulty?: Difficulty
+  /** Line of the JavaScript source the current step points at */
   currentLine?: number
   variables?: Record<string, string | number | boolean | null>
   consoleOutput?: string[]
   activeTab: 'code' | 'about'
   onTabChange: (tab: 'code' | 'about') => void
+  /** null while the preferred language is still resolving (no switcher item active). */
+  language: CodeLanguage | null
+  onLanguageChange: (language: CodeLanguage) => void
   locale?: Locale
 }
 
@@ -71,7 +82,7 @@ function defineThemes(monaco: Monaco) {
 }
 
 export default function CodePanel({
-  code,
+  algorithm,
   description,
   difficulty,
   currentLine,
@@ -79,18 +90,73 @@ export default function CodePanel({
   consoleOutput,
   activeTab,
   onTabChange,
+  language,
+  onLanguageChange,
   locale = 'en',
 }: CodePanelProps) {
   const t = translations[locale]
   const [isMounted, setIsMounted] = useState(false)
   const [editorReady, setEditorReady] = useState(false)
+  const [languageImpl, setLanguageImpl] = useState<CodeImplementation | null>(null)
+  const [languageLoading, setLanguageLoading] = useState(false)
   const editorRef = useRef<any>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const decorationsRef = useRef<string[]>([])
 
+  const availableLanguages = useMemo(() => getAvailableLanguages(algorithm), [algorithm])
+  // null until parent resolves preference — do not default to JS (avoids a flash)
+  const activeLanguage = language != null && availableLanguages.includes(language) ? language : null
+  const code = activeLanguage != null ? getCode(algorithm, activeLanguage, languageImpl) : ''
+  const activeLine =
+    activeLanguage != null
+      ? getCodeLine(algorithm, activeLanguage, currentLine, languageImpl)
+      : undefined
+  const contentLoading = activeLanguage == null || !editorReady || languageLoading
+
   useEffect(() => {
     setIsMounted(true)
   }, [])
+
+  // Reset editor ready when algorithm or language changes so the content area can fade in again
+  useEffect(() => {
+    setEditorReady(false)
+  }, [algorithm.id, activeLanguage])
+
+  // Load non-JS language packs only when that language is selected
+  useEffect(() => {
+    let cancelled = false
+
+    if (activeLanguage == null) {
+      setLanguageImpl(null)
+      setLanguageLoading(false)
+      return
+    }
+
+    if (activeLanguage === 'javascript') {
+      setLanguageImpl(null)
+      setLanguageLoading(false)
+      return
+    }
+
+    setLanguageLoading(true)
+    loadLanguageImplementation(algorithm.id, activeLanguage)
+      .then((impl) => {
+        if (!cancelled) {
+          setLanguageImpl(impl ?? null)
+          setLanguageLoading(false)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLanguageImpl(null)
+          setLanguageLoading(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [algorithm.id, activeLanguage])
 
   useEffect(() => {
     const updateEditorTheme = (event?: Event) => {
@@ -112,12 +178,12 @@ export default function CodePanel({
       monacoRef.current = monacoInstance
 
       // Apply initial line highlight
-      if (currentLine != null && currentLine > 0) {
+      if (activeLine != null && activeLine > 0) {
         decorationsRef.current = editor.deltaDecorations(
           [],
           [
             {
-              range: new monacoInstance.Range(currentLine, 1, currentLine, 1),
+              range: new monacoInstance.Range(activeLine, 1, activeLine, 1),
               options: {
                 isWholeLine: true,
                 className: 'algoviz-active-line',
@@ -130,7 +196,7 @@ export default function CodePanel({
 
       setEditorReady(true)
     },
-    [currentLine],
+    [activeLine],
   )
 
   // Build inline variable annotation for the active line
@@ -142,16 +208,18 @@ export default function CodePanel({
     return '  // ' + parts.join(', ')
   }, [variables])
 
-  // Update line highlight + inline variable annotation when currentLine/variables change
+  // Update line highlight + inline variable annotation when the step, the
+  // variables or the language change (switching language replaces the model
+  // content, which drops the decorations).
   useEffect(() => {
     const editor = editorRef.current
     const monaco = monacoRef.current
     if (!editor || !monaco) return
 
-    if (currentLine != null && currentLine > 0) {
+    if (activeLine != null && activeLine > 0) {
       const decorations: any[] = [
         {
-          range: new monaco.Range(currentLine, 1, currentLine, 1),
+          range: new monaco.Range(activeLine, 1, activeLine, 1),
           options: {
             isWholeLine: true,
             className: 'algoviz-active-line',
@@ -164,9 +232,9 @@ export default function CodePanel({
       if (inlineVarText) {
         decorations.push({
           range: new monaco.Range(
-            currentLine,
+            activeLine,
             Number.MAX_SAFE_INTEGER,
-            currentLine,
+            activeLine,
             Number.MAX_SAFE_INTEGER,
           ),
           options: {
@@ -181,11 +249,11 @@ export default function CodePanel({
       decorationsRef.current = editor.deltaDecorations(decorationsRef.current, decorations)
 
       // Scroll to the active line
-      editor.revealLineInCenterIfOutsideViewport(currentLine)
+      editor.revealLineInCenterIfOutsideViewport(activeLine)
     } else {
       decorationsRef.current = editor.deltaDecorations(decorationsRef.current, [])
     }
-  }, [currentLine, editorReady, inlineVarText])
+  }, [activeLine, activeLanguage, editorReady, inlineVarText])
 
   return (
     <div className="flex flex-col h-full">
@@ -195,6 +263,8 @@ export default function CodePanel({
         role="tablist"
         aria-label={locale === 'es' ? 'Pestañas de código y detalles' : 'Code and details tabs'}
         onKeyDown={(e) => {
+          // The language switcher shares this row — leave its arrow keys alone
+          if (!(e.target as HTMLElement).closest('[role="tab"]')) return
           const tabs = ['code', 'about'] as const
           const currentIndex = tabs.indexOf(activeTab)
           if (e.key === 'ArrowRight') {
@@ -215,7 +285,7 @@ export default function CodePanel({
             aria-controls={`tabpanel-${tab}`}
             id={`tab-${tab}`}
             tabIndex={activeTab === tab ? 0 : -1}
-            className={`px-3 py-2.5 md:px-5 md:py-3 text-xs font-medium transition-all relative capitalize ${
+            className={`px-3 py-2.5 md:px-5 md:py-3 text-xs font-medium transition-colors relative capitalize ${
               activeTab === tab ? 'text-white' : 'text-neutral-600 hover:text-neutral-400'
             }`}
           >
@@ -247,59 +317,109 @@ export default function CodePanel({
           id="tabpanel-code"
           aria-labelledby="tab-code"
         >
-          <div
-            className="flex-1 overflow-hidden transition-opacity duration-500 ease-in-out"
-            style={{ opacity: editorReady ? 1 : 0 }}
-          >
-            {isMounted && (
-              <Suspense fallback={null}>
-                <LazyEditor
-                  defaultLanguage="javascript"
-                  value={code}
-                  theme={
-                    document.documentElement.dataset.theme === 'light'
-                      ? 'algoviz-light'
-                      : 'algoviz-dark'
-                  }
-                  onMount={handleEditorDidMount}
-                  loading={null}
-                  options={{
-                    readOnly: true,
-                    domReadOnly: true,
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false,
-                    fontSize: 13,
-                    lineHeight: 28,
-                    fontFamily: "'Geist Mono', ui-monospace, monospace",
-                    fontLigatures: true,
-                    renderLineHighlight: 'none',
-                    overviewRulerLanes: 0,
-                    hideCursorInOverviewRuler: true,
-                    overviewRulerBorder: false,
-                    scrollbar: {
-                      vertical: 'hidden',
-                      horizontal: 'hidden',
-                      handleMouseWheel: true,
-                    },
-                    lineNumbers: 'on',
-                    lineDecorationsWidth: 12,
-                    lineNumbersMinChars: 3,
-                    glyphMargin: false,
-                    folding: false,
-                    contextmenu: false,
-                    selectionHighlight: false,
-                    occurrencesHighlight: 'off',
-                    renderLineHighlightOnlyWhenFocus: false,
-                    matchBrackets: 'never',
-                    padding: { top: 12, bottom: 12 },
-                    guides: { indentation: false },
-                    wordWrap: 'off',
-                    cursorStyle: 'line-thin',
-                    cursorBlinking: 'solid',
-                  }}
-                />
-              </Suspense>
+          {/* Language switcher — sits between the tabs and the editor */}
+          {availableLanguages.length > 1 && (
+            <div
+              className="flex items-center gap-1 shrink-0 px-2 md:px-3 py-1.5 border-b border-white/[0.06]"
+              role="group"
+              aria-label={t.codeLanguage}
+            >
+              {availableLanguages.map((id) => {
+                const meta = getCodeLanguageMeta(id)
+                const isActive = activeLanguage != null && activeLanguage === id
+                return (
+                  <button
+                    key={id}
+                    onClick={() => onLanguageChange(id)}
+                    aria-pressed={isActive}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium rounded-md whitespace-nowrap transition-colors ${
+                      isActive
+                        ? 'text-white bg-white/8'
+                        : 'text-neutral-600 hover:text-neutral-400 hover:bg-white/3'
+                    }`}
+                  >
+                    <svg
+                      className="w-3.5 h-3.5 shrink-0"
+                      viewBox={meta.iconViewBox ?? '0 0 24 24'}
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d={meta.iconPath} />
+                    </svg>
+                    {meta.label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Only this content region loads — tabs + language switcher stay painted */}
+          <div className="relative flex-1 overflow-hidden min-h-0">
+            {contentLoading && (
+              <div
+                className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+                aria-hidden="true"
+              >
+                <div className="flex items-center gap-2 text-[11px] text-neutral-600 font-mono">
+                  <span className="inline-block size-1.5 rounded-full bg-neutral-600 animate-pulse" />
+                  {locale === 'es' ? 'Cargando código…' : 'Loading code…'}
+                </div>
+              </div>
             )}
+            <div
+              className="h-full transition-opacity duration-300 ease-out"
+              style={{ opacity: contentLoading ? 0 : 1 }}
+            >
+              {isMounted && activeLanguage != null && !languageLoading && code !== '' && (
+                <Suspense fallback={null}>
+                  <LazyEditor
+                    language={getCodeLanguageMeta(activeLanguage).monacoId}
+                    value={code}
+                    theme={
+                      document.documentElement.dataset.theme === 'light'
+                        ? 'algoviz-light'
+                        : 'algoviz-dark'
+                    }
+                    onMount={handleEditorDidMount}
+                    loading={null}
+                    options={{
+                      readOnly: true,
+                      domReadOnly: true,
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                      fontSize: 13,
+                      lineHeight: 28,
+                      fontFamily: "'Geist Mono', ui-monospace, monospace",
+                      fontLigatures: true,
+                      renderLineHighlight: 'none',
+                      overviewRulerLanes: 0,
+                      hideCursorInOverviewRuler: true,
+                      overviewRulerBorder: false,
+                      scrollbar: {
+                        vertical: 'hidden',
+                        horizontal: 'hidden',
+                        handleMouseWheel: true,
+                      },
+                      lineNumbers: 'on',
+                      lineDecorationsWidth: 12,
+                      lineNumbersMinChars: 3,
+                      glyphMargin: false,
+                      folding: false,
+                      contextmenu: false,
+                      selectionHighlight: false,
+                      occurrencesHighlight: 'off',
+                      renderLineHighlightOnlyWhenFocus: false,
+                      matchBrackets: 'never',
+                      padding: { top: 12, bottom: 12 },
+                      guides: { indentation: false },
+                      wordWrap: 'off',
+                      cursorStyle: 'line-thin',
+                      cursorBlinking: 'solid',
+                    }}
+                  />
+                </Suspense>
+              )}
+            </div>
           </div>
 
           {/* Console output panel */}

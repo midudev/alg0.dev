@@ -10,9 +10,19 @@ export const SPEED_MAP: Record<number, number> = {
   5: 50,
 }
 
-export function usePlayback(locale: Locale, initialAlgorithm?: Algorithm | null) {
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm | null>(initialAlgorithm ?? null)
-  const [steps, setSteps] = useState<Step[]>(() => initialAlgorithm ? initialAlgorithm.generateSteps(locale) : [])
+export function usePlayback(
+  locale: Locale,
+  initialAlgorithm?: Algorithm | null,
+  initialSteps?: Step[] | null,
+) {
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm | null>(
+    initialAlgorithm ?? null,
+  )
+  const [steps, setSteps] = useState<Step[]>(() => {
+    if (initialSteps && initialSteps.length > 0) return initialSteps
+    if (initialAlgorithm) return initialAlgorithm.generateSteps(locale)
+    return []
+  })
   const [currentStep, setCurrentStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeed] = useState(2)
@@ -27,21 +37,29 @@ export function usePlayback(locale: Locale, initialAlgorithm?: Algorithm | null)
   }, [])
 
   useEffect(() => {
-    if (initialAlgorithm && steps.length > 0) {
+    if ((initialAlgorithm || (initialSteps && initialSteps.length > 0)) && steps.length > 0) {
       autoplayTimerRef.current = setTimeout(() => setIsPlaying(true), 800)
     }
     return clearAutoplayTimer
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const selectAlgorithm = useCallback((algo: Algorithm) => {
-    clearAutoplayTimer()
-    setIsPlaying(false)
+  const selectAlgorithm = useCallback(
+    (algo: Algorithm) => {
+      clearAutoplayTimer()
+      setIsPlaying(false)
+      setSelectedAlgorithm(algo)
+      const newSteps = algo.generateSteps(locale)
+      setSteps(newSteps)
+      setCurrentStep(0)
+      autoplayTimerRef.current = setTimeout(() => setIsPlaying(true), 600)
+    },
+    [locale, clearAutoplayTimer],
+  )
+
+  /** Swap in a fuller Algorithm object without resetting playback (SSR hydrate → full chunk). */
+  const replaceAlgorithm = useCallback((algo: Algorithm) => {
     setSelectedAlgorithm(algo)
-    const newSteps = algo.generateSteps(locale)
-    setSteps(newSteps)
-    setCurrentStep(0)
-    autoplayTimerRef.current = setTimeout(() => setIsPlaying(true), 600)
-  }, [locale, clearAutoplayTimer])
+  }, [])
 
   const stepForward = useCallback(() => {
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
@@ -104,6 +122,7 @@ export function usePlayback(locale: Locale, initialAlgorithm?: Algorithm | null)
     speed,
     setSpeed,
     selectAlgorithm,
+    replaceAlgorithm,
     clearSelection,
     stepForward,
     stepBackward,

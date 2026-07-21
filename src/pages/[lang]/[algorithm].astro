@@ -1,23 +1,28 @@
 ---
 import Layout from "@layouts/Layout.astro"
 import AlgoViz from "@components/AlgoViz"
-import { algorithms } from "@lib/algorithms"
+import { algorithmCatalog, getCatalogEntry } from "@lib/algorithms/catalog"
+import { loadAlgorithm } from "@lib/algorithms/loaders"
 import { getAlgorithmMetaTitle, getAlgorithmMetaDescription, type Locale, locales, defaultLocale } from "@i18n/translations"
 import { getAlgorithmStructuredData } from "@lib/seo"
 import type { GetStaticPaths } from "astro"
 
-export const getStaticPaths: GetStaticPaths = () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   return locales
     .filter((lang) => lang !== defaultLocale)
     .flatMap((lang) =>
-      algorithms.map((algo) => ({
+      algorithmCatalog.map((algo) => ({
         params: { lang, algorithm: algo.id },
       }))
     )
 }
 
 const { algorithm, lang } = Astro.params as { algorithm: string, lang: Locale }
-const algo = algorithms.find((a) => a.id === algorithm)!
+const algo = getCatalogEntry(algorithm)!
+
+// Precompute steps + JS source on the server so the preview paints instantly
+const full = await loadAlgorithm(algo.id)
+const initialSteps = full.generateSteps(lang)
 
 const title = getAlgorithmMetaTitle(lang, algo.id, algo.name)
 const description = getAlgorithmMetaDescription(lang, algo.id)
@@ -31,5 +36,11 @@ const canonicalURL = new URL(`/${lang}/${algo.id}/`, Astro.site).href
   canonicalURL={canonicalURL}
   structuredData={getAlgorithmStructuredData(lang, algo, canonicalURL)}
 >
-  <AlgoViz locale={lang} initialAlgorithmId={algo.id} client:load />
+  <AlgoViz
+    locale={lang}
+    initialAlgorithm={algo}
+    initialCode={full.code}
+    initialSteps={initialSteps}
+    client:load
+  />
 </Layout>

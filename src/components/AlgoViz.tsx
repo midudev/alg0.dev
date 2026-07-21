@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import type { Locale } from '@i18n/translations'
 import {
   translations,
@@ -9,7 +9,8 @@ import {
   defaultLocale,
   locales,
 } from '@i18n/translations'
-import { algorithms, categories } from '@lib/algorithms'
+import { catalogCategories } from '@lib/algorithms/catalog'
+import { loadAlgorithm } from '@lib/algorithms/loaders'
 import { usePlayback } from '@hooks/usePlayback'
 import { useResizablePanel } from '@hooks/useResizablePanel'
 import { useKeyboardShortcuts } from '@hooks/useKeyboardShortcuts'
@@ -21,7 +22,19 @@ import GraphVisualizer from '@components/GraphVisualizer'
 import MatrixVisualizer from '@components/MatrixVisualizer'
 import ConceptVisualizer from '@components/ConceptVisualizer'
 import CodePanel from '@components/CodePanel'
-import type { Algorithm } from '@lib/types'
+import { CODE_LANGUAGE_STORAGE_KEY, defaultCodeLanguage, isCodeLanguage } from '@lib/code-languages'
+import type { Algorithm, AlgorithmSummary, CodeLanguage, Step } from '@lib/types'
+
+/** Build a serializable hydrate payload into a playable Algorithm for first paint. */
+function hydrateAlgorithm(summary: AlgorithmSummary, code: string, steps: Step[]): Algorithm {
+  return {
+    ...summary,
+    description: '',
+    code,
+    // Fixed steps from SSR — full module later upgrades generateSteps via replaceAlgorithm
+    generateSteps: () => steps,
+  }
+}
 
 const SIDEBAR_MAX = 260
 const CODEPANEL_MAX = 420
@@ -44,6 +57,13 @@ function getAlgorithmIdFromPath(pathname: string): string | null {
 
 interface AlgoVizProps {
   locale?: Locale
+  /** Catalog entry from SSR so the breadcrumb paints on first frame. */
+  initialAlgorithm?: AlgorithmSummary
+  /** Precomputed steps from SSR so the visualizer paints without a client fetch. */
+  initialSteps?: Step[]
+  /** JavaScript source from SSR for the code panel (language packs still load on demand). */
+  initialCode?: string
+  /** @deprecated Prefer `initialAlgorithm` — kept for callers that only know the id. */
   initialAlgorithmId?: string
 }
 
@@ -63,16 +83,32 @@ function useIsMobile() {
   return isMobile
 }
 
-export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizProps) {
+export default function AlgoViz({
+  locale = 'en',
+  initialAlgorithm,
+  initialSteps,
+  initialCode,
+  initialAlgorithmId,
+}: AlgoVizProps) {
   const t = translations[locale]
+  const resolvedInitialId = initialAlgorithm?.id ?? initialAlgorithmId
+
+  // SSR hydrate: algorithm + steps available on first paint (no "Loading…" for the preview)
+  const hydratedInitial = useMemo(() => {
+    if (!initialAlgorithm || initialCode == null || !initialSteps?.length) return null
+    return hydrateAlgorithm(initialAlgorithm, initialCode, initialSteps)
+  }, [initialAlgorithm, initialCode, initialSteps])
+
   const [activeTab, setActiveTab] = useState<'code' | 'about'>('code')
+  // null until we know the preferred language — avoids flashing JavaScript then switching
+  const [codeLanguage, setCodeLanguage] = useState<CodeLanguage | null>(null)
   const isMobile = useIsMobile()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [mobileCodePanelOpen, setMobileCodePanelOpen] = useState(false)
-
-  const initialAlgorithm = initialAlgorithmId
-    ? (algorithms.find((a) => a.id === initialAlgorithmId) ?? null)
-    : null
+  // Breadcrumb meta available from the first paint (SSR props)
+  const [headerAlgorithm, setHeaderAlgorithm] = useState<AlgorithmSummary | null>(
+    initialAlgorithm ?? null,
+  )
 
   const {
     selectedAlgorithm,
@@ -83,12 +119,18 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
     speed,
     setSpeed,
     selectAlgorithm: selectAlgorithmBase,
-    clearSelection,
+    replaceAlgorithm,
+    clearSelection: clearSelectionBase,
     stepForward,
     stepBackward,
     togglePlay,
     currentStepData,
-  } = usePlayback(locale, initialAlgorithm)
+  } = usePlayback(locale, hydratedInitial, initialSteps)
+
+  const clearSelection = useCallback(() => {
+    clearSelectionBase()
+    setHeaderAlgorithm(null)
+  }, [clearSelectionBase])
 
   const sidebar = useResizablePanel({
     maxWidth: SIDEBAR_MAX,
@@ -100,10 +142,21 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
     maxWidth: CODEPANEL_MAX,
     collapseThreshold: COLLAPSE_THRESHOLD,
     side: 'right',
-    initialCollapsed: !initialAlgorithmId,
+    initialCollapsed: !resolvedInitialId,
   })
 
   useKeyboardShortcuts({ togglePlay, stepForward, stepBackward, onTabChange: setActiveTab })
+
+  // Resolve preferred language after mount (localStorage is client-only)
+  useEffect(() => {
+    const stored = localStorage.getItem(CODE_LANGUAGE_STORAGE_KEY)
+    setCodeLanguage(isCodeLanguage(stored) ? stored : defaultCodeLanguage)
+  }, [])
+
+  const changeCodeLanguage = useCallback((language: CodeLanguage) => {
+    setCodeLanguage(language)
+    localStorage.setItem(CODE_LANGUAGE_STORAGE_KEY, language)
+  }, [])
 
   // Close mobile drawers on escape
   useEffect(() => {
@@ -135,32 +188,82 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
     if (meta) meta.setAttribute('content', description)
   }, [])
 
-  const selectAlgorithm = useCallback(
-    (algo: Algorithm) => {
+  const activateAlgorithm = useCallback(
+    (algo: Algorithm, { pushUrl }: { pushUrl: boolean }) => {
+      setHeaderAlgorithm(algo)
       selectAlgorithmBase(algo)
       setActiveTab('code')
       setMobileSidebarOpen(false)
       codePanel.expand()
-      const url = getAlgorithmUrl(locale, algo.id)
-      window.history.pushState({ algorithmId: algo.id }, '', url)
+      if (pushUrl) {
+        const url = getAlgorithmUrl(locale, algo.id)
+        window.history.pushState({ algorithmId: algo.id }, '', url)
+      }
       document.title = getAlgorithmMetaTitle(locale, algo.id, algo.name)
       updateMetaDescription(getAlgorithmMetaDescription(locale, algo.id))
     },
     [locale, selectAlgorithmBase, codePanel.expand, updateMetaDescription],
   )
 
+  const selectAlgorithmById = useCallback(
+    async (
+      id: string,
+      options: {
+        pushUrl: boolean
+        summary?: AlgorithmSummary
+        /** When true, only upgrade the Algorithm object (keep current steps/playback). */
+        soft?: boolean
+      } = { pushUrl: true },
+    ) => {
+      if (options.summary) setHeaderAlgorithm(options.summary)
+      try {
+        const algo = await loadAlgorithm(id)
+        if (options.soft) {
+          // Full module arrived after SSR hydrate — keep the running preview
+          setHeaderAlgorithm(algo)
+          replaceAlgorithm(algo)
+          return
+        }
+        activateAlgorithm(algo, { pushUrl: options.pushUrl })
+      } catch (error) {
+        console.error(`Failed to load algorithm "${id}"`, error)
+      }
+    },
+    [activateAlgorithm, replaceAlgorithm],
+  )
+
+  const selectAlgorithm = useCallback(
+    (summary: AlgorithmSummary) => {
+      void selectAlgorithmById(summary.id, { pushUrl: true, summary })
+    },
+    [selectAlgorithmById],
+  )
+
+  // After SSR hydrate, quietly fetch the full algorithm module (for language packs / re-runs)
+  useEffect(() => {
+    if (!resolvedInitialId) return
+    if (hydratedInitial) {
+      void selectAlgorithmById(resolvedInitialId, {
+        pushUrl: false,
+        summary: initialAlgorithm,
+        soft: true,
+      })
+      return
+    }
+    // No SSR payload (e.g. client-only navigation without steps) — full load
+    void selectAlgorithmById(resolvedInitialId, {
+      pushUrl: false,
+      summary: initialAlgorithm,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedInitialId])
+
   useEffect(() => {
     const handlePopState = () => {
       const algoId = getAlgorithmIdFromPath(window.location.pathname)
       if (algoId) {
-        const algo = algorithms.find((a) => a.id === algoId)
-        if (algo) {
-          selectAlgorithmBase(algo)
-          setActiveTab('code')
-          document.title = getAlgorithmMetaTitle(locale, algo.id, algo.name)
-          updateMetaDescription(getAlgorithmMetaDescription(locale, algo.id))
-          return
-        }
+        void selectAlgorithmById(algoId, { pushUrl: false })
+        return
       }
       clearSelection()
       document.title = t.siteTitle
@@ -169,14 +272,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
 
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
-  }, [
-    locale,
-    selectAlgorithmBase,
-    clearSelection,
-    t.siteTitle,
-    t.siteDescription,
-    updateMetaDescription,
-  ])
+  }, [selectAlgorithmById, clearSelection, t.siteTitle, t.siteDescription, updateMetaDescription])
 
   const getLocalizedDescription = (algo: Algorithm): string => {
     return getAlgorithmDescription(locale, algo.id) ?? algo.description
@@ -206,7 +302,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
       <Header
         locale={locale}
         t={t}
-        selectedAlgorithm={selectedAlgorithm}
+        selectedAlgorithm={headerAlgorithm}
         sidebarCollapsed={isMobile ? true : sidebar.collapsed}
         codePanelCollapsed={isMobile ? true : codePanel.collapsed}
         onExpandSidebar={isMobile ? () => setMobileSidebarOpen(true) : sidebar.expand}
@@ -232,7 +328,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
           <div className="relative shrink-0 flex">
             <aside
               className={`bg-black overflow-hidden ${
-                sidebar.isDragging ? '' : 'transition-all duration-300 ease-in-out'
+                sidebar.isDragging ? '' : 'transition-[width] duration-300 ease-in-out'
               }`}
               style={{
                 width: sidebar.isDragging ? sidebar.width : sidebar.collapsed ? 0 : SIDEBAR_MAX,
@@ -254,8 +350,8 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
                 }}
               >
                 <Sidebar
-                  categories={categories}
-                  selectedId={selectedAlgorithm?.id ?? null}
+                  categories={catalogCategories}
+                  selectedId={headerAlgorithm?.id ?? null}
                   onSelect={selectAlgorithm}
                   locale={locale}
                 />
@@ -329,8 +425,8 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
                   </button>
                 </div>
                 <Sidebar
-                  categories={categories}
-                  selectedId={selectedAlgorithm?.id ?? null}
+                  categories={catalogCategories}
+                  selectedId={headerAlgorithm?.id ?? null}
                   onSelect={selectAlgorithm}
                   locale={locale}
                 />
@@ -347,17 +443,17 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
         >
           {/* Screen-reader page heading — reflects the current algorithm.
               The WelcomeScreen renders its own visible <h1> when nothing is selected. */}
-          {selectedAlgorithm && (
+          {headerAlgorithm && (
             <h1 className="sr-only">
-              {selectedAlgorithm.name} — {getCategoryName(locale, selectedAlgorithm.category)}
+              {headerAlgorithm.name} — {getCategoryName(locale, headerAlgorithm.category)}
             </h1>
           )}
-          <div className="flex-1 flex flex-col p-4 md:p-8 overflow-auto">
+          <div className="flex-1 flex flex-col px-3 py-3 md:px-5 md:py-4 overflow-auto min-h-0">
             {renderVisualization()}
           </div>
 
           {/* Step description */}
-          <div className="px-4 pb-3 md:px-8 md:pb-5" aria-live="polite" aria-atomic="true">
+          <div className="px-3 pb-3 md:px-5 md:pb-4" aria-live="polite" aria-atomic="true">
             {currentStepData?.description && (
               <div className="text-xs md:text-sm text-neutral-300 bg-white/5 rounded-lg px-3 py-2 md:px-5 md:py-3 border border-white/12">
                 <span className="text-amber-300/90 font-medium mr-2">
@@ -398,7 +494,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
             </div>
             <aside
               className={`bg-black overflow-hidden ${
-                codePanel.isDragging ? '' : 'transition-all duration-300 ease-in-out'
+                codePanel.isDragging ? '' : 'transition-[width] duration-300 ease-in-out'
               }`}
               style={{
                 width: codePanel.isDragging
@@ -425,7 +521,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
               >
                 {selectedAlgorithm ? (
                   <CodePanel
-                    code={selectedAlgorithm.code}
+                    algorithm={selectedAlgorithm}
                     description={getLocalizedDescription(selectedAlgorithm)}
                     difficulty={selectedAlgorithm.difficulty}
                     currentLine={currentStepData?.codeLine}
@@ -433,6 +529,8 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
                     consoleOutput={currentStepData?.consoleOutput}
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
+                    language={codeLanguage}
+                    onLanguageChange={changeCodeLanguage}
                     locale={locale}
                   />
                 ) : (
@@ -485,7 +583,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
                 </div>
                 {selectedAlgorithm ? (
                   <CodePanel
-                    code={selectedAlgorithm.code}
+                    algorithm={selectedAlgorithm}
                     description={getLocalizedDescription(selectedAlgorithm)}
                     difficulty={selectedAlgorithm.difficulty}
                     currentLine={currentStepData?.codeLine}
@@ -493,6 +591,8 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
                     consoleOutput={currentStepData?.consoleOutput}
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
+                    language={codeLanguage}
+                    onLanguageChange={changeCodeLanguage}
                     locale={locale}
                   />
                 ) : (
@@ -507,7 +607,7 @@ export default function AlgoViz({ locale = 'en', initialAlgorithmId }: AlgoVizPr
       </div>
 
       {/* Mobile bottom controls bar */}
-      {isMobile && selectedAlgorithm && (
+      {isMobile && headerAlgorithm && (
         <div className="shrink-0 flex items-center justify-between px-3 py-2 border-t border-white/8 bg-black z-10 gap-2">
           <button
             onClick={() => setMobileSidebarOpen(true)}

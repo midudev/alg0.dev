@@ -1,11 +1,11 @@
 import type { Translations, Locale } from '@i18n/translations'
-import type { Algorithm } from '@lib/types'
+import type { AlgorithmSummary } from '@lib/types'
 import AlgorithmShowcase from '@components/AlgorithmShowcase'
 
 interface WelcomeScreenProps {
   t: Translations
   locale?: Locale
-  onSelectAlgorithm?: (algo: Algorithm) => void
+  onSelectAlgorithm?: (algo: AlgorithmSummary) => void
 }
 
 export default function WelcomeScreen({ t, locale, onSelectAlgorithm }: WelcomeScreenProps) {

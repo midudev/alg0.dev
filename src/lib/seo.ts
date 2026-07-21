@@ -6,8 +6,8 @@ import {
   getCategoryName,
   translations,
 } from '@i18n/translations'
-import { algorithms } from '@lib/algorithms'
-import type { Algorithm } from '@lib/types'
+import { algorithmCatalog } from '@lib/algorithms/catalog'
+import type { AlgorithmSummary } from '@lib/types'
 
 const AUTHOR = {
   '@type': 'Person',
@@ -43,8 +43,8 @@ export function getHomeStructuredData(locale: Locale, canonicalURL: string) {
       {
         '@type': 'ItemList',
         name: locale === 'es' ? 'Visualizaciones de algoritmos' : 'Algorithm visualizations',
-        numberOfItems: algorithms.length,
-        itemListElement: algorithms.map((algorithm, index) => ({
+        numberOfItems: algorithmCatalog.length,
+        itemListElement: algorithmCatalog.map((algorithm, index) => ({
           '@type': 'ListItem',
           position: index + 1,
           name: algorithm.name,
@@ -58,7 +58,7 @@ export function getHomeStructuredData(locale: Locale, canonicalURL: string) {
 
 export function getAlgorithmStructuredData(
   locale: Locale,
-  algorithm: Algorithm,
+  algorithm: AlgorithmSummary,
   canonicalURL: string,
 ) {
   const name = (
