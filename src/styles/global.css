@@ -1,24 +1,18 @@
 @import 'tailwindcss';
 
+/* Fonts are subset to the Latin characters this site actually renders.
+   Regenerate with `pnpm fonts:subset` (sources live in `fonts-src/`). */
+
 /* Geist Mono — variable weight, for the code editor */
 @font-face {
   font-family: 'Geist Mono';
   src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
-  font-weight: 100 900;
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
 }
 
-/* Geist Pixel Circle — for headings / titles */
-@font-face {
-  font-family: 'Geist Pixel Circle';
-  src: url('/fonts/GeistPixel-Circle.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Geist Pixel Square — for body text */
+/* Geist Pixel Square — body text and headings */
 @font-face {
   font-family: 'Geist Pixel Square';
   src: url('/fonts/GeistPixel-Square.woff2') format('woff2');
@@ -64,7 +58,7 @@
 @theme {
   --font-sans: 'Geist Pixel Square', system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
-  --font-heading: 'Geist Pixel Circle', system-ui, sans-serif;
+  --font-heading: 'Geist Pixel Square', system-ui, sans-serif;
 }
 
 /* The app predates semantic color tokens. Keep the dark palette intact while

@@ -8,6 +8,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "prepare": "husky",
+    "fonts:subset": "node scripts/subset-fonts.mjs",
     "format": "prettier . --write",
     "lint": "eslint . --fix"
   },
@@ -20,7 +21,6 @@
     "@monaco-editor/react": "4.7.0",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.1.1",
-    "geist": "1.7.2",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "tailwindcss": "4.3.3"
@@ -35,6 +35,7 @@
     "globals": "17.7.0",
     "husky": "9.1.7",
     "lint-staged": "17.1.0",
-    "prettier": "3.9.5"
+    "prettier": "3.9.5",
+    "subset-font": "^2.5.0"
   }
 }
