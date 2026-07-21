@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
-import type { Algorithm, Category } from '@lib/types'
+import type { AlgorithmSummary, CategorySummary } from '@lib/types'
 import type { Locale } from '@i18n/translations'
 import { translations, getCategoryName } from '@i18n/translations'
 
 interface SidebarProps {
-  categories: Category[]
+  categories: CategorySummary[]
   selectedId: string | null
-  onSelect: (algo: Algorithm) => void
+  onSelect: (algo: AlgorithmSummary) => void
   locale?: Locale
 }
 
@@ -157,51 +157,72 @@ const categoryIcons: Record<string, React.ReactNode> = {
   ),
 }
 
-const categoryColors: Record<string, { icon: string; badge: string; line: string }> = {
+const categoryColors: Record<
+  string,
+  { icon: string; badge: string; line: string; selected: string; dot: string }
+> = {
   Concepts: {
     icon: 'text-sky-400',
     badge: 'bg-sky-500/10 text-sky-400/70',
     line: 'border-sky-500/20',
+    selected: 'text-sky-300',
+    dot: 'bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.45)]',
   },
   'Data Structures': {
     icon: 'text-violet-400',
     badge: 'bg-violet-500/10 text-violet-400/70',
     line: 'border-violet-500/20',
+    selected: 'text-violet-300',
+    dot: 'bg-violet-400 shadow-[0_0_6px_rgba(167,139,250,0.45)]',
   },
   Sorting: {
     icon: 'text-emerald-400',
     badge: 'bg-emerald-500/10 text-emerald-400/70',
     line: 'border-emerald-500/20',
+    selected: 'text-emerald-300',
+    dot: 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.45)]',
   },
   Searching: {
     icon: 'text-amber-400',
     badge: 'bg-amber-500/10 text-amber-400/70',
     line: 'border-amber-500/20',
+    selected: 'text-amber-300',
+    dot: 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.45)]',
   },
   Graphs: {
     icon: 'text-cyan-400',
     badge: 'bg-cyan-500/10 text-cyan-400/70',
     line: 'border-cyan-500/20',
+    selected: 'text-cyan-300',
+    dot: 'bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.45)]',
   },
   Backtracking: {
     icon: 'text-rose-400',
     badge: 'bg-rose-500/10 text-rose-400/70',
     line: 'border-rose-500/20',
+    selected: 'text-rose-300',
+    dot: 'bg-rose-400 shadow-[0_0_6px_rgba(251,113,133,0.45)]',
   },
   'Dynamic Programming': {
     icon: 'text-orange-400',
     badge: 'bg-orange-500/10 text-orange-400/70',
     line: 'border-orange-500/20',
+    selected: 'text-orange-300',
+    dot: 'bg-orange-400 shadow-[0_0_6px_rgba(251,146,60,0.45)]',
   },
   'Divide and Conquer': {
     icon: 'text-indigo-400',
     badge: 'bg-indigo-500/10 text-indigo-400/70',
     line: 'border-indigo-500/20',
+    selected: 'text-indigo-300',
+    dot: 'bg-indigo-400 shadow-[0_0_6px_rgba(129,140,248,0.45)]',
   },
   Math: {
     icon: 'text-fuchsia-400',
     badge: 'bg-fuchsia-500/10 text-fuchsia-400/70',
     line: 'border-fuchsia-500/20',
+    selected: 'text-fuchsia-300',
+    dot: 'bg-fuchsia-400 shadow-[0_0_6px_rgba(232,121,249,0.45)]',
   },
 }
 
@@ -209,6 +230,8 @@ const defaultCategoryColor = {
   icon: 'text-neutral-400',
   badge: 'bg-white/[0.04] text-neutral-600',
   line: 'border-white/[0.08]',
+  selected: 'text-neutral-300',
+  dot: 'bg-neutral-400 shadow-[0_0_6px_rgba(163,163,163,0.45)]',
 }
 
 export default function Sidebar({ categories, selectedId, onSelect, locale = 'en' }: SidebarProps) {
@@ -362,7 +385,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                 id={categoryId}
                 role="group"
                 aria-label={`${getCategoryName(locale, category.name)} algorithms`}
-                className="overflow-hidden transition-all duration-200"
+                className="overflow-hidden transition-[max-height,opacity] duration-200"
                 style={{
                   maxHeight: isExpanded ? `${category.algorithms.length * 36}px` : '0px',
                   opacity: isExpanded ? 1 : 0,
@@ -378,18 +401,24 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                         onSelect(algo)
                       }}
                       aria-current={selectedId === algo.id ? 'page' : undefined}
-                      className={`flex items-center justify-between gap-3 px-3 py-1.5 text-[13px] rounded-md transition-colors duration-150 ${
+                      className={`flex items-center justify-between gap-3 pl-3 pr-2.5 py-1.5 text-[13px] rounded-md transition-colors duration-150 ${
                         selectedId === algo.id
-                          ? 'text-sky-300 font-medium'
+                          ? `${colors.selected} font-medium`
                           : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/4'
                       }`}
                     >
                       <span>{algo.name}</span>
                       {selectedId === algo.id && (
+                        // Mirrors the category badge box so the dot lines up with its count
                         <span
-                          className="size-1 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.45)] shrink-0"
+                          className="relative inline-block shrink-0 px-1.5 text-[10px] font-normal tabular-nums"
                           aria-hidden="true"
-                        />
+                        >
+                          <span className="invisible">{category.algorithms.length}</span>
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <span className={`size-1 rounded-full ${colors.dot}`} />
+                          </span>
+                        </span>
                       )}
                     </a>
                   ))}

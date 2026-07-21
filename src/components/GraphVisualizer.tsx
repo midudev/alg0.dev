@@ -56,11 +56,16 @@ export default function GraphVisualizer({ step, locale = 'en' }: GraphVisualizer
 
   return (
     <div
-      className="flex-1 flex flex-col items-center justify-center gap-5"
+      className="flex-1 flex flex-col items-center justify-center gap-5 w-full min-h-0"
       role="img"
       aria-label={`Graph visualization: ${nodes.length} nodes, ${edges.length} edges.${currentNodeLabel ? ` Current node: ${currentNodeLabel}.` : ''}${visitedLabels.length > 0 ? ` Visited: ${visitedLabels.join(', ')}.` : ''}`}
     >
-      <svg viewBox="0 0 500 340" className="w-full max-w-lg" aria-hidden="true">
+      <svg
+        viewBox="0 0 500 340"
+        className="w-full max-w-3xl"
+        style={{ maxHeight: 'min(55vh, 480px)', height: 'auto' }}
+        aria-hidden="true"
+      >
         <defs>
           <filter id="glow">
             <feGaussianBlur stdDeviation="3" result="coloredBlur" />

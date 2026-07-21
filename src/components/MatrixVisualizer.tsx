@@ -18,23 +18,23 @@ export default function MatrixVisualizer({ step }: MatrixVisualizerProps) {
 
   const { rows, cols, values, highlights = {} } = matrix
 
-  // Adaptive cell sizing — responsive for mobile
+  // Adaptive cell sizing — responsive for mobile, roomier on desktop
   const maxDim = Math.max(rows, cols)
   const cellSize =
     maxDim <= 5
-      ? 'w-10 h-10 md:w-14 md:h-14 text-xl md:text-2xl'
+      ? 'w-12 h-12 md:w-16 md:h-16 text-xl md:text-2xl'
       : maxDim <= 6
-        ? 'w-8 h-8 md:w-12 md:h-12 text-lg md:text-xl'
+        ? 'w-10 h-10 md:w-14 md:h-14 text-lg md:text-xl'
         : maxDim <= 8
-          ? 'w-7 h-7 md:w-10 md:h-10 text-base md:text-lg'
-          : 'w-6 h-6 md:w-8 md:h-8 text-xs md:text-sm'
-  const gapSize = maxDim <= 6 ? 'gap-1 md:gap-1.5' : 'gap-0.5 md:gap-1'
+          ? 'w-8 h-8 md:w-12 md:h-12 text-base md:text-lg'
+          : 'w-7 h-7 md:w-9 md:h-9 text-xs md:text-sm'
+  const gapSize = maxDim <= 6 ? 'gap-1.5 md:gap-2' : 'gap-1 md:gap-1.5'
   const fontSize =
     maxDim <= 5
-      ? 'text-[10px] md:text-xs'
+      ? 'text-[11px] md:text-sm'
       : maxDim <= 8
-        ? 'text-[9px] md:text-[10px]'
-        : 'text-[8px] md:text-[9px]'
+        ? 'text-[10px] md:text-xs'
+        : 'text-[9px] md:text-[10px]'
 
   // Build text description for screen readers
   const specialCells: string[] = []
@@ -50,7 +50,7 @@ export default function MatrixVisualizer({ step }: MatrixVisualizerProps) {
 
   return (
     <div
-      className="flex-1 flex items-center justify-center"
+      className="flex-1 flex items-center justify-center min-h-0 w-full"
       role="img"
       aria-label={`${rows}×${cols} board.${specialCells.length > 0 ? ` ${specialCells.join('; ')}.` : ''}${highlightedCells.length > 0 ? ` Highlights: ${highlightedCells.join(', ')}.` : ''}`}
     >

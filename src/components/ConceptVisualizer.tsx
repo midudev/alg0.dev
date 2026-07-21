@@ -105,11 +105,11 @@ function BigOChart({ state }: { state: BigOState }) {
   const xTicks = Math.min(maxN, 10)
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full">
+    <div className="flex-1 flex flex-col items-center justify-center gap-5 w-full min-h-0">
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full max-w-2xl"
-        style={{ maxHeight: '340px' }}
+        className="w-full max-w-4xl"
+        style={{ maxHeight: 'min(58vh, 520px)', height: 'auto' }}
         role="img"
         aria-label={`Big O complexity chart${
           visibleCurves.length > 0 ? `: ${visibleCurves.map((c) => c.name).join(', ')}` : ''
@@ -312,7 +312,7 @@ function CallStackViz({ state }: { state: CallStackState }) {
       </div>
 
       {/* Frames — top of stack (last frame) is rendered first */}
-      <div className="flex flex-col gap-1.5 w-full max-w-sm">
+      <div className="flex flex-col gap-1.5 w-full max-w-md">
         {[...frames].reverse().map((frame, visualIdx) => {
           const logicalIdx = frames.length - 1 - visualIdx
           const colors = FRAME_COLORS[frame.state] ?? FRAME_COLORS.waiting
@@ -376,7 +376,7 @@ function CallStackViz({ state }: { state: CallStackState }) {
       </div>
 
       {/* Bottom base line */}
-      <div className="w-full max-w-sm flex items-center gap-2 mt-1">
+      <div className="w-full max-w-md flex items-center gap-2 mt-1">
         <div className="w-6" />
         <div className="flex-1 h-px bg-white/10" />
       </div>
@@ -436,16 +436,16 @@ function StackViz({
       )}
 
       {/* Stack container */}
-      <div className="relative w-36 md:w-48">
+      <div className="relative w-40 md:w-56">
         {/* TOP indicator */}
         {items.length > 0 && (
-          <div className="absolute -left-12 md:-left-14 top-0 flex items-center h-11 text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
+          <div className="absolute -left-12 md:-left-14 top-0 flex items-center h-12 md:h-14 text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
             top →
           </div>
         )}
 
         {/* Slots — top of stack (last item) at top */}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           {Array.from({ length: MAX_SLOTS }, (_, visualIdx) => {
             const logicalIdx = items.length - 1 - visualIdx
             const item = logicalIdx >= 0 ? items[logicalIdx] : null
@@ -454,7 +454,7 @@ function StackViz({
               return (
                 <div
                   key={`empty-${visualIdx}`}
-                  className="h-11 rounded-lg border border-dashed border-white/5 bg-white/1 transition-all duration-300"
+                  className="h-12 md:h-14 rounded-lg border border-dashed border-white/5 bg-white/1 transition-all duration-300"
                 />
               )
             }
@@ -464,7 +464,7 @@ function StackViz({
             return (
               <div
                 key={`item-${visualIdx}`}
-                className="h-11 rounded-lg border flex items-center justify-center font-mono text-base font-semibold transition-all duration-400 ease-in-out relative overflow-hidden"
+                className="h-12 md:h-14 rounded-lg border flex items-center justify-center font-mono text-base md:text-lg font-semibold transition-all duration-400 ease-in-out relative overflow-hidden"
                 style={{
                   backgroundColor: colors.bg,
                   borderColor: colors.border,
@@ -534,7 +534,7 @@ function QueueViz({
         </div>
 
         {/* Slots — horizontal */}
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
           {Array.from({ length: MAX_SLOTS }, (_, i) => {
             const item = i < items.length ? items[i] : null
 
@@ -542,7 +542,7 @@ function QueueViz({
               return (
                 <div
                   key={`empty-${i}`}
-                  className="w-16 h-16 rounded-lg border border-dashed border-white/5 bg-white/1 transition-all duration-300"
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-lg border border-dashed border-white/5 bg-white/1 transition-all duration-300"
                 />
               )
             }
@@ -552,7 +552,7 @@ function QueueViz({
             return (
               <div
                 key={`item-${i}`}
-                className="w-16 h-16 rounded-lg border flex items-center justify-center font-mono text-lg font-semibold transition-all duration-400 ease-in-out relative overflow-hidden"
+                className="w-16 h-16 md:w-20 md:h-20 rounded-lg border flex items-center justify-center font-mono text-lg md:text-xl font-semibold transition-all duration-400 ease-in-out relative overflow-hidden"
                 style={{
                   backgroundColor: colors.bg,
                   borderColor: colors.border,
@@ -646,7 +646,7 @@ function LinkedListViz({ state }: { state: LinkedListState }) {
               <div key={i} className="flex items-center shrink-0">
                 {/* Node box */}
                 <div
-                  className="w-14 h-14 rounded-lg border flex flex-col items-center justify-center font-mono transition-all duration-300 relative"
+                  className="w-14 h-14 md:w-16 md:h-16 rounded-lg border flex flex-col items-center justify-center font-mono transition-all duration-300 relative"
                   style={{
                     backgroundColor: colors.bg,
                     borderColor: colors.border,
@@ -654,7 +654,7 @@ function LinkedListViz({ state }: { state: LinkedListState }) {
                     boxShadow: node.state !== 'normal' ? `0 0 16px ${colors.border}` : 'none',
                   }}
                 >
-                  <span className="text-base font-bold">{node.value}</span>
+                  <span className="text-base md:text-lg font-bold">{node.value}</span>
                 </div>
                 {/* Arrow to next */}
                 <svg
@@ -726,7 +726,7 @@ function HashTableViz({ state }: { state: HashTableState }) {
         </div>
       )}
 
-      <div className="flex flex-col gap-1 w-full max-w-lg">
+      <div className="flex flex-col gap-1 w-full max-w-2xl">
         {Array.from({ length: size }, (_, idx) => {
           const entries = buckets[idx] ?? []
           const isTarget = hashResult === idx
@@ -860,7 +860,11 @@ function BinaryTreeViz({ state }: { state: BinaryTreeState }) {
       {nonNullNodes === 0 ? (
         <div className="font-mono text-sm text-neutral-600">empty tree</div>
       ) : (
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-lg" style={{ maxHeight: `${H}px` }}>
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          className="w-full max-w-3xl"
+          style={{ maxHeight: 'min(52vh, 460px)', height: 'auto' }}
+        >
           {/* Edges */}
           {nodes.map((node, idx) => {
             if (!node) return null
@@ -993,7 +997,7 @@ function TwoPointersViz({ state }: { state: TwoPointersState }) {
             const isLeft = i === left
             const isRight = i === right
             return (
-              <div key={`lbl-${i}`} className="w-14 flex justify-center">
+              <div key={`lbl-${i}`} className="w-14 md:w-16 flex justify-center">
                 {isLeft && (
                   <span className="text-[10px] font-mono font-bold text-blue-400">L ↓</span>
                 )}
@@ -1006,14 +1010,14 @@ function TwoPointersViz({ state }: { state: TwoPointersState }) {
         </div>
 
         {/* Array cells */}
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           {array.map((val, i) => {
             const hl = highlights[i] ?? 'default'
             const colors = TP_COLORS[hl] ?? TP_COLORS.default
             return (
               <div
                 key={i}
-                className="w-13 h-13 rounded-lg border flex items-center justify-center font-mono text-base font-bold transition-all duration-300"
+                className="w-14 h-14 md:w-16 md:h-16 rounded-lg border flex items-center justify-center font-mono text-base md:text-lg font-bold transition-all duration-300"
                 style={{
                   backgroundColor: colors.bg,
                   borderColor: colors.border,
@@ -1186,7 +1190,7 @@ function MemoTableViz({ state }: { state: MemoTableState }) {
               <div key={i} className="flex flex-col items-center gap-0.5">
                 <div className="text-[9px] font-mono text-neutral-500">f({entry.key})</div>
                 <div
-                  className="w-11 h-11 rounded-lg border flex items-center justify-center font-mono text-sm font-bold transition-all duration-300"
+                  className="w-12 h-12 md:w-14 md:h-14 rounded-lg border flex items-center justify-center font-mono text-sm md:text-base font-bold transition-all duration-300"
                   style={{
                     backgroundColor: colors.bg,
                     borderColor: colors.border,
@@ -1435,7 +1439,7 @@ function BucketsViz({ state }: { state: BucketsState }) {
       )}
 
       {/* Main Array Section */}
-      <div className="flex flex-col items-center gap-3 w-full max-w-2xl px-4 py-3 bg-white/2 rounded-xl border border-white/5">
+      <div className="flex flex-col items-center gap-3 w-full max-w-4xl px-4 py-3 bg-white/2 rounded-xl border border-white/5">
         <div className="flex items-center justify-between w-full mb-1">
           <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
             {phase === 'collecting' ? 'Result Array' : 'Input Array'}

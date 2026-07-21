@@ -20,14 +20,14 @@ export default function ArrayVisualizer({ step }: ArrayVisualizerProps) {
 
   return (
     <div
-      className="flex-1 flex flex-col items-center justify-center gap-6 w-full"
+      className="flex-1 flex flex-col items-center justify-center gap-5 w-full min-h-0"
       role="img"
       aria-label={`Array visualization: ${array.length} elements [${array.join(', ')}]${activeHighlights ? `. Active: ${activeHighlights}` : ''}`}
     >
       {/* Bar chart */}
       <div
-        className="flex items-end w-full max-w-3xl"
-        style={{ height: 'clamp(180px, 40vw, 300px)', gap: `${barGap}px` }}
+        className="flex items-end w-full max-w-5xl"
+        style={{ height: 'clamp(200px, 46vh, 420px)', gap: `${barGap}px` }}
         aria-hidden="true"
       >
         {array.map((value, index) => {
@@ -69,7 +69,7 @@ export default function ArrayVisualizer({ step }: ArrayVisualizerProps) {
       </div>
 
       {/* Index row */}
-      <div className="flex w-full max-w-3xl" style={{ gap: `${barGap}px` }} aria-hidden="true">
+      <div className="flex w-full max-w-5xl" style={{ gap: `${barGap}px` }} aria-hidden="true">
         {array.map((_, index) => {
           const highlight = highlights[index]
           const isSorted = sorted.includes(index)
