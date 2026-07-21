@@ -35,7 +35,7 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -49,6 +49,24 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#000000" />
+    <script is:inline>
+      const savedTheme = document.cookie
+        .split('; ')
+        .find((cookie) => cookie.startsWith('theme='))
+        ?.split('=')[1]
+      const theme =
+        savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme
+          : window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark'
+      document.documentElement.dataset.theme = theme
+      document.documentElement.style.colorScheme = theme
+      document.querySelector('meta[name="theme-color"]')?.setAttribute(
+        'content',
+        theme === 'light' ? '#ffffff' : '#000000',
+      )
+    </script>
     <link rel="canonical" href={canonicalURL} />
     <link rel="manifest" href="/site.webmanifest" />
     
@@ -116,6 +134,10 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
     overflow: hidden;
   }
 
+  html {
+    background: var(--surface);
+  }
+
   /* Skip link — visible only on focus */
   .skip-link {
     position: absolute;
@@ -151,11 +173,11 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--subtle-strong);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: var(--subtle-hover);
   }
 
   /* Custom range slider for speed */
@@ -167,14 +189,14 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
   }
   input[type="range"]::-webkit-slider-runnable-track {
     height: 4px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--subtle-strong);
     border-radius: 2px;
   }
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 12px;
     height: 12px;
-    background: #fff;
+    background: var(--foreground);
     border-radius: 50%;
     margin-top: -4px;
     transition: transform 0.15s ease;
@@ -184,13 +206,13 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
   }
   input[type="range"]::-moz-range-track {
     height: 4px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--subtle-strong);
     border-radius: 2px;
   }
   input[type="range"]::-moz-range-thumb {
     width: 12px;
     height: 12px;
-    background: #fff;
+    background: var(--foreground);
     border-radius: 50%;
     border: none;
   }

@@ -56,6 +56,18 @@ export default function Header({
   onToggleMobileSidebar,
   onToggleMobileCodePanel,
 }: HeaderProps) {
+  const toggleTheme = () => {
+    const root = document.documentElement
+    const nextTheme = root.dataset.theme === 'light' ? 'dark' : 'light'
+    root.dataset.theme = nextTheme
+    root.style.colorScheme = nextTheme
+    document.cookie = `theme=${nextTheme}; Path=/; Max-Age=31536000; SameSite=Lax`
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', nextTheme === 'light' ? '#ffffff' : '#000000')
+    window.dispatchEvent(new CustomEvent('themechange', { detail: nextTheme }))
+  }
+
   return (
     <header
       className="h-12 shrink-0 flex items-center justify-between px-3 md:px-5 border-b border-white/8 bg-black z-10"
@@ -177,6 +189,41 @@ export default function Header({
 
       {/* Right: Language switcher + code panel toggle */}
       <div className="flex items-center justify-end gap-2 min-w-0 shrink-0">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/6 transition-[transform,color,background-color] duration-150 text-neutral-400 hover:text-white active:scale-[0.97]"
+          aria-label={locale === 'es' ? 'Cambiar tema de color' : 'Toggle color theme'}
+        >
+          <svg
+            className="theme-icon-dark w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.75}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.7 6.7 0 0 0 9.8 9.8Z"
+            />
+          </svg>
+          <svg
+            className="theme-icon-light w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.75}
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="3.5" />
+            <path
+              strokeLinecap="round"
+              d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"
+            />
+          </svg>
+        </button>
         {isMobile && selectedAlgorithm && (
           <button
             onClick={onToggleMobileCodePanel}

@@ -41,8 +41,7 @@ interface CodePanelProps {
   locale?: Locale
 }
 
-/** Custom dark theme that matches the app background */
-function defineTheme(monaco: Monaco) {
+function defineThemes(monaco: Monaco) {
   monaco.editor.defineTheme('algoviz-dark', {
     base: 'vs-dark',
     inherit: true,
@@ -54,6 +53,19 @@ function defineTheme(monaco: Monaco) {
       'editorLineNumber.activeForeground': '#facc15',
       'editor.selectionBackground': '#ffffff15',
       'editorCursor.foreground': '#fff',
+    },
+  })
+  monaco.editor.defineTheme('algoviz-light', {
+    base: 'vs',
+    inherit: true,
+    rules: [],
+    colors: {
+      'editor.background': '#ffffff',
+      'editor.lineHighlightBackground': '#00000006',
+      'editorLineNumber.foreground': '#b3b3b3',
+      'editorLineNumber.activeForeground': '#ca8a04',
+      'editor.selectionBackground': '#00000015',
+      'editorCursor.foreground': '#171717',
     },
   })
 }
@@ -80,10 +92,22 @@ export default function CodePanel({
     setIsMounted(true)
   }, [])
 
+  useEffect(() => {
+    const updateEditorTheme = (event?: Event) => {
+      const theme =
+        event instanceof CustomEvent ? event.detail : document.documentElement.dataset.theme
+      monacoRef.current?.editor.setTheme(theme === 'light' ? 'algoviz-light' : 'algoviz-dark')
+    }
+    window.addEventListener('themechange', updateEditorTheme)
+    return () => window.removeEventListener('themechange', updateEditorTheme)
+  }, [])
+
   const handleEditorDidMount = useCallback(
     (editor: any, monacoInstance: Monaco) => {
-      defineTheme(monacoInstance)
-      monacoInstance.editor.setTheme('algoviz-dark')
+      defineThemes(monacoInstance)
+      monacoInstance.editor.setTheme(
+        document.documentElement.dataset.theme === 'light' ? 'algoviz-light' : 'algoviz-dark',
+      )
       editorRef.current = editor
       monacoRef.current = monacoInstance
 
@@ -232,7 +256,11 @@ export default function CodePanel({
                 <LazyEditor
                   defaultLanguage="javascript"
                   value={code}
-                  theme="vs-dark"
+                  theme={
+                    document.documentElement.dataset.theme === 'light'
+                      ? 'algoviz-light'
+                      : 'algoviz-dark'
+                  }
                   onMount={handleEditorDidMount}
                   loading={null}
                   options={{
