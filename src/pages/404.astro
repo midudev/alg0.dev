@@ -6,10 +6,15 @@ const pathName = Astro.url.pathname
 const maybeLocale = pathName.split('/')[1] as Locale
 const locale = locales.includes(maybeLocale) ? maybeLocale : defaultLocale
 const t = translations[locale]
-const pathnameToRedirect = locale === defaultLocale ? `/` : `/${locale}`
+const pathnameToRedirect = locale === defaultLocale ? `/` : `/${locale}/`
 ---
 
-<Layout locale={locale} title={t.notFoundTitle}>
+<Layout
+  locale={locale}
+  title={t.notFoundTitle}
+  description={t.notFoundDescription}
+  robots="noindex, nofollow"
+>
   <div class="h-screen flex flex-col items-center justify-center gap-6 bg-black text-white px-4">
     <div
       class="w-12 h-12 rounded-xl bg-white/4 flex items-center justify-center border border-white/8"

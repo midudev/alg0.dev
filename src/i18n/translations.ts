@@ -2045,9 +2045,17 @@ export function getAlgorithmMetaTitle(
   fallbackName: string,
 ): string {
   const desc = translations[locale].algorithmDescriptions[algorithmId]
-  if (!desc) return `${fallbackName} | alg0.dev`
+  if (!desc) {
+    return locale === 'es'
+      ? `${fallbackName}: Visualizador | alg0.dev`
+      : `${fallbackName} Visualizer | alg0.dev`
+  }
   const firstLine = desc.split('\n')[0].trim()
-  return `${firstLine || fallbackName} | alg0.dev`
+  const name = firstLine || fallbackName
+  const suffix = locale === 'es' ? ': Visualizador | alg0.dev' : ' Visualizer | alg0.dev'
+  const maxNameLength = 60 - suffix.length
+  const conciseName = name.length > maxNameLength ? name.split(' (')[0] : name
+  return `${conciseName.slice(0, maxNameLength).trim()}${suffix}`
 }
 
 export function getAlgorithmMetaDescription(locale: Locale, algorithmId: string): string {
@@ -2057,5 +2065,7 @@ export function getAlgorithmMetaDescription(locale: Locale, algorithmId: string)
   const content = paragraphs.length > 1 ? paragraphs[1] : paragraphs[0]
   const cleaned = content.replace(/\n/g, ' ').trim()
   if (cleaned.length <= 160) return cleaned
-  return cleaned.slice(0, 157) + '...'
+  const truncated = cleaned.slice(0, 157)
+  const lastSpace = truncated.lastIndexOf(' ')
+  return `${truncated.slice(0, lastSpace > 120 ? lastSpace : 157)}...`
 }
