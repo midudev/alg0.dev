@@ -29,9 +29,9 @@ const algorithmCodeHtml = initialAlgorithmId
   data-code-panel-content
   data-locale={locale}
   data-initial-algorithm-id={initialAlgorithmId}
-  class="flex flex-col h-full"
+  class="flex flex-col h-full min-h-0"
 >
-  <div class="flex flex-1 flex-col overflow-hidden">
+  <div class="flex flex-1 flex-col overflow-hidden min-h-0">
     <div
       class="flex items-center gap-1 shrink-0 px-2 md:px-3 py-1.5 border-b border-white/[0.06]"
       role="group"
@@ -73,7 +73,7 @@ const algorithmCodeHtml = initialAlgorithmId
         </div>
       </div>
 
-      <div data-code-variants class="h-full" set:html={algorithmCodeHtml}></div>
+      <div data-code-variants class="h-full min-h-0" set:html={algorithmCodeHtml}></div>
     </div>
 
     <div

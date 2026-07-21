@@ -236,17 +236,48 @@
   }
 }
 
+/* Keep the scroll chain constrained so long sources can overflow-auto. */
+[data-code-variants],
+[data-algorithm-code] {
+  height: 100%;
+  min-height: 0;
+}
+
+[data-algorithm-code] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .code-viewer {
   color: var(--foreground);
   background: var(--surface);
   tab-size: 2;
-  scrollbar-width: none;
+  /* pre is the scrollport — height must not grow with content */
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 18%, transparent) transparent;
   opacity: 1;
   transition: opacity 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .code-viewer::-webkit-scrollbar {
-  display: none;
+  width: 8px;
+  height: 8px;
+}
+
+.code-viewer::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--foreground) 18%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.code-viewer::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .code-viewer.is-loading {
