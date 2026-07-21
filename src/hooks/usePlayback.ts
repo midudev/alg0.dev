@@ -1,14 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Algorithm, Step } from '@lib/types'
 import type { Locale } from '@i18n/translations'
+import { SPEED_MAP } from '@lib/playback'
 
-export const SPEED_MAP: Record<number, number> = {
-  1: 1500,
-  2: 800,
-  3: 400,
-  4: 150,
-  5: 50,
-}
+export { SPEED_MAP }
 
 export function usePlayback(
   locale: Locale,

@@ -1,0 +1,102 @@
+---
+/**
+ * Static code-panel shell (desktop resize + mobile drawer).
+ * Monaco / CodePanel React content portals into `[data-code-panel-mount]`.
+ */
+import type { Locale } from "@i18n/translations"
+import { translations } from "@i18n/translations"
+
+interface Props {
+  locale: Locale
+  /** Start collapsed (home) vs open (algorithm pages). */
+  initialCollapsed?: boolean
+}
+
+const { locale, initialCollapsed = true } = Astro.props
+const t = translations[locale]
+const panelWidth = "420px"
+---
+
+<!-- Mobile backdrop -->
+<div
+  data-code-panel-backdrop
+  class="site-code-panel-backdrop fixed inset-0 bg-black/60 z-40 md:hidden"
+  aria-hidden="true"
+></div>
+
+<div
+  data-code-panel-shell
+  class="site-code-panel-shell relative shrink-0 flex z-50 md:z-auto"
+  style={`--code-panel-width: ${panelWidth}`}
+  data-initial-collapsed={initialCollapsed ? "" : undefined}
+  data-collapsed={initialCollapsed ? "" : undefined}
+>
+  <!-- Desktop resize handle (left of panel) -->
+  <div
+    data-code-panel-resize
+    class:list={[
+      "w-px shrink-0 cursor-col-resize group relative select-none max-md:hidden",
+      { hidden: initialCollapsed },
+    ]}
+    role="separator"
+    aria-orientation="vertical"
+    aria-label={t.resizeCodePanel}
+    tabindex={initialCollapsed ? -1 : 0}
+  >
+    <div
+      class="absolute inset-y-0 -right-0.5 w-[5px] z-20 hover:bg-white/10 transition-colors"
+      data-code-panel-resize-hit
+    >
+    </div>
+    <div class="h-full bg-white/8"></div>
+  </div>
+
+  <aside
+    data-code-panel-panel
+    class="site-code-panel-panel bg-black overflow-hidden flex flex-col"
+    style={`width: ${initialCollapsed ? "0px" : panelWidth}`}
+    aria-label={t.codePanelAriaLabel}
+    aria-hidden={initialCollapsed ? "true" : "false"}
+    inert={initialCollapsed || undefined}
+  >
+    <!-- Mobile drawer chrome -->
+    <div
+      class="flex md:hidden items-center justify-between px-4 py-3 border-b border-white/8 shrink-0"
+    >
+      <span class="text-sm font-semibold text-white font-heading">{t.tabCode}</span>
+      <button
+        type="button"
+        data-code-panel-close
+        class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors"
+        aria-label={t.closePanel}
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="h-full flex flex-col min-h-0 relative" style={`width: ${panelWidth}`}>
+      <div data-code-panel-mount class="h-full flex flex-col min-h-0"></div>
+      <div
+        data-code-panel-empty
+        class="absolute inset-0 flex items-center justify-center text-neutral-600 text-sm pointer-events-none"
+      >
+        {t.selectAlgorithmCode}
+      </div>
+    </div>
+  </aside>
+</div>
+
+<style is:global>
+  html[data-has-algorithm] [data-code-panel-empty] {
+    display: none;
+  }
+</style>
