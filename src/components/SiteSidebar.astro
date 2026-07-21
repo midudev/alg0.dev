@@ -1,0 +1,281 @@
+---
+/**
+ * Fully static algorithm sidebar (SSR HTML + inline SVGs).
+ * Lives outside the React island. Client JS only for search, resize, mobile open,
+ * and SPA selection bridge — never for painting icons or the catalog.
+ */
+import type { Locale } from "@i18n/translations"
+import { translations, getCategoryName } from "@i18n/translations"
+import { catalogCategories } from "@lib/algorithms/catalog"
+import { getLocaleUrl } from "@lib/locale-url"
+import {
+  SIDEBAR_MAX_WIDTH,
+  categoryDomId,
+  categoryIconPaths,
+  getCategoryColor,
+} from "@lib/sidebar-meta"
+
+interface Props {
+  locale: Locale
+  selectedId?: string | null
+}
+
+const { locale, selectedId = null } = Astro.props
+const t = translations[locale]
+const totalCount = catalogCategories.reduce((sum, c) => sum + c.algorithms.length, 0)
+const clearLabel = locale === "es" ? "Limpiar búsqueda" : "Clear search"
+const panelWidth = `${SIDEBAR_MAX_WIDTH}px`
+---
+
+<!-- Mobile backdrop -->
+<div
+  data-sidebar-backdrop
+  class="site-sidebar-backdrop fixed inset-0 bg-black/60 z-40 md:hidden"
+  aria-hidden="true"
+></div>
+
+<!-- Shell: in-flow on desktop, drawer on mobile — single DOM instance, no duplicated SVGs -->
+<div
+  data-sidebar-shell
+  class="site-sidebar-shell relative shrink-0 flex z-50 md:z-auto"
+  style={`--sidebar-width: ${panelWidth}`}
+>
+  <aside
+    data-sidebar-panel
+    class="site-sidebar-panel bg-black overflow-hidden flex flex-col"
+    style={`width: ${panelWidth}`}
+    aria-label={t.sidebarAriaLabel}
+  >
+    <!-- Mobile drawer chrome -->
+    <div
+      class="flex md:hidden items-center justify-between px-4 py-3 border-b border-white/8 shrink-0"
+    >
+      <span class="text-sm font-semibold text-white font-heading">{t.mobileMenuTitle}</span>
+      <button
+        type="button"
+        data-sidebar-close
+        class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors"
+        aria-label={t.closeMenu}
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex flex-col h-full min-h-0" data-sidebar style={`width: ${panelWidth}`}>
+      <!-- Search -->
+      <div class="p-3 pb-2 shrink-0">
+        <div class="relative">
+          <svg
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            ></path>
+          </svg>
+          <input
+            type="search"
+            data-sidebar-search
+            placeholder={t.searchPlaceholder}
+            aria-label={t.searchPlaceholder}
+            class="w-full bg-white/3 border border-white/8 rounded-lg pl-9 pr-8 py-2 text-xs text-neutral-300 placeholder-neutral-600 outline-none focus:border-white/20 focus:bg-white/5 transition-all"
+          />
+          <button
+            type="button"
+            data-sidebar-search-clear
+            hidden
+            class="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[18px] h-[18px] rounded border border-white/10 bg-white/3 text-neutral-600 hover:text-neutral-300 hover:border-white/20 hover:bg-white/6 transition-all"
+            aria-label={clearLabel}
+          >
+            <svg
+              class="w-2.5 h-2.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+          <kbd
+            data-sidebar-search-kbd
+            class="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-[18px] h-[18px] text-[10px] font-mono rounded border border-white/10 text-neutral-600 bg-white/3"
+            aria-hidden="true"
+          >
+            /
+          </kbd>
+        </div>
+      </div>
+
+      <!-- Categories: <details> = expand/collapse with zero JS -->
+      <nav class="flex-1 overflow-y-auto px-2 pb-4 min-h-0" aria-label="Algorithm list">
+        {
+          catalogCategories.map((category) => {
+            const colors = getCategoryColor(category.name)
+            const catId = categoryDomId(category.name)
+            const localizedName = getCategoryName(locale, category.name)
+            const iconPath = categoryIconPaths[category.name]
+
+            return (
+              <details
+                class="mb-1 group/cat"
+                data-sidebar-category
+                open
+                style={`--sidebar-selected: ${colors.selectedCss}`}
+              >
+                <summary
+                  class="site-sidebar-summary w-full flex items-center justify-between px-2.5 py-2 text-[11px] font-semibold text-neutral-500 hover:text-neutral-400 transition-colors rounded-md hover:bg-white/3 uppercase tracking-widest cursor-pointer list-none"
+                >
+                  <div class="flex items-center gap-2">
+                    <svg
+                      class="site-sidebar-chevron w-3 h-3 text-neutral-600 transition-transform duration-200"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <span class="flex items-center gap-1.5">
+                      <span class={colors.icon}>
+                        {iconPath && (
+                          <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d={iconPath}
+                            />
+                          </svg>
+                        )}
+                      </span>
+                      {localizedName}
+                    </span>
+                  </div>
+                  <span
+                    class:list={[
+                      "text-[10px] font-normal px-1.5 py-0.5 rounded-full tabular-nums",
+                      colors.badge,
+                    ]}
+                    aria-label={t.algorithmCountLabel.replace(
+                      "{count}",
+                      String(category.algorithms.length),
+                    )}
+                  >
+                    {category.algorithms.length}
+                  </span>
+                </summary>
+
+                <div
+                  id={catId}
+                  role="group"
+                  aria-label={`${localizedName} algorithms`}
+                  class="pb-0.5"
+                >
+                  <div class:list={["ml-4 mt-0.5 space-y-0.5 border-l pl-2", colors.line]}>
+                    {category.algorithms.map((algo) => {
+                      const selected = selectedId === algo.id
+                      return (
+                        <a
+                          href={getLocaleUrl(locale, algo.id)}
+                          data-algo-id={algo.id}
+                          data-algo-name={algo.name.toLowerCase()}
+                          data-category-name={localizedName.toLowerCase()}
+                          aria-current={selected ? "page" : undefined}
+                          class="site-sidebar-algo flex items-center justify-between gap-3 pl-3 pr-2.5 py-1.5 text-[13px] rounded-md transition-colors duration-150 text-neutral-500 hover:text-neutral-300 hover:bg-white/4"
+                        >
+                          <span>{algo.name}</span>
+                          <span
+                            data-sidebar-selected-dot
+                            class="relative inline-block shrink-0 px-1.5 text-[10px] font-normal tabular-nums"
+                            aria-hidden="true"
+                          >
+                            <span class="invisible">{category.algorithms.length}</span>
+                            <span class="absolute inset-0 flex items-center justify-center">
+                              <span class:list={["size-1 rounded-full", colors.dot]} />
+                            </span>
+                          </span>
+                        </a>
+                      )
+                    })}
+                  </div>
+                </div>
+              </details>
+            )
+          })
+        }
+      </nav>
+
+      <!-- Footer -->
+      <div class="p-3 border-t border-white/6 shrink-0">
+        <div class="flex items-center justify-center gap-1.5 text-[10px] text-neutral-700">
+          <span>{t.algorithmsCount.replace("{count}", String(totalCount))}</span>
+          <span class="text-neutral-800">·</span>
+          <a
+            href="https://midu.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-neutral-600 hover:text-neutral-400 transition-colors"
+          >
+            by midudev
+          </a>
+          <a
+            href="https://github.com/midudev/alg0.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-neutral-600 hover:text-neutral-400 transition-colors cursor-pointer"
+            aria-label="GitHub Alg0.dev - Algorithm Visualizer Repository"
+          >
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"
+              ></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Desktop resize handle -->
+  <div
+    data-sidebar-resize
+    class="w-px shrink-0 cursor-col-resize group relative select-none max-md:hidden"
+    role="separator"
+    aria-orientation="vertical"
+    aria-label={t.resizeSidebar}
+    tabindex="0"
+  >
+    <div
+      class="absolute inset-y-0 -left-0.5 w-[5px] z-20 hover:bg-white/10 transition-colors data-[dragging]:bg-blue-500/50"
+      data-sidebar-resize-hit
+    >
+    </div>
+    <div class="h-full bg-white/8"></div>
+  </div>
+</div>

@@ -1,26 +1,31 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import type { Locale } from '@i18n/translations'
-import {
-  translations,
-  getAlgorithmDescription,
-  getAlgorithmMetaTitle,
-  getAlgorithmMetaDescription,
-  getCategoryName,
-  defaultLocale,
-  locales,
-} from '@i18n/translations'
-import { catalogCategories } from '@lib/algorithms/catalog'
+import { translations, getCategoryName, defaultLocale, locales } from '@i18n/translations'
+import { getCatalogEntry } from '@lib/algorithms/catalog'
 import { loadAlgorithm } from '@lib/algorithms/loaders'
+import { $ } from '@lib/dom'
+import { syncHeaderChrome } from '@lib/header-chrome'
+import {
+  SELECT_ALGORITHM_EVENT,
+  closeMobileSidebar,
+  openMobileSidebar,
+  syncSidebarSelection,
+  type SelectAlgorithmDetail,
+} from '@lib/sidebar'
+import { onPlaybackCommand, publishPlaybackState, type PlaybackCommand } from '@lib/playback'
+import {
+  expandCodePanel,
+  openMobileCodePanel,
+  syncCodePanelForAlgorithm,
+} from '@lib/code-panel-shell'
 import { usePlayback } from '@hooks/usePlayback'
-import { useResizablePanel } from '@hooks/useResizablePanel'
-import { useKeyboardShortcuts } from '@hooks/useKeyboardShortcuts'
-import Header from '@components/Header'
-import Sidebar from '@components/Sidebar'
 import WelcomeScreen from '@components/WelcomeScreen'
-import ArrayVisualizer from '@components/ArrayVisualizer'
+import DomStepViz from '@components/DomStepViz'
 import GraphVisualizer from '@components/GraphVisualizer'
-import MatrixVisualizer from '@components/MatrixVisualizer'
 import ConceptVisualizer from '@components/ConceptVisualizer'
+import { renderArrayVisualizer } from '@lib/visualizers/array'
+import { renderMatrixVisualizer } from '@lib/visualizers/matrix'
 import CodePanel from '@components/CodePanel'
 import { CODE_LANGUAGE_STORAGE_KEY, defaultCodeLanguage, isCodeLanguage } from '@lib/code-languages'
 import type { Algorithm, AlgorithmSummary, CodeLanguage, Step } from '@lib/types'
@@ -29,16 +34,12 @@ import type { Algorithm, AlgorithmSummary, CodeLanguage, Step } from '@lib/types
 function hydrateAlgorithm(summary: AlgorithmSummary, code: string, steps: Step[]): Algorithm {
   return {
     ...summary,
-    description: '',
     code,
-    // Fixed steps from SSR — full module later upgrades generateSteps via replaceAlgorithm
+    // Fixed steps from SSR keep the initial route fully functional without a client import.
     generateSteps: () => steps,
   }
 }
 
-const SIDEBAR_MAX = 260
-const CODEPANEL_MAX = 420
-const COLLAPSE_THRESHOLD = 100
 const MOBILE_BREAKPOINT = 768
 
 function getAlgorithmUrl(locale: string, algoId: string): string {
@@ -65,6 +66,34 @@ interface AlgoVizProps {
   initialCode?: string
   /** @deprecated Prefer `initialAlgorithm` — kept for callers that only know the id. */
   initialAlgorithmId?: string
+  /** SSR welcome chrome from Astro (`WelcomeChrome.astro`), via `slot="welcome-chrome"`. */
+  welcomeChrome?: ReactNode
+  /** SSR algorithm description from Astro (`AlgorithmDescription.astro`) for the about tab. */
+  children?: ReactNode
+}
+
+interface AlgorithmPageContent {
+  html: string
+  pageTitle: string
+  metaDescription: string
+}
+
+async function loadAlgorithmPageContent(
+  locale: Locale,
+  algorithmId: string,
+): Promise<AlgorithmPageContent | null> {
+  const response = await fetch(`/algorithm-content/${locale}/${algorithmId}`)
+  if (!response.ok) throw new Error(`Description request failed with ${response.status}`)
+
+  const parsedDocument = new DOMParser().parseFromString(await response.text(), 'text/html')
+  const content = $<HTMLElement>('[data-algorithm-description]', parsedDocument)
+  if (!content) return null
+
+  return {
+    html: content.outerHTML,
+    pageTitle: content.dataset.pageTitle ?? '',
+    metaDescription: content.dataset.metaDescription ?? '',
+  }
 }
 
 function useIsMobile() {
@@ -89,26 +118,25 @@ export default function AlgoViz({
   initialSteps,
   initialCode,
   initialAlgorithmId,
+  welcomeChrome,
+  children,
 }: AlgoVizProps) {
   const t = translations[locale]
   const resolvedInitialId = initialAlgorithm?.id ?? initialAlgorithmId
 
-  // SSR hydrate: algorithm + steps available on first paint (no "Loading…" for the preview)
   const hydratedInitial = useMemo(() => {
     if (!initialAlgorithm || initialCode == null || !initialSteps?.length) return null
     return hydrateAlgorithm(initialAlgorithm, initialCode, initialSteps)
   }, [initialAlgorithm, initialCode, initialSteps])
 
   const [activeTab, setActiveTab] = useState<'code' | 'about'>('code')
-  // null until we know the preferred language — avoids flashing JavaScript then switching
+  const [aboutHtml, setAboutHtml] = useState<string | null>(null)
   const [codeLanguage, setCodeLanguage] = useState<CodeLanguage | null>(null)
   const isMobile = useIsMobile()
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [mobileCodePanelOpen, setMobileCodePanelOpen] = useState(false)
-  // Breadcrumb meta available from the first paint (SSR props)
   const [headerAlgorithm, setHeaderAlgorithm] = useState<AlgorithmSummary | null>(
     initialAlgorithm ?? null,
   )
+  const [codeMount, setCodeMount] = useState<Element | null>(null)
 
   const {
     selectedAlgorithm,
@@ -119,7 +147,6 @@ export default function AlgoViz({
     speed,
     setSpeed,
     selectAlgorithm: selectAlgorithmBase,
-    replaceAlgorithm,
     clearSelection: clearSelectionBase,
     stepForward,
     stepBackward,
@@ -132,22 +159,63 @@ export default function AlgoViz({
     setHeaderAlgorithm(null)
   }, [clearSelectionBase])
 
-  const sidebar = useResizablePanel({
-    maxWidth: SIDEBAR_MAX,
-    collapseThreshold: COLLAPSE_THRESHOLD,
-    side: 'left',
-  })
+  // Mount point for CodePanel inside static CodePanelShell.astro
+  useEffect(() => {
+    setCodeMount($('[data-code-panel-mount]'))
+  }, [])
 
-  const codePanel = useResizablePanel({
-    maxWidth: CODEPANEL_MAX,
-    collapseThreshold: COLLAPSE_THRESHOLD,
-    side: 'right',
-    initialCollapsed: !resolvedInitialId,
-  })
+  // Publish playback state → header controls (plain JS)
+  useEffect(() => {
+    publishPlaybackState({
+      currentStep,
+      totalSteps: steps.length,
+      isPlaying,
+      speed,
+      disabled: steps.length === 0,
+      hasAlgorithm: headerAlgorithm != null,
+    })
+  }, [currentStep, steps.length, isPlaying, speed, headerAlgorithm])
 
-  useKeyboardShortcuts({ togglePlay, stepForward, stepBackward, onTabChange: setActiveTab })
+  // Commands from header controls / keyboard
+  useEffect(() => {
+    return onPlaybackCommand((command: PlaybackCommand) => {
+      switch (command.type) {
+        case 'togglePlay':
+          togglePlay()
+          break
+        case 'stepForward':
+          stepForward()
+          break
+        case 'stepBackward':
+          stepBackward()
+          break
+        case 'setStep':
+          setCurrentStep(command.step)
+          break
+        case 'setSpeed':
+          setSpeed(command.speed)
+          break
+        case 'setTab':
+          setActiveTab(command.tab)
+          break
+      }
+    })
+  }, [togglePlay, stepForward, stepBackward, setCurrentStep, setSpeed])
 
-  // Resolve preferred language after mount (localStorage is client-only)
+  // Keep SSR header chrome + sidebar highlight in sync
+  useEffect(() => {
+    syncHeaderChrome(locale, headerAlgorithm)
+  }, [locale, headerAlgorithm])
+
+  useEffect(() => {
+    syncSidebarSelection(headerAlgorithm?.id ?? null)
+  }, [headerAlgorithm?.id])
+
+  useEffect(() => {
+    syncCodePanelForAlgorithm(headerAlgorithm != null)
+  }, [headerAlgorithm])
+
+  // Resolve preferred language after mount
   useEffect(() => {
     const stored = localStorage.getItem(CODE_LANGUAGE_STORAGE_KEY)
     setCodeLanguage(isCodeLanguage(stored) ? stored : defaultCodeLanguage)
@@ -158,51 +226,34 @@ export default function AlgoViz({
     localStorage.setItem(CODE_LANGUAGE_STORAGE_KEY, language)
   }, [])
 
-  // Close mobile drawers on escape
-  useEffect(() => {
-    if (!isMobile) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setMobileSidebarOpen(false)
-        setMobileCodePanelOpen(false)
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [isMobile])
-
-  // Prevent body scroll when mobile drawer is open
-  useEffect(() => {
-    if (mobileSidebarOpen || mobileCodePanelOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [mobileSidebarOpen, mobileCodePanelOpen])
-
   const updateMetaDescription = useCallback((description: string) => {
     const meta = document.querySelector('meta[name="description"]')
     if (meta) meta.setAttribute('content', description)
   }, [])
 
   const activateAlgorithm = useCallback(
-    (algo: Algorithm, { pushUrl }: { pushUrl: boolean }) => {
+    (
+      algo: Algorithm,
+      { pushUrl, pageContent }: { pushUrl: boolean; pageContent: AlgorithmPageContent | null },
+    ) => {
       setHeaderAlgorithm(algo)
       selectAlgorithmBase(algo)
+      setAboutHtml(pageContent?.html ?? '')
       setActiveTab('code')
-      setMobileSidebarOpen(false)
-      codePanel.expand()
+      closeMobileSidebar()
+      expandCodePanel()
       if (pushUrl) {
         const url = getAlgorithmUrl(locale, algo.id)
         window.history.pushState({ algorithmId: algo.id }, '', url)
       }
-      document.title = getAlgorithmMetaTitle(locale, algo.id, algo.name)
-      updateMetaDescription(getAlgorithmMetaDescription(locale, algo.id))
+      document.title =
+        pageContent?.pageTitle ||
+        (locale === 'es'
+          ? `${algo.name}: Visualizador | alg0.dev`
+          : `${algo.name} Visualizer | alg0.dev`)
+      updateMetaDescription(pageContent?.metaDescription || t.siteDescription)
     },
-    [locale, selectAlgorithmBase, codePanel.expand, updateMetaDescription],
+    [locale, selectAlgorithmBase, t.siteDescription, updateMetaDescription],
   )
 
   const selectAlgorithmById = useCallback(
@@ -211,25 +262,24 @@ export default function AlgoViz({
       options: {
         pushUrl: boolean
         summary?: AlgorithmSummary
-        /** When true, only upgrade the Algorithm object (keep current steps/playback). */
-        soft?: boolean
       } = { pushUrl: true },
     ) => {
       if (options.summary) setHeaderAlgorithm(options.summary)
+      setAboutHtml('')
       try {
-        const algo = await loadAlgorithm(id)
-        if (options.soft) {
-          // Full module arrived after SSR hydrate — keep the running preview
-          setHeaderAlgorithm(algo)
-          replaceAlgorithm(algo)
-          return
-        }
-        activateAlgorithm(algo, { pushUrl: options.pushUrl })
+        const [algo, pageContent] = await Promise.all([
+          loadAlgorithm(id),
+          loadAlgorithmPageContent(locale, id).catch((error) => {
+            console.error(`Failed to load description for "${id}"`, error)
+            return null
+          }),
+        ])
+        activateAlgorithm(algo, { pushUrl: options.pushUrl, pageContent })
       } catch (error) {
         console.error(`Failed to load algorithm "${id}"`, error)
       }
     },
-    [activateAlgorithm, replaceAlgorithm],
+    [activateAlgorithm, locale],
   )
 
   const selectAlgorithm = useCallback(
@@ -239,18 +289,20 @@ export default function AlgoViz({
     [selectAlgorithmById],
   )
 
-  // After SSR hydrate, quietly fetch the full algorithm module (for language packs / re-runs)
+  useEffect(() => {
+    const onSelect = (event: Event) => {
+      const detail = (event as CustomEvent<SelectAlgorithmDetail>).detail
+      if (!detail?.id) return
+      const summary = getCatalogEntry(detail.id)
+      void selectAlgorithmById(detail.id, { pushUrl: true, summary })
+    }
+    window.addEventListener(SELECT_ALGORITHM_EVENT, onSelect)
+    return () => window.removeEventListener(SELECT_ALGORITHM_EVENT, onSelect)
+  }, [selectAlgorithmById])
+
   useEffect(() => {
     if (!resolvedInitialId) return
-    if (hydratedInitial) {
-      void selectAlgorithmById(resolvedInitialId, {
-        pushUrl: false,
-        summary: initialAlgorithm,
-        soft: true,
-      })
-      return
-    }
-    // No SSR payload (e.g. client-only navigation without steps) — full load
+    if (hydratedInitial) return
     void selectAlgorithmById(resolvedInitialId, {
       pushUrl: false,
       summary: initialAlgorithm,
@@ -266,6 +318,7 @@ export default function AlgoViz({
         return
       }
       clearSelection()
+      setAboutHtml(null)
       document.title = t.siteTitle
       updateMetaDescription(t.siteDescription)
     }
@@ -274,22 +327,27 @@ export default function AlgoViz({
     return () => window.removeEventListener('popstate', handlePopState)
   }, [selectAlgorithmById, clearSelection, t.siteTitle, t.siteDescription, updateMetaDescription])
 
-  const getLocalizedDescription = (algo: Algorithm): string => {
-    return getAlgorithmDescription(locale, algo.id) ?? algo.description
-  }
+  const aboutContent =
+    aboutHtml !== null ? (
+      <div dangerouslySetInnerHTML={{ __html: aboutHtml }} />
+    ) : initialAlgorithm?.id === selectedAlgorithm?.id ? (
+      children
+    ) : null
 
   const renderVisualization = () => {
     if (!selectedAlgorithm || !currentStepData) {
-      return <WelcomeScreen t={t} locale={locale} onSelectAlgorithm={selectAlgorithm} />
+      return (
+        <WelcomeScreen locale={locale} onSelectAlgorithm={selectAlgorithm} chrome={welcomeChrome} />
+      )
     }
 
     switch (selectedAlgorithm.visualization) {
       case 'array':
-        return <ArrayVisualizer step={currentStepData} />
+        return <DomStepViz step={currentStepData} render={renderArrayVisualizer} />
       case 'graph':
         return <GraphVisualizer step={currentStepData} locale={locale} />
       case 'matrix':
-        return <MatrixVisualizer step={currentStepData} />
+        return <DomStepViz step={currentStepData} render={renderMatrixVisualizer} />
       case 'concept':
         return <ConceptVisualizer step={currentStepData} />
       default:
@@ -297,152 +355,35 @@ export default function AlgoViz({
     }
   }
 
+  const codePanelContent =
+    selectedAlgorithm && codeMount
+      ? createPortal(
+          <CodePanel
+            algorithm={selectedAlgorithm}
+            aboutContent={aboutContent}
+            currentLine={currentStepData?.codeLine}
+            variables={currentStepData?.variables}
+            consoleOutput={currentStepData?.consoleOutput}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            language={codeLanguage}
+            onLanguageChange={changeCodeLanguage}
+            locale={locale}
+          />,
+          codeMount,
+        )
+      : null
+
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      <Header
-        locale={locale}
-        t={t}
-        selectedAlgorithm={headerAlgorithm}
-        sidebarCollapsed={isMobile ? true : sidebar.collapsed}
-        codePanelCollapsed={isMobile ? true : codePanel.collapsed}
-        onExpandSidebar={isMobile ? () => setMobileSidebarOpen(true) : sidebar.expand}
-        onExpandCodePanel={isMobile ? () => setMobileCodePanelOpen(true) : codePanel.expand}
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        isPlaying={isPlaying}
-        speed={speed}
-        onTogglePlay={togglePlay}
-        onStepForward={stepForward}
-        onStepBackward={stepBackward}
-        onSpeedChange={setSpeed}
-        onStepChange={setCurrentStep}
-        isMobile={isMobile}
-        onToggleMobileSidebar={() => setMobileSidebarOpen((v) => !v)}
-        onToggleMobileCodePanel={() => setMobileCodePanelOpen((v) => !v)}
-      />
+    <div className="flex-1 flex flex-col overflow-hidden min-h-0 min-w-0">
+      {codePanelContent}
 
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* Desktop Sidebar */}
-        {!isMobile && (
-          <div className="relative shrink-0 flex">
-            <aside
-              className={`bg-black overflow-hidden ${
-                sidebar.isDragging ? '' : 'transition-[width] duration-300 ease-in-out'
-              }`}
-              style={{
-                width: sidebar.isDragging ? sidebar.width : sidebar.collapsed ? 0 : SIDEBAR_MAX,
-              }}
-              aria-label={t.sidebarAriaLabel}
-              aria-hidden={sidebar.collapsed}
-              inert={sidebar.collapsed || undefined}
-            >
-              <div
-                className="h-full flex flex-col"
-                style={{
-                  width: SIDEBAR_MAX,
-                  opacity: sidebar.isDragging
-                    ? Math.max(0, sidebar.width / SIDEBAR_MAX)
-                    : sidebar.collapsed
-                      ? 0
-                      : 1,
-                  transition: sidebar.isDragging ? 'none' : 'opacity 0.3s ease-in-out',
-                }}
-              >
-                <Sidebar
-                  categories={catalogCategories}
-                  selectedId={headerAlgorithm?.id ?? null}
-                  onSelect={selectAlgorithm}
-                  locale={locale}
-                />
-              </div>
-            </aside>
-            {/* Drag handle */}
-            <div
-              className={`w-px shrink-0 cursor-col-resize group relative select-none ${
-                sidebar.collapsed && !sidebar.isDragging ? 'hidden' : ''
-              }`}
-              onMouseDown={sidebar.handleDragStart}
-              role="separator"
-              aria-orientation="vertical"
-              aria-label={t.resizeSidebar}
-              tabIndex={sidebar.collapsed ? -1 : 0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  sidebar.collapse()
-                }
-              }}
-            >
-              <div
-                className={`absolute inset-y-0 -left-0.5 w-[5px] z-20 ${
-                  sidebar.isDragging ? 'bg-blue-500/50' : 'hover:bg-white/10'
-                } transition-colors`}
-              />
-              <div className="h-full bg-white/8" />
-            </div>
-          </div>
-        )}
-
-        {/* Mobile Sidebar Overlay */}
-        {isMobile && (
-          <>
-            <div
-              className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 ${
-                mobileSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}
-              onClick={() => setMobileSidebarOpen(false)}
-              aria-hidden="true"
-            />
-            <aside
-              className={`fixed top-0 left-0 bottom-0 w-[280px] bg-black z-50 border-r border-white/8 transition-transform duration-300 ease-in-out ${
-                mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-              }`}
-              aria-label={t.sidebarAriaLabel}
-              aria-hidden={!mobileSidebarOpen}
-              inert={!mobileSidebarOpen || undefined}
-            >
-              <div className="h-full flex flex-col">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
-                  <span className="text-sm font-semibold text-white font-heading">
-                    {t.mobileMenuTitle}
-                  </span>
-                  <button
-                    onClick={() => setMobileSidebarOpen(false)}
-                    className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors"
-                    aria-label={t.closeMenu}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      aria-hidden="true"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                <Sidebar
-                  categories={catalogCategories}
-                  selectedId={headerAlgorithm?.id ?? null}
-                  onSelect={selectAlgorithm}
-                  locale={locale}
-                />
-              </div>
-            </aside>
-          </>
-        )}
-
-        {/* Visualization Area */}
+      <div className="flex-1 flex overflow-hidden relative min-h-0">
         <main
           id="main-content"
           className="flex-1 flex flex-col overflow-hidden min-w-0"
           aria-label={t.visualizationLabel}
         >
-          {/* Screen-reader page heading — reflects the current algorithm.
-              The WelcomeScreen renders its own visible <h1> when nothing is selected. */}
           {headerAlgorithm && (
             <h1 className="sr-only">
               {headerAlgorithm.name} — {getCategoryName(locale, headerAlgorithm.category)}
@@ -452,7 +393,6 @@ export default function AlgoViz({
             {renderVisualization()}
           </div>
 
-          {/* Step description */}
           <div className="px-3 pb-3 md:px-5 md:pb-4" aria-live="polite" aria-atomic="true">
             {currentStepData?.description && (
               <div className="text-xs md:text-sm text-neutral-300 bg-white/5 rounded-lg px-3 py-2 md:px-5 md:py-3 border border-white/12">
@@ -464,153 +404,14 @@ export default function AlgoViz({
             )}
           </div>
         </main>
-
-        {/* Desktop Code Panel */}
-        {!isMobile && (
-          <div className="relative shrink-0 flex">
-            {/* Drag handle */}
-            <div
-              className={`w-px shrink-0 cursor-col-resize group relative select-none ${
-                codePanel.collapsed && !codePanel.isDragging ? 'hidden' : ''
-              }`}
-              onMouseDown={codePanel.handleDragStart}
-              role="separator"
-              aria-orientation="vertical"
-              aria-label={t.resizeCodePanel}
-              tabIndex={codePanel.collapsed ? -1 : 0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  codePanel.collapse()
-                }
-              }}
-            >
-              <div
-                className={`absolute inset-y-0 -right-0.5 w-[5px] z-20 ${
-                  codePanel.isDragging ? 'bg-blue-500/50' : 'hover:bg-white/10'
-                } transition-colors`}
-              />
-              <div className="h-full bg-white/8" />
-            </div>
-            <aside
-              className={`bg-black overflow-hidden ${
-                codePanel.isDragging ? '' : 'transition-[width] duration-300 ease-in-out'
-              }`}
-              style={{
-                width: codePanel.isDragging
-                  ? codePanel.width
-                  : codePanel.collapsed
-                    ? 0
-                    : CODEPANEL_MAX,
-              }}
-              aria-label={t.codePanelAriaLabel}
-              aria-hidden={codePanel.collapsed}
-              inert={codePanel.collapsed || undefined}
-            >
-              <div
-                className="h-full flex flex-col"
-                style={{
-                  width: CODEPANEL_MAX,
-                  opacity: codePanel.isDragging
-                    ? Math.max(0, codePanel.width / CODEPANEL_MAX)
-                    : codePanel.collapsed
-                      ? 0
-                      : 1,
-                  transition: codePanel.isDragging ? 'none' : 'opacity 0.3s ease-in-out',
-                }}
-              >
-                {selectedAlgorithm ? (
-                  <CodePanel
-                    algorithm={selectedAlgorithm}
-                    description={getLocalizedDescription(selectedAlgorithm)}
-                    difficulty={selectedAlgorithm.difficulty}
-                    currentLine={currentStepData?.codeLine}
-                    variables={currentStepData?.variables}
-                    consoleOutput={currentStepData?.consoleOutput}
-                    activeTab={activeTab}
-                    onTabChange={setActiveTab}
-                    language={codeLanguage}
-                    onLanguageChange={changeCodeLanguage}
-                    locale={locale}
-                  />
-                ) : (
-                  <div className="h-full flex items-center justify-center text-neutral-600 text-sm">
-                    {t.selectAlgorithmCode}
-                  </div>
-                )}
-              </div>
-            </aside>
-          </div>
-        )}
-
-        {/* Mobile Code Panel Overlay */}
-        {isMobile && (
-          <>
-            <div
-              className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 ${
-                mobileCodePanelOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}
-              onClick={() => setMobileCodePanelOpen(false)}
-              aria-hidden="true"
-            />
-            <aside
-              className={`fixed top-0 right-0 bottom-0 w-[min(360px,90vw)] bg-black z-50 border-l border-white/8 transition-transform duration-300 ease-in-out ${
-                mobileCodePanelOpen ? 'translate-x-0' : 'translate-x-full'
-              }`}
-              aria-label={t.codePanelAriaLabel}
-              aria-hidden={!mobileCodePanelOpen}
-              inert={!mobileCodePanelOpen || undefined}
-            >
-              <div className="h-full flex flex-col">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
-                  <span className="text-sm font-semibold text-white font-heading">{t.tabCode}</span>
-                  <button
-                    onClick={() => setMobileCodePanelOpen(false)}
-                    className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors"
-                    aria-label={t.closePanel}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      aria-hidden="true"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                {selectedAlgorithm ? (
-                  <CodePanel
-                    algorithm={selectedAlgorithm}
-                    description={getLocalizedDescription(selectedAlgorithm)}
-                    difficulty={selectedAlgorithm.difficulty}
-                    currentLine={currentStepData?.codeLine}
-                    variables={currentStepData?.variables}
-                    consoleOutput={currentStepData?.consoleOutput}
-                    activeTab={activeTab}
-                    onTabChange={setActiveTab}
-                    language={codeLanguage}
-                    onLanguageChange={changeCodeLanguage}
-                    locale={locale}
-                  />
-                ) : (
-                  <div className="h-full flex items-center justify-center text-neutral-600 text-sm">
-                    {t.selectAlgorithmCode}
-                  </div>
-                )}
-              </div>
-            </aside>
-          </>
-        )}
       </div>
 
-      {/* Mobile bottom controls bar */}
+      {/* Mobile bottom transport bar */}
       {isMobile && headerAlgorithm && (
         <div className="shrink-0 flex items-center justify-between px-3 py-2 border-t border-white/8 bg-black z-10 gap-2">
           <button
-            onClick={() => setMobileSidebarOpen(true)}
+            type="button"
+            onClick={() => openMobileSidebar()}
             className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors shrink-0"
             aria-label={t.openMenu}
           >
@@ -632,6 +433,7 @@ export default function AlgoViz({
           <div className="flex-1 flex items-center justify-center min-w-0">
             <div className="flex items-center gap-1" role="group" aria-label={t.controlsLabel}>
               <button
+                type="button"
                 onClick={stepBackward}
                 disabled={currentStep <= 0}
                 className="p-1.5 rounded-md hover:bg-white/8 disabled:opacity-20 text-neutral-500 hover:text-white transition-all active:scale-95"
@@ -647,6 +449,7 @@ export default function AlgoViz({
                 </svg>
               </button>
               <button
+                type="button"
                 onClick={togglePlay}
                 className="w-8 h-8 rounded-full bg-white hover:bg-neutral-200 flex items-center justify-center transition-all active:scale-95"
                 aria-label={t.playPause}
@@ -678,6 +481,7 @@ export default function AlgoViz({
                 )}
               </button>
               <button
+                type="button"
                 onClick={stepForward}
                 disabled={currentStep >= steps.length - 1}
                 className="p-1.5 rounded-md hover:bg-white/8 disabled:opacity-20 text-neutral-500 hover:text-white transition-all active:scale-95"
@@ -698,7 +502,8 @@ export default function AlgoViz({
             </span>
           </div>
           <button
-            onClick={() => setMobileCodePanelOpen(true)}
+            type="button"
+            onClick={() => openMobileCodePanel()}
             className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/6 text-neutral-400 hover:text-white transition-colors shrink-0"
             aria-label={t.viewCode}
           >

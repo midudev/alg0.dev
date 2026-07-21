@@ -1,5 +1,9 @@
 ---
 import Layout from "@layouts/Layout.astro"
+import SiteHeader from "@components/SiteHeader.astro"
+import SiteSidebar from "@components/SiteSidebar.astro"
+import CodePanelShell from "@components/CodePanelShell.astro"
+import WelcomeChrome from "@components/WelcomeChrome.astro"
 import AlgoViz from "@components/AlgoViz"
 import { locales, defaultLocale } from "@i18n/translations"
 import type { GetStaticPaths } from "astro"
@@ -21,5 +25,14 @@ const canonicalURL = new URL(`/${lang}/`, Astro.site).href
   canonicalURL={canonicalURL}
   structuredData={getHomeStructuredData(lang, canonicalURL)}
 >
-  <AlgoViz locale={lang} client:load />
+  <div class="h-screen flex flex-col overflow-hidden">
+    <SiteHeader locale={lang} />
+    <div class="flex-1 flex overflow-hidden min-h-0 relative">
+      <SiteSidebar locale={lang} />
+      <AlgoViz locale={lang} client:load>
+        <WelcomeChrome locale={lang} slot="welcome-chrome" />
+      </AlgoViz>
+      <CodePanelShell locale={lang} initialCollapsed={true} />
+    </div>
+  </div>
 </Layout>

@@ -1,0 +1,232 @@
+---
+import type { Locale } from "@i18n/translations"
+import { translations, getCategoryName, locales, localeNames } from "@i18n/translations"
+import { getHomeUrl, getLocaleUrl } from "@lib/locale-url"
+import type { AlgorithmSummary } from "@lib/types"
+import HeaderControls from "@components/HeaderControls.astro"
+
+interface Props {
+  locale: Locale
+  algorithm?: AlgorithmSummary | null
+}
+
+const { locale, algorithm = null } = Astro.props
+const t = translations[locale]
+const homeUrl = getHomeUrl(locale)
+const hasAlgorithm = algorithm != null
+---
+
+<header class="site-header h-12 shrink-0 flex items-center justify-between px-3 md:px-5 z-10" role="banner">
+  <!-- Left: sidebar toggles + logo + breadcrumb (all static) -->
+  <div class="flex items-center gap-2 md:gap-2.5 min-w-0 shrink-0">
+    <!-- Mobile: open algorithm drawer -->
+    <button
+      type="button"
+      data-sidebar-open
+      class="header-icon-btn shrink-0 md:hidden"
+      aria-label={t.openMenu}
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+      </svg>
+    </button>
+    <!-- Desktop: re-expand collapsed sidebar (shown by plain JS when collapsed) -->
+    <button
+      type="button"
+      data-sidebar-expand
+      class="header-icon-btn max-md:hidden"
+      aria-label={t.expandSidebar}
+      hidden
+    >
+      <svg height="16" stroke-linejoin="round" viewBox="0 0 16 16" width="16" aria-hidden="true">
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M6.245 2.5H14.5V12.5C14.5 13.0523 14.0523 13.5 13.5 13.5H6.245V2.5ZM4.995 2.5H1.5V12.5C1.5 13.0523 1.94772 13.5 2.5 13.5H4.995V2.5ZM0 1H1.5H14.5H16V2.5V12.5C16 13.8807 14.8807 15 13.5 15H2.5C1.11929 15 0 13.8807 0 12.5V2.5V1Z"
+          fill="currentColor"></path>
+      </svg>
+    </button>
+
+    <a
+      href={homeUrl}
+      class="flex items-center gap-2 hover:opacity-70 transition-opacity duration-150 min-w-0"
+      aria-label="alg0.dev - Algorithm Visualizer — Home"
+    >
+      <div class="header-logo w-6 h-6 rounded-md flex items-center justify-center shrink-0">
+        <svg
+          class="w-4 h-4"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <g stroke="currentColor" stroke-linejoin="round" stroke-width="1.5">
+            <path
+              stroke-linecap="round"
+              d="M10.5 2v2m3-2v2M8 6.5H6m2 3H6m12-3h-2m2 3h-2M13.333 4h-2.666C9.41 4 8.78 4 8.39 4.39C8 4.782 8 5.41 8 6.668v2.666c0 1.257 0 1.886.39 2.277c.391.39 1.02.39 2.277.39h2.666c1.257 0 1.886 0 2.277-.39c.39-.391.39-1.02.39-2.277V6.667c0-1.257 0-1.886-.39-2.276C15.219 4 14.59 4 13.333 4"
+            ></path>
+            <path
+              d="M3.617 21.924c.184.076.417.076.883.076s.699 0 .883-.076a1 1 0 0 0 .54-.541C6 21.199 6 20.966 6 20.5s0-.699-.076-.883a1 1 0 0 0-.541-.54C5.199 19 4.966 19 4.5 19s-.699 0-.883.076a1 1 0 0 0-.54.541C3 19.801 3 20.034 3 20.5s0 .699.076.883a1 1 0 0 0 .541.54Zm7.5 0c.184.076.417.076.883.076s.699 0 .883-.076a1 1 0 0 0 .54-.541c.077-.184.077-.417.077-.883s0-.699-.076-.883a1 1 0 0 0-.541-.54C12.699 19 12.466 19 12 19s-.699 0-.883.076a1 1 0 0 0-.54.541c-.077.184-.077.417-.077.883s0 .699.076.883a1 1 0 0 0 .541.54Z"
+            ></path>
+            <path
+              stroke-linecap="round"
+              d="M12 19v-7m-7.5 7c0-1.404 0-2.107.337-2.611a2 2 0 0 1 .552-.552C5.893 15.5 6.596 15.5 8 15.5h8c1.404 0 2.107 0 2.611.337c.218.146.406.334.552.552c.337.504.337 1.207.337 2.611"
+            ></path>
+            <path
+              d="M18.617 21.924c.184.076.417.076.883.076s.699 0 .883-.076a1 1 0 0 0 .54-.541c.077-.184.077-.417.077-.883s0-.699-.076-.883a1 1 0 0 0-.541-.54C20.199 19 19.966 19 19.5 19s-.699 0-.883.076a1 1 0 0 0-.54.541c-.077.184-.077.417-.077.883s0 .699.076.883a1 1 0 0 0 .541.54Z"
+            ></path>
+          </g>
+        </svg>
+      </div>
+      <span
+        data-header-title
+        class="header-title font-semibold text-sm tracking-tight font-heading max-md:hidden"
+        hidden={hasAlgorithm}
+      >
+        alg0.dev - Algorithm Visualizer
+      </span>
+    </a>
+
+    <nav
+      data-header-breadcrumb
+      aria-label="Breadcrumb"
+      class="flex items-center gap-1.5 min-w-0 overflow-hidden"
+      hidden={!hasAlgorithm}
+    >
+      <span class="header-crumb-sep shrink-0" aria-hidden="true">/</span>
+      <span
+        data-header-crumb-category
+        class="header-crumb-muted text-xs hidden md:inline shrink-0"
+      >
+        {algorithm ? getCategoryName(locale, algorithm.category) : ""}
+      </span>
+      <span class="header-crumb-sep hidden md:inline shrink-0" aria-hidden="true">/</span>
+      <span
+        data-header-crumb-name
+        class="header-crumb-current text-xs font-medium truncate"
+        aria-current="page"
+      >
+        {algorithm?.name ?? ""}
+      </span>
+    </nav>
+  </div>
+
+  <!-- Center: static playback controls (desktop) -->
+  <div class="flex-1 flex justify-center min-w-0 mx-2 max-md:hidden">
+    <HeaderControls locale={locale} />
+  </div>
+
+  <!-- Right: theme + code panel toggles + language (all static) -->
+  <div class="flex items-center justify-end gap-1.5 min-w-0 shrink-0">
+    <button
+      type="button"
+      data-theme-toggle
+      class="header-icon-btn"
+      aria-label={locale === "es" ? "Cambiar tema de color" : "Toggle color theme"}
+    >
+      <svg
+        class="theme-icon-dark w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.7 6.7 0 0 0 9.8 9.8Z"></path>
+      </svg>
+      <svg
+        class="theme-icon-light w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="3.5"></circle>
+        <path
+          stroke-linecap="round"
+          d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"
+        ></path>
+      </svg>
+    </button>
+
+    <!-- Mobile: open code drawer (shown when algorithm selected) -->
+    <button
+      type="button"
+      data-code-panel-open
+      class="header-icon-btn md:hidden"
+      aria-label={t.viewCode}
+      hidden={!hasAlgorithm}
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+        ></path>
+      </svg>
+    </button>
+
+    <!-- Desktop: re-expand collapsed code panel -->
+    <button
+      type="button"
+      data-code-panel-expand
+      class="header-icon-btn max-md:hidden"
+      aria-label={t.expandCodePanel}
+      hidden
+    >
+      <svg height="16" stroke-linejoin="round" viewBox="0 0 16 16" width="16" aria-hidden="true">
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M9.755 2.5H1.5V12.5C1.5 13.0523 1.94772 13.5 2.5 13.5H9.755V2.5ZM11.005 2.5H14.5V12.5C14.5 13.0523 14.0523 13.5 13.5 13.5H11.005V2.5ZM16 1H14.5H1.5H0V2.5V12.5C0 13.8807 1.11929 15 2.5 15H13.5C14.8807 15 16 13.8807 16 12.5V2.5V1Z"
+          fill="currentColor"></path>
+      </svg>
+    </button>
+
+    <nav aria-label={t.languageLabel} class="header-lang flex items-center">
+      {
+        locales.map((l, i) => (
+          <>
+            {i > 0 && (
+              <span class="header-lang-sep text-[10px] px-0.5" aria-hidden="true">
+                /
+              </span>
+            )}
+            <a
+              data-lang-link
+              data-lang={l}
+              href={getLocaleUrl(l, algorithm?.id)}
+              class:list={["header-lang-link", { "is-active": l === locale }]}
+              aria-label={localeNames[l]}
+              aria-current={l === locale ? "page" : undefined}
+              lang={l}
+            >
+              {l.toUpperCase()}
+            </a>
+          </>
+        ))
+      }
+    </nav>
+  </div>
+</header>

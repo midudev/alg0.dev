@@ -1,9 +1,19 @@
 ---
 import Layout from "@layouts/Layout.astro"
+import SiteHeader from "@components/SiteHeader.astro"
+import AlgorithmDescription from "@components/AlgorithmDescription.astro"
+import SiteSidebar from "@components/SiteSidebar.astro"
+import CodePanelShell from "@components/CodePanelShell.astro"
+import WelcomeChrome from "@components/WelcomeChrome.astro"
 import AlgoViz from "@components/AlgoViz"
 import { algorithmCatalog, getCatalogEntry } from "@lib/algorithms/catalog"
 import { loadAlgorithm } from "@lib/algorithms/loaders"
-import { getAlgorithmMetaTitle, getAlgorithmMetaDescription, type Locale, locales, defaultLocale } from "@i18n/translations"
+import { type Locale, locales, defaultLocale } from "@i18n/translations"
+import {
+  getAlgorithmMetaTitle,
+  getAlgorithmMetaDescription,
+  loadAlgorithmDescription,
+} from "@lib/algorithm-content"
 import { getAlgorithmStructuredData } from "@lib/seo"
 import type { GetStaticPaths } from "astro"
 
@@ -17,15 +27,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
     )
 }
 
-const { algorithm, lang } = Astro.params as { algorithm: string, lang: Locale }
+const { algorithm, lang } = Astro.params as { algorithm: string; lang: Locale }
 const algo = getCatalogEntry(algorithm)!
 
-// Precompute steps + JS source on the server so the preview paints instantly
 const full = await loadAlgorithm(algo.id)
 const initialSteps = full.generateSteps(lang)
+const algorithmDescription = await loadAlgorithmDescription(lang, algo.id)
 
-const title = getAlgorithmMetaTitle(lang, algo.id, algo.name)
-const description = getAlgorithmMetaDescription(lang, algo.id)
+const title = getAlgorithmMetaTitle(lang, algo.name, algorithmDescription)
+const description = getAlgorithmMetaDescription(lang, algorithmDescription)
 const canonicalURL = new URL(`/${lang}/${algo.id}/`, Astro.site).href
 ---
 
@@ -34,13 +44,29 @@ const canonicalURL = new URL(`/${lang}/${algo.id}/`, Astro.site).href
   title={title}
   description={description}
   canonicalURL={canonicalURL}
-  structuredData={getAlgorithmStructuredData(lang, algo, canonicalURL)}
+  structuredData={getAlgorithmStructuredData(lang, algo, canonicalURL, algorithmDescription)}
 >
-  <AlgoViz
-    locale={lang}
-    initialAlgorithm={algo}
-    initialCode={full.code}
-    initialSteps={initialSteps}
-    client:load
-  />
+  <div class="h-screen flex flex-col overflow-hidden">
+    <SiteHeader locale={lang} algorithm={algo} />
+    <div class="flex-1 flex overflow-hidden min-h-0 relative">
+      <SiteSidebar locale={lang} selectedId={algo.id} />
+      <AlgoViz
+        locale={lang}
+        initialAlgorithm={algo}
+        initialCode={full.code}
+        initialSteps={initialSteps}
+        client:load
+      >
+        <AlgorithmDescription
+          description={algorithmDescription}
+          difficulty={algo.difficulty}
+          locale={lang}
+          pageTitle={title}
+          metaDescription={description}
+        />
+        <WelcomeChrome locale={lang} slot="welcome-chrome" />
+      </AlgoViz>
+      <CodePanelShell locale={lang} initialCollapsed={false} />
+    </div>
+  </div>
 </Layout>

@@ -300,6 +300,30 @@ input[type='search']::-webkit-search-decoration {
     transform 150ms ease;
 }
 
+/* Respect native [hidden] — always wins over display:inline-flex above */
+.header-icon-btn[hidden] {
+  display: none !important;
+}
+
+/*
+ * Sidebar open (hamburger): mobile drawer only.
+ * Default hidden so desktop never shows a no-op menu button
+ * (header-icon-btn's display:inline-flex would otherwise beat Tailwind md:hidden).
+ */
+.site-header [data-sidebar-open] {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .site-header [data-sidebar-open] {
+    display: inline-flex;
+  }
+
+  .site-header [data-sidebar-expand] {
+    display: none !important;
+  }
+}
+
 .header-icon-btn:hover {
   color: var(--foreground);
   background: var(--header-hover);
@@ -476,4 +500,151 @@ input[type='search']::-webkit-search-decoration {
   --controls-ring: #0284c7;
   --controls-ring-track: rgb(2 132 199 / 0.28);
   --controls-ring-glow: rgb(2 132 199 / 0.35);
+}
+
+/* ── Static sidebar (SiteSidebar.astro — outside React) ── */
+.site-sidebar-shell {
+  /* Desktop default: in-flow column */
+}
+
+.site-sidebar-panel {
+  transition:
+    width 300ms ease-in-out,
+    opacity 300ms ease-in-out;
+}
+
+.site-sidebar-shell[data-collapsed] .site-sidebar-panel {
+  opacity: 0;
+}
+
+/* Mobile: fixed drawer */
+@media (max-width: 767px) {
+  .site-sidebar-shell {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 280px;
+    max-width: 90vw;
+    transform: translateX(-100%);
+    transition: transform 300ms ease-in-out;
+  }
+
+  .site-sidebar-panel {
+    width: 100% !important;
+    height: 100%;
+    border-right: 1px solid rgb(255 255 255 / 0.08);
+    opacity: 1 !important;
+  }
+
+  html[data-sidebar-mobile-open] .site-sidebar-shell {
+    transform: translateX(0);
+  }
+
+  .site-sidebar-backdrop {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease-in-out;
+  }
+
+  html[data-sidebar-mobile-open] .site-sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 768px) {
+  .site-sidebar-backdrop {
+    display: none;
+  }
+}
+
+/* details/summary reset + chevron */
+.site-sidebar-summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-sidebar-chevron {
+  transform: rotate(0deg);
+}
+
+details[data-sidebar-category][open] > .site-sidebar-summary .site-sidebar-chevron {
+  transform: rotate(90deg);
+}
+
+/* Selection: color + dot via CSS only (JS only sets aria-current) */
+.site-sidebar-algo[aria-current='page'] {
+  color: var(--sidebar-selected);
+  font-weight: 500;
+}
+
+.site-sidebar-algo[aria-current='page']:hover {
+  color: var(--sidebar-selected);
+  background: transparent;
+}
+
+.site-sidebar-algo [data-sidebar-selected-dot] {
+  visibility: hidden;
+}
+
+.site-sidebar-algo[aria-current='page'] [data-sidebar-selected-dot] {
+  visibility: visible;
+}
+
+[data-sidebar-resize-hit][data-dragging] {
+  /* ── Static code panel shell (CodePanelShell.astro) ── */
+  .site-code-panel-panel {
+    transition:
+      width 300ms ease-in-out,
+      opacity 300ms ease-in-out;
+  }
+
+  .site-code-panel-shell[data-collapsed] .site-code-panel-panel {
+    opacity: 0;
+  }
+
+  @media (max-width: 767px) {
+    .site-code-panel-shell {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: min(360px, 90vw);
+      transform: translateX(100%);
+      transition: transform 300ms ease-in-out;
+    }
+
+    .site-code-panel-panel {
+      width: 100% !important;
+      height: 100%;
+      border-left: 1px solid rgb(255 255 255 / 0.08);
+      opacity: 1 !important;
+    }
+
+    html[data-code-panel-mobile-open] .site-code-panel-shell {
+      transform: translateX(0);
+    }
+
+    .site-code-panel-backdrop {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 300ms ease-in-out;
+    }
+
+    html[data-code-panel-mobile-open] .site-code-panel-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .site-code-panel-backdrop {
+      display: none;
+    }
+  }
+
+  [data-code-panel-resize-hit][data-dragging] {
+    background: rgb(59 130 246 / 0.5);
+  }
+  background: rgb(59 130 246 / 0.5);
 }
