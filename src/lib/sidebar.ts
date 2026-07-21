@@ -9,6 +9,7 @@ export type SelectAlgorithmDetail = { id: string }
 
 const SIDEBAR_MAX = 260
 const COLLAPSE_THRESHOLD = 100
+const COLLAPSE_FADE_START = 200
 /** Below this: mobile drawer (hamburger). */
 const MOBILE_MQ = '(max-width: 767px)'
 /**
@@ -33,11 +34,31 @@ function isCompactDesktop(): boolean {
   return !isMobile() && window.matchMedia(COMPACT_MQ).matches
 }
 
-function syncExpandButton(collapsed: boolean): void {
-  const expandBtn = $<HTMLElement>('[data-sidebar-expand]')
-  if (!expandBtn) return
-  // Expand icon only on desktop when the in-flow panel is collapsed
-  expandBtn.hidden = isMobile() || !collapsed
+function syncSidebarToggle(collapsed: boolean): void {
+  const btn = $<HTMLButtonElement>('[data-sidebar-toggle]')
+  if (!btn) return
+  // Mobile: always show (opens drawer). Desktop: only when sidebar is collapsed.
+  const mobile = isMobile()
+  btn.hidden = !mobile && !collapsed
+  const label = mobile
+    ? (btn.dataset.labelMenu ?? btn.getAttribute('aria-label') ?? '')
+    : (btn.dataset.labelExpand ?? btn.getAttribute('aria-label') ?? '')
+  if (label) btn.setAttribute('aria-label', label)
+}
+
+function syncCollapsePreview(width: number): void {
+  const sh = shell()
+  if (!sh) return
+  const opacity = Math.max(0, Math.min(1, width / COLLAPSE_FADE_START))
+  sh.style.setProperty('--sidebar-content-opacity', opacity.toFixed(3))
+  sh.toggleAttribute('data-will-collapse', width < COLLAPSE_THRESHOLD)
+}
+
+function clearCollapsePreview(): void {
+  const sh = shell()
+  if (!sh) return
+  sh.style.removeProperty('--sidebar-content-opacity')
+  sh.removeAttribute('data-will-collapse')
 }
 
 function setPanelWidth(width: number, { animate = true }: { animate?: boolean } = {}): void {
@@ -57,7 +78,7 @@ function setPanelWidth(width: number, { animate = true }: { animate?: boolean } 
   if (collapsed) el.setAttribute('inert', '')
   else el.removeAttribute('inert')
 
-  syncExpandButton(collapsed)
+  syncSidebarToggle(collapsed)
 
   const resize = $('[data-sidebar-resize]')
   if (resize) {
@@ -72,10 +93,12 @@ function setPanelWidth(width: number, { animate = true }: { animate?: boolean } 
 }
 
 export function expandSidebar(): void {
+  clearCollapsePreview()
   setPanelWidth(SIDEBAR_MAX)
 }
 
 export function collapseSidebar(): void {
+  clearCollapsePreview()
   setPanelWidth(0)
 }
 
@@ -106,6 +129,7 @@ export function closeMobileSidebar(): void {
  * - wide desktop: sidebar open
  */
 function applyViewportLayout({ animate = true }: { animate?: boolean } = {}): void {
+  clearCollapsePreview()
   if (isMobile()) {
     closeMobileSidebar()
     const el = panel()
@@ -116,7 +140,7 @@ function applyViewportLayout({ animate = true }: { animate?: boolean } = {}): vo
       el.setAttribute('aria-hidden', 'true')
     }
     shell()?.removeAttribute('data-collapsed')
-    syncExpandButton(false) // hide expand; hamburger is for mobile
+    syncSidebarToggle(false) // mobile: toggle always visible (opens drawer)
     const resize = $('[data-sidebar-resize]')
     if (resize) resize.classList.add('hidden')
     return
@@ -180,6 +204,7 @@ function initResize(): void {
     if (!dragging) return
     const delta = e.clientX - startX
     const next = Math.max(0, Math.min(SIDEBAR_MAX, startWidth + delta))
+    syncCollapsePreview(next)
     setPanelWidth(next, { animate: false })
   }
 
@@ -191,8 +216,13 @@ function initResize(): void {
     document.body.style.userSelect = ''
     const el = panel()
     const width = el ? parseFloat(el.style.width) || 0 : 0
-    if (width < COLLAPSE_THRESHOLD) collapseSidebar()
-    else expandSidebar()
+    if (width < COLLAPSE_THRESHOLD) {
+      syncCollapsePreview(0)
+      setPanelWidth(0)
+    } else {
+      clearCollapsePreview()
+      expandSidebar()
+    }
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseup', onUp)
   }
@@ -204,6 +234,7 @@ function initResize(): void {
     startX = e.clientX
     startWidth = el ? parseFloat(el.style.width) || SIDEBAR_MAX : SIDEBAR_MAX
     dragging = true
+    syncCollapsePreview(startWidth)
     hit?.setAttribute('data-dragging', '')
     document.body.style.cursor = 'col-resize'
     document.body.style.userSelect = 'none'
@@ -228,12 +259,9 @@ export function initSidebar(): void {
     const target = event.target
     if (!(target instanceof Element)) return
 
-    if (target.closest('[data-sidebar-open]')) {
+    if (target.closest('[data-sidebar-toggle]')) {
       if (isMobile()) openMobileSidebar()
-      return
-    }
-    if (target.closest('[data-sidebar-expand]')) {
-      expandSidebar()
+      else expandSidebar()
       return
     }
     if (target.closest('[data-sidebar-close]') || target.closest('[data-sidebar-backdrop]')) {
@@ -263,11 +291,18 @@ export function initSidebar(): void {
 
     const id = link.dataset.algoId
     if (!id) return
+
+    // Only hijack the click when a SPA host (algo-page) claims the event via
+    // preventDefault(). On the home page nothing listens, so the link navigates.
+    const selectEvent = new CustomEvent<SelectAlgorithmDetail>(SELECT_ALGORITHM_EVENT, {
+      detail: { id },
+      cancelable: true,
+    })
+    const handled = !window.dispatchEvent(selectEvent)
+    if (!handled) return
+
     event.preventDefault()
     closeMobileSidebar()
-    window.dispatchEvent(
-      new CustomEvent<SelectAlgorithmDetail>(SELECT_ALGORITHM_EVENT, { detail: { id } }),
-    )
   })
 
   document.addEventListener('keydown', (event) => {

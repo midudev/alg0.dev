@@ -3,8 +3,7 @@ import Layout from "@layouts/Layout.astro"
 import SiteHeader from "@components/SiteHeader.astro"
 import SiteSidebar from "@components/SiteSidebar.astro"
 import CodePanelShell from "@components/CodePanelShell.astro"
-import WelcomeChrome from "@components/WelcomeChrome.astro"
-import AlgoViz from "@components/AlgoViz"
+import WelcomeHome from "@components/WelcomeHome.astro"
 import { locales, defaultLocale } from "@i18n/translations"
 import type { GetStaticPaths } from "astro"
 import type { Locale } from "@i18n/translations"
@@ -29,9 +28,13 @@ const canonicalURL = new URL(`/${lang}/`, Astro.site).href
     <SiteHeader locale={lang} />
     <div class="flex-1 flex overflow-hidden min-h-0 relative">
       <SiteSidebar locale={lang} />
-      <AlgoViz locale={lang} client:load>
-        <WelcomeChrome locale={lang} slot="welcome-chrome" />
-      </AlgoViz>
+      <main
+        id="main-content"
+        class="flex-1 flex flex-col overflow-hidden min-w-0"
+        aria-label="Algorithm visualization"
+      >
+        <WelcomeHome locale={lang} />
+      </main>
       <CodePanelShell locale={lang} initialCollapsed={true} />
     </div>
   </div>

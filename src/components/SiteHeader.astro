@@ -17,36 +17,15 @@ const hasAlgorithm = algorithm != null
 ---
 
 <header class="site-header h-12 shrink-0 flex items-center justify-between px-3 md:px-5 z-10" role="banner">
-  <!-- Left: sidebar toggles + logo + breadcrumb (all static) -->
+  <!-- Left: sidebar toggle (mobile drawer + desktop expand) + logo + breadcrumb -->
   <div class="flex items-center gap-2 md:gap-2.5 min-w-0 shrink-0">
-    <!-- Mobile: open algorithm drawer -->
     <button
       type="button"
-      data-sidebar-open
-      class="header-icon-btn shrink-0 md:hidden"
+      data-sidebar-toggle
+      class="header-icon-btn shrink-0"
       aria-label={t.openMenu}
-    >
-      <svg
-        class="w-4 h-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-        aria-hidden="true"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
-      </svg>
-    </button>
-    <!-- Desktop: re-expand collapsed sidebar (shown by plain JS when collapsed) -->
-    <button
-      type="button"
-      data-sidebar-expand
-      class="header-icon-btn max-md:hidden"
-      aria-label={t.expandSidebar}
-      hidden
+      data-label-menu={t.openMenu}
+      data-label-expand={t.expandSidebar}
     >
       <svg height="16" stroke-linejoin="round" viewBox="0 0 16 16" width="16" aria-hidden="true">
         <path
@@ -163,37 +142,15 @@ const hasAlgorithm = algorithm != null
       </svg>
     </button>
 
-    <!-- Mobile: open code drawer (shown when algorithm selected) -->
+    <!-- Code panel toggle (mobile drawer + desktop expand when collapsed) -->
     <button
       type="button"
-      data-code-panel-open
-      class="header-icon-btn md:hidden"
+      data-code-panel-toggle
+      class="header-icon-btn"
       aria-label={t.viewCode}
+      data-label-open={t.viewCode}
+      data-label-expand={t.expandCodePanel}
       hidden={!hasAlgorithm}
-    >
-      <svg
-        class="w-4 h-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-        aria-hidden="true"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
-        ></path>
-      </svg>
-    </button>
-
-    <!-- Desktop: re-expand collapsed code panel -->
-    <button
-      type="button"
-      data-code-panel-expand
-      class="header-icon-btn max-md:hidden"
-      aria-label={t.expandCodePanel}
-      hidden
     >
       <svg height="16" stroke-linejoin="round" viewBox="0 0 16 16" width="16" aria-hidden="true">
         <path

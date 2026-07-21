@@ -1,0 +1,15 @@
+---
+import { algorithmCatalog } from "@lib/algorithms/catalog"
+import { renderAlgorithmCodeHtml } from "@lib/algorithm-code"
+import type { GetStaticPaths } from "astro"
+
+export const getStaticPaths: GetStaticPaths = () =>
+  algorithmCatalog.map((algorithm) => ({
+    params: { algorithm: algorithm.id },
+  }))
+
+const { algorithm } = Astro.params as { algorithm: string }
+const html = await renderAlgorithmCodeHtml(algorithm)
+---
+
+<Fragment set:html={html} />

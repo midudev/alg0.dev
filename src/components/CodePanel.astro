@@ -1,0 +1,181 @@
+---
+import { codeLanguages } from "@lib/code-languages"
+import { renderAlgorithmCodeHtml } from "@lib/algorithm-code"
+import type { Locale } from "@i18n/translations"
+import { translations } from "@i18n/translations"
+import type { Step } from "@lib/types"
+
+interface Props {
+  locale: Locale
+  initialAlgorithmId?: string
+  initialStep?: Step
+}
+
+const { locale, initialAlgorithmId, initialStep } = Astro.props
+const t = translations[locale]
+const initialVariables = Object.entries(initialStep?.variables ?? {})
+const initialConsole = initialStep?.consoleOutput ?? []
+const algorithmCodeHtml = initialAlgorithmId
+  ? await renderAlgorithmCodeHtml(initialAlgorithmId, {
+      activeJsLine: initialStep?.codeLine,
+      variables: initialStep?.variables,
+    })
+  : ""
+---
+
+<div
+  data-code-panel-content
+  data-locale={locale}
+  data-initial-algorithm-id={initialAlgorithmId}
+  class="flex flex-col h-full"
+>
+  <div
+    class="flex border-b border-white/8 shrink-0"
+    role="tablist"
+    aria-label={locale === "es" ? "Pestañas de código y detalles" : "Code and details tabs"}
+  >
+    {
+      (["code", "about"] as const).map((tab) => (
+        <button
+          type="button"
+          data-code-panel-tab={tab}
+          role="tab"
+          aria-selected={tab === "code" ? "true" : "false"}
+          aria-controls={`tabpanel-${tab}`}
+          id={`tab-${tab}`}
+          tabindex={tab === "code" ? 0 : -1}
+          class:list={[
+            "code-panel-tab px-3 py-2.5 md:px-5 md:py-3 text-xs font-medium relative capitalize",
+            { "is-active": tab === "code" },
+          ]}
+        >
+          <span class="flex items-center gap-2">
+            {tab === "code" ? t.tabCode : t.tabAbout}
+            <kbd
+              class="code-panel-tab__key inline-flex items-center justify-center w-[18px] h-[18px] text-[10px] font-mono rounded border"
+              aria-hidden="true"
+            >
+              {tab === "code" ? "C" : "E"}
+            </kbd>
+          </span>
+          <span class="code-panel-tab__indicator absolute bottom-0 left-2 right-2 h-px" aria-hidden="true" />
+        </button>
+      ))
+    }
+  </div>
+
+  <div
+    data-code-panel-tabpanel="code"
+    class="flex flex-1 flex-col overflow-hidden"
+    role="tabpanel"
+    id="tabpanel-code"
+    aria-labelledby="tab-code"
+  >
+    <div
+      class="flex items-center gap-1 shrink-0 px-2 md:px-3 py-1.5 border-b border-white/[0.06]"
+      role="group"
+      aria-label={t.codeLanguage}
+    >
+      {
+        // No language is active on SSR. The client resolves localStorage first,
+        // then selects the stored language (or JavaScript if unset).
+        codeLanguages.map((language) => (
+          <button
+            type="button"
+            data-code-language={language.id}
+            aria-pressed="false"
+            class="code-language-button inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium rounded-md whitespace-nowrap"
+          >
+            <svg
+              class="w-3.5 h-3.5 shrink-0"
+              viewBox={language.iconViewBox ?? "0 0 24 24"}
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d={language.iconPath} />
+            </svg>
+            {language.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="relative flex-1 overflow-hidden min-h-0">
+      <div
+        data-code-loading
+        class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+        aria-hidden="true"
+      >
+        <div class="flex items-center gap-2 text-[11px] text-neutral-600 font-mono">
+          <span class="inline-block size-1.5 rounded-full bg-neutral-600 animate-pulse"></span>
+          {locale === "es" ? "Cargando código…" : "Loading code…"}
+        </div>
+      </div>
+
+      <div data-code-variants class="h-full" set:html={algorithmCodeHtml}></div>
+    </div>
+
+    <div
+      data-code-console
+      class:list={[
+        "shrink-0 border-t border-white/[0.08] max-h-[140px] flex-col",
+        { hidden: initialConsole.length === 0, flex: initialConsole.length > 0 },
+      ]}
+      role="region"
+      aria-label={locale === "es" ? "Salida de consola" : "Console output"}
+    >
+      <div class="px-4 py-2 flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"></path>
+          </svg>
+          <span class="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">Console</span>
+          <span data-code-console-count class="text-[10px] text-neutral-600 tabular-nums">({initialConsole.length})</span>
+        </div>
+      </div>
+      <div data-code-console-lines class="px-4 pb-3 overflow-auto flex-1 min-h-0" aria-live="polite">
+        {initialConsole.map((line, index) => (
+          <div class:list={["flex gap-2 text-[11px] font-mono leading-[18px]", index === initialConsole.length - 1 ? "text-emerald-300/90" : "text-neutral-500"]}>
+            <span class="text-neutral-600 select-none shrink-0" aria-hidden="true">›</span>
+            <span class="break-all">{line}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div
+      data-code-variables
+      class:list={["shrink-0 border-t border-white/8", { hidden: initialVariables.length === 0 }]}
+      role="region"
+      aria-label={t.variables}
+    >
+      <div class="px-4 py-2 flex items-center gap-2">
+        <div class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.745 3A23.933 23.933 0 003 12c0 3.183.62 6.22 1.745 9M19.5 3c.967 2.78 1.5 5.817 1.5 9s-.533 6.22-1.5 9M8.25 8.885l1.444-.89a.75.75 0 011.105.402l2.402 7.206a.75.75 0 001.104.401l1.445-.889"></path>
+          </svg>
+          <span class="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">{t.variables}</span>
+        </div>
+      </div>
+      <div data-code-variable-list class="px-4 pb-3 flex flex-wrap gap-x-3 gap-y-1.5" aria-live="polite">
+        {initialVariables.map(([name, value]) => (
+          <div class="inline-flex items-center gap-1.5 text-[12px] font-mono">
+            <span class="text-neutral-300">{name}</span><span class="text-neutral-600" aria-hidden="true">=</span><span class="sr-only">=</span>
+            <span class:list={["font-medium", typeof value === "number" ? "text-amber-300/90" : typeof value === "boolean" ? value ? "text-emerald-400/90" : "text-red-400/90" : value === null ? "text-neutral-600" : "text-sky-300/90"]}>{String(value)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div
+    data-code-panel-tabpanel="about"
+    class="hidden flex-1 flex-col overflow-auto p-4 md:p-6 min-h-0"
+    role="tabpanel"
+    id="tabpanel-about"
+    aria-labelledby="tab-about"
+    aria-hidden="true"
+  >
+    <div data-code-panel-about class="min-h-0"><slot /></div>
+  </div>
+</div>

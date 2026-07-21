@@ -1,11 +1,9 @@
-import type { Algorithm, CodeImplementation, CodeLanguage } from '@lib/types'
+import type { CodeImplementation, CodeLanguage } from '@lib/types'
 
 export interface CodeLanguageMeta {
   id: CodeLanguage
   /** Label shown in the language switcher */
   label: string
-  /** Monaco language id used for syntax highlighting */
-  monacoId: string
   /** Single-colour logo path, drawn with currentColor */
   iconPath: string
   /** viewBox the `iconPath` was authored in. Defaults to 24×24. */
@@ -33,66 +31,26 @@ const CPP_ICON =
   'M22.394 6c-.167-.29-.398-.543-.652-.69L12.926.22c-.509-.294-1.34-.294-1.848 0L2.26 5.31c-.508.293-.923 1.013-.923 1.6v10.18c0 .294.104.62.271.91.167.29.398.543.652.69l8.816 5.09c.508.293 1.34.293 1.848 0l8.816-5.09c.254-.147.485-.4.652-.69.167-.29.27-.616.27-.91V6.91c.003-.294-.1-.62-.268-.91zM12 19.11c-3.92 0-7.109-3.19-7.109-7.11 0-3.92 3.19-7.11 7.11-7.11a7.133 7.133 0 016.156 3.553l-3.076 1.78a3.567 3.567 0 00-3.08-1.78A3.56 3.56 0 008.444 12 3.56 3.56 0 0012 15.555a3.57 3.57 0 003.08-1.778l3.078 1.78A7.135 7.135 0 0112 19.11zm7.11-6.715h-.79v.79h-.79v-.79h-.79v-.79h.79v-.79h.79v.79h.79zm2.962 0h-.79v.79h-.79v-.79h-.79v-.79h.79v-.79h.79v.79h.79z'
 
 export const codeLanguages: CodeLanguageMeta[] = [
-  { id: 'javascript', label: 'JavaScript', monacoId: 'javascript', iconPath: JAVASCRIPT_ICON },
-  { id: 'python', label: 'Python', monacoId: 'python', iconPath: PYTHON_ICON },
+  { id: 'javascript', label: 'JavaScript', iconPath: JAVASCRIPT_ICON },
+  { id: 'python', label: 'Python', iconPath: PYTHON_ICON },
   {
     id: 'java',
     label: 'Java',
-    monacoId: 'java',
     iconPath: JAVA_ICON,
     iconViewBox: JAVA_VIEWBOX,
   },
-  { id: 'cpp', label: 'C++', monacoId: 'cpp', iconPath: CPP_ICON },
-  { id: 'rust', label: 'Rust', monacoId: 'rust', iconPath: RUST_ICON },
+  { id: 'cpp', label: 'C++', iconPath: CPP_ICON },
+  { id: 'rust', label: 'Rust', iconPath: RUST_ICON },
 ]
+
+export const codeLanguageIds: CodeLanguage[] = ['javascript', 'python', 'java', 'cpp', 'rust']
 
 export const defaultCodeLanguage: CodeLanguage = 'javascript'
 
 export const CODE_LANGUAGE_STORAGE_KEY = 'algoviz:code-language'
 
 export function isCodeLanguage(value: unknown): value is CodeLanguage {
-  return codeLanguages.some((lang) => lang.id === value)
-}
-
-export function getCodeLanguageMeta(language: CodeLanguage): CodeLanguageMeta {
-  return codeLanguages.find((lang) => lang.id === language) ?? codeLanguages[0]
-}
-
-/**
- * Languages offered in the switcher.
- * Every algorithm currently has JS + Python + Java + C++ translations, so we
- * always expose the full set. Language packs still load on demand.
- */
-export function getAvailableLanguages(_algorithm?: Algorithm): CodeLanguage[] {
-  return codeLanguages.map((lang) => lang.id)
-}
-
-export function getCode(
-  algorithm: Algorithm,
-  language: CodeLanguage,
-  implementation?: CodeImplementation | null,
-): string {
-  if (language === 'javascript') return algorithm.code
-  // Never fall back to JS while another language is selected — avoids a flash of the wrong source
-  return implementation?.code ?? algorithm.implementations?.[language]?.code ?? ''
-}
-
-/**
- * Translates the JavaScript line a step points at into the equivalent line of
- * the selected language. Returns undefined when that line has no counterpart,
- * so we highlight nothing rather than the wrong line.
- */
-export function getCodeLine(
-  algorithm: Algorithm,
-  language: CodeLanguage,
-  jsLine: number | undefined,
-  implementation?: CodeImplementation | null,
-): number | undefined {
-  if (jsLine == null) return undefined
-  if (language === 'javascript') return jsLine
-  const impl = implementation ?? algorithm.implementations?.[language]
-  if (!impl) return undefined
-  return impl.lineMap[jsLine]
+  return codeLanguageIds.some((language) => language === value)
 }
 
 /** Supports Python (`#@`) and C-family (`//@`) line markers. */

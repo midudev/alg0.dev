@@ -16,19 +16,13 @@
     "*": "prettier --ignore-unknown --write"
   },
   "dependencies": {
-    "@astrojs/react": "6.0.1",
     "@astrojs/sitemap": "3.7.3",
-    "@monaco-editor/react": "4.7.0",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.1.1",
-    "react": "19.2.7",
-    "react-dom": "19.2.7",
     "tailwindcss": "4.3.3"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "5.10.0",
-    "@types/react": "19.2.17",
-    "@types/react-dom": "19.2.3",
     "eslint": "10.7.0",
     "eslint-plugin-n": "18.2.2",
     "eslint-plugin-promise": "7.3.0",
@@ -36,6 +30,7 @@
     "husky": "9.1.7",
     "lint-staged": "17.1.0",
     "prettier": "3.9.5",
+    "shiki": "4.3.1",
     "subset-font": "^2.5.0"
   }
 }

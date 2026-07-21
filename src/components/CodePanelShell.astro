@@ -1,18 +1,27 @@
 ---
 /**
  * Static code-panel shell (desktop resize + mobile drawer).
- * Monaco / CodePanel React content portals into `[data-code-panel-mount]`.
+ * Its contents are rendered by Astro and updated by the global plain-JS controller.
  */
+import CodePanel from "@components/CodePanel.astro"
 import type { Locale } from "@i18n/translations"
 import { translations } from "@i18n/translations"
+import type { Step } from "@lib/types"
 
 interface Props {
   locale: Locale
   /** Start collapsed (home) vs open (algorithm pages). */
   initialCollapsed?: boolean
+  initialAlgorithmId?: string
+  initialStep?: Step
 }
 
-const { locale, initialCollapsed = true } = Astro.props
+const {
+  locale,
+  initialCollapsed = true,
+  initialAlgorithmId,
+  initialStep,
+} = Astro.props
 const t = translations[locale]
 const panelWidth = "420px"
 ---
@@ -83,8 +92,14 @@ const panelWidth = "420px"
       </button>
     </div>
 
-    <div class="h-full flex flex-col min-h-0 relative" style={`width: ${panelWidth}`}>
-      <div data-code-panel-mount class="h-full flex flex-col min-h-0"></div>
+    <div class="w-full h-full flex flex-col min-h-0 relative">
+      <CodePanel
+        locale={locale}
+        initialAlgorithmId={initialAlgorithmId}
+        initialStep={initialStep}
+      >
+        <slot />
+      </CodePanel>
       <div
         data-code-panel-empty
         class="absolute inset-0 flex items-center justify-center text-neutral-600 text-sm pointer-events-none"

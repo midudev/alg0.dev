@@ -1,7 +1,6 @@
 # Agent notes — alg0.dev
 
-Astro site with a single React island (`AlgoViz`) for the interactive visualizer.
-Prefer **Astro + plain JS** for static chrome; keep React for playback, visualizers, Monaco, and orchestration.
+Astro + plain JS only. **No React.** Prefer SSR Astro chrome and thin client modules in `src/lib/` / `src/scripts/client.ts`.
 
 ## DOM helpers: `$` and `$$`
 
@@ -10,10 +9,7 @@ Defined in `src/lib/dom.ts` (import `@lib/dom`). **Always prefer these** over ra
 ```ts
 import { $, $$ } from '@lib/dom'
 
-// One element (or null)
 const btn = $<HTMLButtonElement>('[data-theme-toggle]')
-
-// All matches as Element[]
 const tabs = $$<HTMLButtonElement>('[role="tab"]', panel)
 ```
 
@@ -22,79 +18,63 @@ const tabs = $$<HTMLButtonElement>('[role="tab"]', panel)
 | `$(selector, root?)`  | `root.querySelector`    | `T \| null` |
 | `$$(selector, root?)` | `root.querySelectorAll` | `T[]`       |
 
-- Optional second arg scopes the search (`ParentNode`, default `document`).
-- Pass a generic for typed elements: `$<HTMLInputElement>('#q')`.
-- Do **not** reintroduce ad-hoc `querySelector` helpers elsewhere.
-
 ## Theme
 
-- Module: `src/lib/theme.ts` (`getTheme`, `setTheme`, `toggleTheme`, `resolveInitialTheme`).
-- FOUC-safe init stays **inline** in `Layout.astro` (must run before paint; cannot import modules).
-- Interactive toggle: put `data-theme-toggle` on a button. Global listener in `src/scripts/client.ts` (event delegation) — no React `onClick` required.
-- Theme changes dispatch `window` event `themechange` with `detail: 'light' \| 'dark'`.
+- Module: `src/lib/theme.ts`. FOUC-safe init stays **inline** in `Layout.astro`.
+- Toggle: `data-theme-toggle` + listener in `src/scripts/client.ts`.
 
 ## Client bootstrap
 
-`src/scripts/client.ts` is imported once from `Layout.astro`. Add other small, site-wide plain-JS behaviors there (delegation preferred) instead of one-off scripts per page.
+`src/scripts/client.ts` is imported once from `Layout.astro`. Site-wide behaviors go there (sidebar, controls, code panel shell, keyboard, showcase, **algo-page**).
 
-## React vs Astro
+## Architecture
 
-| Use React                                | Prefer Astro / plain JS                                           |
-| ---------------------------------------- | ----------------------------------------------------------------- |
-| `AlgoViz` orchestration + playback state | `SiteHeader.astro` (logo, breadcrumb, langs, theme, **controls**) |
-| Monaco / `CodePanel` editor body         | `HeaderControls.astro` + `controls.ts`                            |
-| Graph / concept visualizers              | `SiteSidebar.astro` + `sidebar.ts`                                |
-| Mobile bottom transport bar              | `CodePanelShell.astro` + `code-panel-shell.ts`                    |
-|                                          | Array/matrix visualizers (`src/lib/visualizers/*`)                |
-|                                          | Keyboard shortcuts (`keyboard.ts`)                                |
-|                                          | Layout, SEO, static copy                                          |
+| Area           | Implementation                                                         |
+| -------------- | ---------------------------------------------------------------------- |
+| Header         | `SiteHeader.astro` + `HeaderControls.astro` + `controls.ts`            |
+| Sidebar        | `SiteSidebar.astro` + `sidebar.ts`                                     |
+| Code panel     | `CodePanelShell.astro` + `code-panel-shell.ts` + `code-panel-state.ts` |
+| Playback       | `create-playback.ts` + bus in `playback.ts`                            |
+| Algorithm page | `AlgoStage.astro` + `algo-page.ts`                                     |
+| Home           | `WelcomeHome.astro` + `showcase.ts` (no algo-page)                     |
+| Visualizers    | `array`/`matrix`/`graph` + lazy `concept/*` per type                   |
 
-### Site header
+### Algorithm page
 
-- Static chrome: `SiteHeader.astro` (breadcrumb, logo, langs, theme, **playback controls**, code expand/open).
-- No React portals into the header.
-- SPA selection updates breadcrumb/lang with `syncHeaderChrome` (`header-chrome.ts`).
-- Playback UI syncs via event bus: `publishPlaybackState` / `dispatchPlaybackCommand` (`playback.ts`).
+- Markup: `AlgoStage.astro` (viz host, step description SSR, mobile transport).
+- Bootstrap: `<script type="application/json" data-algo-bootstrap>` with `{ locale, algorithm, steps }`.
+- Runtime: `initAlgoPage` / `initAllAlgoPages` — SPA select, popstate, playback, chrome sync, step paint.
+- Sidebar SPA: dispatches cancelable `alg0:select-algorithm`; algo-page `preventDefault()`s to claim; home navigates fully.
 
-### Code panel shell
+### Playback
 
-- Outside the React island (sibling of `AlgoViz`), like the sidebar.
-- Shell + resize + mobile drawer: `CodePanelShell.astro` + `code-panel-shell.ts`.
-- Monaco content: React `CodePanel` portaled into `[data-code-panel-mount]` only.
+- Engine: `createPlayback` — steps, play/pause, speed, autoplay.
+- Bus: `publishPlaybackState` / `dispatchPlaybackCommand`.
+- Header controls + keyboard only use the bus.
 
-### Welcome (home)
+### Visualizers
 
-- Static copy + shortcuts: `WelcomeChrome.astro`, passed as `slot="welcome-chrome"` from **every** page (algorithm pages included, so the SPA back-to-home path still has copy). Astro turns named slots into props, so `AlgoViz` receives it as `welcomeChrome`.
-- The default slot is the algorithm description (`AlgorithmDescription.astro` → about tab). Keep the two slots separate: a single `children` slot leaks the description into the welcome screen.
-- Interactive demo: `AlgorithmShowcase` (React) inside `WelcomeScreen` — the only React left there.
-- `WelcomeScreen` lays out chrome via `data-welcome-chrome` / `data-welcome-shortcuts` + CSS `order` so the showcase sits between them.
-- Astro wraps island slots in `<astro-slot>` — WelcomeScreen uses `[&_astro-slot]:contents` so those nodes participate in flex `order`.
+- Array / matrix / graph: eager modules under `src/lib/visualizers/`.
+- **Concept**: split under `src/lib/visualizers/concept/` (one file per type: `big-o`, `linked-list`, …).
+  - Entry `concept/index.ts` **dynamic-imports** only `step.concept.type` (cached after first use).
+  - Shared SVG/DOM helpers: `concept/dom.ts`.
+- Stage: `bindStepVisualizer` → `renderStepVisualizer` (async for concept) on `[data-step-viz]`.
+- Home showcase: same path via `showcase.ts` (loads concept chunks only for concept demos in the cycle).
 
-### Algorithm description (about tab)
+### Code panel
 
-- `AlgorithmDescription.astro` renders the copy; `ComplexityChart.astro` renders the time-complexity curve. Both SSR, zero client JS.
-- Parsing + SVG geometry live in `src/lib/complexity.ts` — server-only, **do not import from a React component** or the parser ships to the browser.
+- Outside the stage (sibling), like the sidebar.
+- Content driven by plain JS (`publishCodePanelState`), not React.
 
-### Sidebar
-
-- **Outside the React island** (sibling of `AlgoViz` in pages), same pattern as `SiteHeader`.
-- Full shell + catalog in `SiteSidebar.astro`: search UI, category icons (inline SVG), real `<a href>`, desktop resize handle, mobile drawer chrome.
-- Category expand uses native `<details open>` (no JS). Selected color/dot via CSS vars + `aria-current` (no class rebuild in JS).
-- SSR tokens only: `src/lib/sidebar-meta.ts` — **do not import from client bundles**.
-- Thin client: `src/lib/sidebar.ts` via `initSidebar()` — search filter, resize drag, mobile open/close, SPA click bridge, `syncSidebarSelection` (toggles `aria-current` only).
-- Click (no modifier) → `alg0:select-algorithm` `{ id }`; AlgoViz loads SPA-style and calls `syncSidebarSelection` + `syncHeaderChrome`.
-
-When adding UI, ask: does this need reactive shared state with the visualizer? If not, implement outside the React island.
+When adding UI: does it need shared reactive state with playback? If not, keep it Astro/static + optional plain-JS listener.
 
 ## Code languages
 
-Algorithm sources live under `src/lib/algorithms/{python,java,cpp,rust}/`.
-Line maps use `#@n` / `//@n` markers via `annotated()` in `src/lib/code-languages.ts`.
-Language packs load on demand through `loadLanguageImplementation` in `src/lib/algorithms/loaders.ts`.
+Algorithm sources under `src/lib/algorithms/{python,java,cpp,rust}/`.
+Line maps: `#@n` / `//@n` via `annotated()` in `code-languages.ts`.
+Packs load on demand through `loaders.ts`.
 
 ## Fonts
 
-- Originals live in `fonts-src/` (not served). `public/fonts/` holds **generated** Latin subsets — never edit by hand.
-- `pnpm fonts:subset` regenerates them (`scripts/subset-fonts.mjs`): keeps ASCII + Latin-1 + the punctuation/math/box glyphs the UI renders, and clips Geist Mono's `wght` axis to 400–700.
-- Adding copy or visualizer glyphs outside that charset? Extend `RANGES` in the script and re-run, otherwise the character falls back to the system font.
-- Only two faces ship: Geist Pixel Square (`--font-sans` **and** `--font-heading`) and Geist Mono. Both are `<link rel="preload">`ed in `Layout.astro` because both paint above the fold.
+- Originals in `fonts-src/`; `public/fonts/` is generated — `pnpm fonts:subset`.
+- Faces: Geist Pixel Square + Geist Mono.

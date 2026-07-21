@@ -5,7 +5,7 @@ import type { AlgorithmSummary } from '@lib/types'
 
 /**
  * Keep the Astro-rendered site header in sync when the client selects/clears
- * an algorithm (SPA-style navigation inside AlgoViz).
+ * an algorithm (SPA-style navigation on algorithm pages).
  */
 export function syncHeaderChrome(locale: Locale, algorithm: AlgorithmSummary | null): void {
   const title = $('[data-header-title]')

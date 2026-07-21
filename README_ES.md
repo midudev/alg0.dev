@@ -25,7 +25,7 @@ Una herramienta web interactiva y gratuita para aprender algoritmos a través de
 - **Visualización animada** — observa cómo se transforma la estructura de datos en cada paso
 - **Código con línea activa** — el código se resalta sincronizado con la animación
 - **Seguimiento de variables** — ve el estado de cada variable en tiempo real
-- **Explicación contextual** — entiende el *porqué* de cada operación
+- **Explicación contextual** — entiende el _porqué_ de cada operación
 
 ## +40 algoritmos en 8 categorías
 
@@ -34,24 +34,28 @@ Una herramienta web interactiva y gratuita para aprender algoritmos a través de
 <td width="25%" valign="top">
 
 ### Ordenamiento
+
 Bubble Sort · Selection Sort · Insertion Sort · Quick Sort · Merge Sort · Heap Sort · Counting Sort · Radix Sort · Shell Sort
 
 </td>
 <td width="25%" valign="top">
 
 ### Estructuras de datos
+
 Stack · Queue · Linked List · Hash Table · Binary Search Tree · Heap
 
 </td>
 <td width="25%" valign="top">
 
 ### Grafos
+
 BFS · DFS · Dijkstra · Prim · Topological Sort
 
 </td>
 <td width="25%" valign="top">
 
 ### Búsqueda
+
 Binary Search · Linear Search · Jump Search · Interpolation Search
 
 </td>
@@ -60,24 +64,28 @@ Binary Search · Linear Search · Jump Search · Interpolation Search
 <td width="25%" valign="top">
 
 ### Programación dinámica
+
 Fibonacci · 0/1 Knapsack · LCS (Longest Common Subsequence)
 
 </td>
 <td width="25%" valign="top">
 
 ### Backtracking
+
 N-Queens · Sudoku Solver · Maze Pathfinding
 
 </td>
 <td width="25%" valign="top">
 
 ### Divide y vencerás
+
 Torre de Hanói
 
 </td>
 <td width="25%" valign="top">
 
 ### Conceptos
+
 Big O · Recursión · Two Pointers · Sliding Window · Memoización · Greedy vs DP · Space Complexity
 
 </td>
@@ -86,13 +94,13 @@ Big O · Recursión · Two Pointers · Sliding Window · Memoización · Greedy 
 
 ## Atajos de teclado
 
-| Tecla | Acción |
-|:---:|:---|
-| `Space` | Play / Pausa |
-| `→` | Siguiente paso |
-| `←` | Paso anterior |
-| `C` | Pestaña de código |
-| `E` | Pestaña de explicación |
+|  Tecla  | Acción                 |
+| :-----: | :--------------------- |
+| `Space` | Play / Pausa           |
+|   `→`   | Siguiente paso         |
+|   `←`   | Paso anterior          |
+|   `C`   | Pestaña de código      |
+|   `E`   | Pestaña de explicación |
 
 Además: control de velocidad (5 niveles), saltar al inicio/final y paneles redimensionables.
 
@@ -107,7 +115,7 @@ Además: control de velocidad (5 niveles), saltar al inicio/final y paneles redi
 
 ## Stack
 
-Construido con [Astro](https://astro.build) + [React](https://react.dev) + [Tailwind CSS](https://tailwindcss.com) + [Monaco Editor](https://microsoft.github.io/monaco-editor/).
+Construido con [Astro](https://astro.build) + JS plano + [Tailwind CSS](https://tailwindcss.com) + [Shiki](https://shiki.style/).
 
 ## Licencia
 

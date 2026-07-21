@@ -3,7 +3,7 @@
 /* Fonts are subset to the Latin characters this site actually renders.
    Regenerate with `pnpm fonts:subset` (sources live in `fonts-src/`). */
 
-/* Geist Mono — variable weight, for the code editor */
+/* Geist Mono — variable weight, for the code viewer */
 @font-face {
   font-family: 'Geist Mono';
   src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
@@ -205,39 +205,166 @@
   display: none;
 }
 
-/* Monaco Editor – active line decoration */
-.algoviz-active-line {
-  background: rgba(250, 204, 21, 0.1) !important;
+/* Static syntax viewer — preserves the previous rhythm and colours without an editor runtime. */
+.code-panel-tab,
+.code-language-button {
+  color: #525252;
+  transition:
+    color 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.code-panel-tab:active,
+.code-language-button:active {
+  transform: scale(0.97);
+}
+
+.code-panel-tab.is-active,
+.code-language-button.is-active {
+  color: var(--foreground);
+}
+
+.code-language-button.is-active {
+  background: var(--subtle-strong);
+}
+
+.code-panel-tab__key {
+  color: #525252;
+  border-color: var(--viz-border);
+  background: var(--subtle);
+}
+
+.code-panel-tab.is-active .code-panel-tab__key {
+  color: var(--viz-label);
+  border-color: var(--viz-axis);
+  background: var(--subtle-strong);
+}
+
+.code-panel-tab__indicator {
+  background: var(--foreground);
+  opacity: 0;
+}
+
+.code-panel-tab.is-active .code-panel-tab__indicator {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .code-panel-tab:hover,
+  .code-language-button:hover {
+    color: var(--foreground);
+  }
+
+  .code-language-button:hover {
+    background: var(--subtle);
+  }
+}
+
+.code-viewer {
+  color: var(--foreground);
+  background: var(--surface);
+  tab-size: 2;
+  scrollbar-width: none;
+  opacity: 1;
+  transition: opacity 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.code-viewer::-webkit-scrollbar {
+  display: none;
+}
+
+.code-viewer.is-loading {
+  opacity: 0;
+}
+
+.code-viewer > code {
+  display: flex;
+  flex-direction: column;
+}
+
+.code-viewer__line {
+  position: relative;
+  display: grid;
+  flex: none;
+  grid-template-columns: 44px max-content;
+  min-width: 100%;
+  height: 28px;
+  line-height: 28px;
+}
+
+.code-viewer__line.is-active {
+  background: rgba(250, 204, 21, 0.1);
   box-shadow: inset 0 0 0 1px rgba(250, 204, 21, 0.08);
 }
 
-/* Circle indicator next to line number */
-.algoviz-active-line-gutter {
-  background: transparent !important;
-  width: 8px !important;
-  margin-left: 2px !important;
-  position: relative;
+.code-viewer__gutter {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  align-items: center;
+  padding-right: 6px;
+  color: var(--viz-faint);
+  text-align: right;
+  background: var(--surface);
+  user-select: none;
 }
-.algoviz-active-line-gutter::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+
+.code-viewer__line.is-active .code-viewer__gutter {
+  color: #facc15;
+  background: color-mix(in srgb, var(--surface) 90%, #facc15 10%);
+}
+
+.code-viewer__marker {
   width: 3px;
   height: 3px;
+  margin: auto;
   border-radius: 50%;
+}
+
+.code-viewer__line.is-active .code-viewer__marker {
   background: #facc15;
   box-shadow: 0 0 4px rgba(250, 204, 21, 0.5);
 }
 
-/* Monaco Editor – inline variable annotations */
-.algoviz-inline-vars {
-  color: var(--viz-label) !important;
-  font-style: italic !important;
-  font-size: 12px !important;
-  padding-left: 16px !important;
+.code-viewer__source {
+  display: block;
+  padding: 0 20px 0 8px;
+  white-space: pre;
+}
+
+.code-viewer__annotation {
+  padding-left: 16px;
+  color: var(--viz-label);
+  font-size: 12px;
+  font-style: italic;
   pointer-events: none;
+}
+
+[data-theme='dark'] .shiki {
+  color: var(--shiki-dark);
+  background-color: var(--surface) !important;
+}
+
+[data-theme='dark'] .shiki span[style] {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+[data-theme='light'] .shiki {
+  color: var(--shiki-light);
+  background-color: var(--surface) !important;
+}
+
+[data-theme='light'] .shiki span[style] {
+  color: var(--shiki-light) !important;
+  font-style: var(--shiki-light-font-style) !important;
+  font-weight: var(--shiki-light-font-weight) !important;
+  text-decoration: var(--shiki-light-text-decoration) !important;
 }
 
 /* Hide native search clear button */
@@ -305,24 +432,7 @@ input[type='search']::-webkit-search-decoration {
   display: none !important;
 }
 
-/*
- * Sidebar open (hamburger): mobile drawer only.
- * Default hidden so desktop never shows a no-op menu button
- * (header-icon-btn's display:inline-flex would otherwise beat Tailwind md:hidden).
- */
-.site-header [data-sidebar-open] {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .site-header [data-sidebar-open] {
-    display: inline-flex;
-  }
-
-  .site-header [data-sidebar-expand] {
-    display: none !important;
-  }
-}
+/* Toggle buttons use [hidden]; .header-icon-btn[hidden] already forces display:none */
 
 .header-icon-btn:hover {
   color: var(--foreground);
@@ -513,6 +623,11 @@ input[type='search']::-webkit-search-decoration {
     opacity 300ms ease-in-out;
 }
 
+.site-sidebar-panel [data-sidebar] {
+  opacity: var(--sidebar-content-opacity, 1);
+  transition: opacity 80ms linear;
+}
+
 .site-sidebar-shell[data-collapsed] .site-sidebar-panel {
   opacity: 0;
 }
@@ -591,60 +706,63 @@ details[data-sidebar-category][open] > .site-sidebar-summary .site-sidebar-chevr
   visibility: visible;
 }
 
-[data-sidebar-resize-hit][data-dragging] {
-  /* ── Static code panel shell (CodePanelShell.astro) ── */
+/* ── Static code panel shell (CodePanelShell.astro) ── */
+.site-code-panel-panel {
+  transition:
+    width 240ms cubic-bezier(0.77, 0, 0.175, 1),
+    opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.site-code-panel-panel [data-code-panel-content] {
+  opacity: var(--code-panel-content-opacity, 1);
+  transition: opacity 80ms linear;
+}
+
+.site-code-panel-shell[data-collapsed] .site-code-panel-panel {
+  opacity: 0;
+}
+
+@media (max-width: 767px) {
+  .site-code-panel-shell {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: min(360px, 90vw);
+    transform: translateX(100%);
+    transition: transform 240ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
   .site-code-panel-panel {
-    transition:
-      width 300ms ease-in-out,
-      opacity 300ms ease-in-out;
+    width: 100% !important;
+    height: 100%;
+    border-left: 1px solid var(--viz-border);
+    opacity: 1 !important;
   }
 
-  .site-code-panel-shell[data-collapsed] .site-code-panel-panel {
+  html[data-code-panel-mobile-open] .site-code-panel-shell {
+    transform: translateX(0);
+  }
+
+  .site-code-panel-backdrop {
     opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  @media (max-width: 767px) {
-    .site-code-panel-shell {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      width: min(360px, 90vw);
-      transform: translateX(100%);
-      transition: transform 300ms ease-in-out;
-    }
-
-    .site-code-panel-panel {
-      width: 100% !important;
-      height: 100%;
-      border-left: 1px solid rgb(255 255 255 / 0.08);
-      opacity: 1 !important;
-    }
-
-    html[data-code-panel-mobile-open] .site-code-panel-shell {
-      transform: translateX(0);
-    }
-
-    .site-code-panel-backdrop {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 300ms ease-in-out;
-    }
-
-    html[data-code-panel-mobile-open] .site-code-panel-backdrop {
-      opacity: 1;
-      pointer-events: auto;
-    }
+  html[data-code-panel-mobile-open] .site-code-panel-backdrop {
+    opacity: 1;
+    pointer-events: auto;
   }
+}
 
-  @media (min-width: 768px) {
-    .site-code-panel-backdrop {
-      display: none;
-    }
+@media (min-width: 768px) {
+  .site-code-panel-backdrop {
+    display: none;
   }
+}
 
-  [data-code-panel-resize-hit][data-dragging] {
-    background: rgb(59 130 246 / 0.5);
-  }
+[data-code-panel-resize-hit][data-dragging],
+[data-sidebar-resize-hit][data-dragging] {
   background: rgb(59 130 246 / 0.5);
 }

@@ -4,8 +4,7 @@ import SiteHeader from "@components/SiteHeader.astro"
 import AlgorithmDescription from "@components/AlgorithmDescription.astro"
 import SiteSidebar from "@components/SiteSidebar.astro"
 import CodePanelShell from "@components/CodePanelShell.astro"
-import WelcomeChrome from "@components/WelcomeChrome.astro"
-import AlgoViz from "@components/AlgoViz"
+import AlgoStage from "@components/AlgoStage.astro"
 import { algorithmCatalog, getCatalogEntry } from "@lib/algorithms/catalog"
 import { loadAlgorithm } from "@lib/algorithms/loaders"
 import { type Locale, locales, defaultLocale } from "@i18n/translations"
@@ -50,12 +49,13 @@ const canonicalURL = new URL(`/${lang}/${algo.id}/`, Astro.site).href
     <SiteHeader locale={lang} algorithm={algo} />
     <div class="flex-1 flex overflow-hidden min-h-0 relative">
       <SiteSidebar locale={lang} selectedId={algo.id} />
-      <AlgoViz
+      <AlgoStage locale={lang} algorithm={algo} steps={initialSteps} />
+      <CodePanelShell
         locale={lang}
-        initialAlgorithm={algo}
+        initialCollapsed={false}
+        initialAlgorithmId={algo.id}
         initialCode={full.code}
-        initialSteps={initialSteps}
-        client:load
+        initialStep={initialSteps[0]}
       >
         <AlgorithmDescription
           description={algorithmDescription}
@@ -64,9 +64,7 @@ const canonicalURL = new URL(`/${lang}/${algo.id}/`, Astro.site).href
           pageTitle={title}
           metaDescription={description}
         />
-        <WelcomeChrome locale={lang} slot="welcome-chrome" />
-      </AlgoViz>
-      <CodePanelShell locale={lang} initialCollapsed={false} />
+      </CodePanelShell>
     </div>
   </div>
 </Layout>

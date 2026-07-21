@@ -126,12 +126,11 @@ function syncControls(state: PlaybackState): void {
     )
   }
 
-  // Header code buttons visibility (expand also managed by code-panel-shell)
-  const expandCode = $<HTMLElement>('[data-code-panel-expand]')
-  const viewCode = $<HTMLElement>('[data-code-panel-open]')
+  // Code panel toggle visibility is managed by code-panel-shell (collapsed + has-algorithm).
   document.documentElement.toggleAttribute('data-has-algorithm', state.hasAlgorithm)
-  if (viewCode) viewCode.hidden = !state.hasAlgorithm
-  if (expandCode && !state.hasAlgorithm) expandCode.hidden = true
+  // Ensure toggle reflects algorithm presence immediately (shell also re-syncs on collapse).
+  const codeToggle = $<HTMLButtonElement>('[data-code-panel-toggle]')
+  if (codeToggle && !state.hasAlgorithm) codeToggle.hidden = true
 }
 
 export function initControls(): void {

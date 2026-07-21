@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config'
 import tailwindcss from '@tailwindcss/vite'
-import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
 import { splitAlgorithmChunks } from './scripts/split-algorithm-chunks.mjs'
 
@@ -11,9 +10,8 @@ export default defineConfig({
     enabled: false,
   },
   integrations: [
-    react(),
     sitemap({
-      filter: (page) => !page.includes('/algorithm-content/'),
+      filter: (page) => !page.includes('/algorithm-content/') && !page.includes('/algorithm-code/'),
       i18n: {
         defaultLocale: 'en',
         locales: {

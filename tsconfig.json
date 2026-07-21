@@ -10,7 +10,6 @@
       "@components/*": ["src/components/*"],
       "@layouts/*": ["src/layouts/*"],
       "@lib/*": ["src/lib/*"],
-      "@hooks/*": ["src/hooks/*"],
       "@i18n/*": ["src/i18n/*"],
       "@assets/*": ["src/assets/*"],
       "@styles/*": ["src/styles/*"],

@@ -1,17 +1,41 @@
 /**
- * Global keyboard shortcuts for playback (plain JS).
- * Space / ← / → / c / e — same as the former useKeyboardShortcuts hook.
+ * Global keyboard shortcuts (plain JS).
+ * Space / ← / → for playback; C / E for code-panel tabs.
  */
 import { dispatchPlaybackCommand } from '@lib/playback'
+import { setCodePanelTab } from '@lib/code-panel-state'
+
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return true
+  if (target instanceof HTMLElement && target.isContentEditable) return true
+  return false
+}
 
 export function initKeyboardShortcuts(): void {
   document.addEventListener('keydown', (event) => {
-    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+    if (isTypingTarget(event.target)) return
+
+    // C / E always switch code-panel tabs (even when focus is on a tab button
+    // inside the panel after clicking "Code" / "Explanation").
+    if (event.key === 'c' || event.key === 'C') {
+      event.preventDefault()
+      setCodePanelTab('code')
       return
     }
-    // Don't steal keys from Monaco / contenteditable
-    if (event.target instanceof HTMLElement && event.target.isContentEditable) return
-    if (event.target instanceof Element && event.target.closest('.monaco-editor')) return
+    if (event.key === 'e' || event.key === 'E') {
+      event.preventDefault()
+      setCodePanelTab('about')
+      return
+    }
+
+    // Playback keys: don't steal when focus is inside the code viewer
+    // (arrows/space scroll that region).
+    if (
+      event.target instanceof Element &&
+      event.target.closest('[data-code-viewer], [data-code-variants], [data-code-panel-about]')
+    ) {
+      return
+    }
 
     switch (event.key) {
       case ' ':
@@ -25,14 +49,6 @@ export function initKeyboardShortcuts(): void {
       case 'ArrowLeft':
         event.preventDefault()
         dispatchPlaybackCommand({ type: 'stepBackward' })
-        break
-      case 'c':
-      case 'C':
-        dispatchPlaybackCommand({ type: 'setTab', tab: 'code' })
-        break
-      case 'e':
-      case 'E':
-        dispatchPlaybackCommand({ type: 'setTab', tab: 'about' })
         break
     }
   })

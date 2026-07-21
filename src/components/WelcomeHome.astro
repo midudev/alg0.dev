@@ -1,0 +1,111 @@
+---
+/**
+ * Home empty state: static chrome + showcase shell (plain JS).
+ */
+import type { Locale } from "@i18n/translations"
+import WelcomeChrome from "@components/WelcomeChrome.astro"
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+---
+
+<div
+  class="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6 min-h-0 px-3 py-3 md:px-5 md:py-4 overflow-auto"
+  data-welcome-home
+>
+  <div class="contents" data-welcome-layout>
+    <WelcomeChrome locale={locale} />
+
+    <div
+      class="order-2 w-full flex justify-center min-h-0"
+      data-showcase
+      data-showcase-locale={locale}
+    >
+      <div
+        data-showcase-stage
+        class="relative w-full max-w-2xl rounded-xl md:rounded-2xl border border-white/6 bg-white/2 overflow-hidden group hover:border-white/12 hover:bg-white/4 transition-colors duration-300 is-loading"
+        style="height: clamp(240px, 45vw, 360px)"
+      >
+        <div
+          data-showcase-fade
+          class="absolute inset-0 flex flex-col p-3 md:p-6 transition-opacity ease-in-out"
+          style="opacity: 1"
+        >
+          <div class="text-center mb-2 shrink-0">
+            <span
+              data-showcase-category
+              class="text-[11px] font-medium text-neutral-500 uppercase tracking-wider"
+            ></span>
+            <h3
+              data-showcase-name
+              class="text-sm font-semibold text-white font-heading mt-0.5"
+            >
+            </h3>
+          </div>
+          <div
+            data-showcase-viz
+            class="flex-1 min-h-0 flex items-center justify-center overflow-hidden"
+          >
+          </div>
+        </div>
+
+        <div
+          class="absolute inset-x-0 bottom-0 h-14 z-20 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3 pointer-events-none"
+        >
+          <a
+            data-showcase-open
+            href="#"
+            class="pointer-events-auto px-3 py-1.5 text-[11px] font-medium rounded-md bg-white text-black hover:bg-neutral-200 transition-colors"
+          >
+            Open
+          </a>
+        </div>
+
+        <div
+          class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-white/6 rounded-full overflow-hidden transition-opacity ease-in-out"
+          style="opacity: 1"
+        >
+          <div
+            data-showcase-progress
+            class="h-full bg-white/20 rounded-full transition-all ease-linear"
+            style="width: 0%"
+          >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  [data-welcome-layout] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    min-height: 0;
+    flex: 1;
+  }
+  @media (min-width: 768px) {
+    [data-welcome-layout] {
+      gap: 1.5rem;
+    }
+  }
+  [data-welcome-layout] [data-welcome-chrome] {
+    order: 1;
+  }
+  [data-welcome-layout] [data-showcase] {
+    order: 2;
+  }
+  [data-welcome-layout] [data-welcome-shortcuts] {
+    order: 3;
+  }
+  [data-showcase-stage].is-loading {
+    /* empty shell while algorithms load */
+  }
+</style>
