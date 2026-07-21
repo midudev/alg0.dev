@@ -1,4 +1,4 @@
-import type { Algorithm } from '@lib/types'
+import type { AlgorithmSummary } from '@lib/types'
 import type { Locale, Translations } from '@i18n/translations'
 import { getCategoryName, locales, localeNames } from '@i18n/translations'
 import Controls from '@components/Controls'
@@ -6,7 +6,8 @@ import Controls from '@components/Controls'
 interface HeaderProps {
   locale: Locale
   t: Translations
-  selectedAlgorithm: Algorithm | null
+  /** Lightweight meta is enough for logo title / breadcrumb (avoids CLS while the full algo loads). */
+  selectedAlgorithm: AlgorithmSummary | null
   sidebarCollapsed: boolean
   codePanelCollapsed: boolean
   onExpandSidebar: () => void
@@ -70,15 +71,15 @@ export default function Header({
 
   return (
     <header
-      className="h-12 shrink-0 flex items-center justify-between px-3 md:px-5 border-b border-white/8 bg-black z-10"
+      className="site-header h-12 shrink-0 flex items-center justify-between px-3 md:px-5 z-10"
       role="banner"
     >
       {/* Left: Logo + Breadcrumb */}
-      <div className="flex items-center gap-2 md:gap-3 min-w-0 shrink-0">
+      <div className="flex items-center gap-2 md:gap-2.5 min-w-0 shrink-0">
         {isMobile ? (
           <button
             onClick={onToggleMobileSidebar}
-            className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/6 transition-colors text-neutral-400 hover:text-white shrink-0"
+            className="header-icon-btn shrink-0"
             aria-label={t.openMenu}
           >
             <svg
@@ -99,7 +100,7 @@ export default function Header({
         ) : sidebarCollapsed ? (
           <button
             onClick={onExpandSidebar}
-            className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/6 transition-colors text-neutral-400 hover:text-white"
+            className="header-icon-btn"
             aria-label={t.expandSidebar}
           >
             <svg
@@ -120,12 +121,12 @@ export default function Header({
         ) : null}
         <a
           href={getLocaleUrl(locale)}
-          className="flex items-center gap-2 md:gap-2.5 hover:opacity-80 transition-opacity min-w-0"
+          className="flex items-center gap-2 hover:opacity-70 transition-opacity duration-150 min-w-0"
           aria-label="alg0.dev - Algorithm Visualizer — Home"
         >
-          <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center shrink-0">
+          <div className="header-logo w-6 h-6 rounded-md flex items-center justify-center shrink-0">
             <svg
-              className="w-4 h-4 text-black"
+              className="w-4 h-4"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="none"
@@ -146,7 +147,7 @@ export default function Header({
             </svg>
           </div>
           {!selectedAlgorithm && !isMobile && (
-            <span className="font-semibold text-sm tracking-tight text-white font-heading">
+            <span className="header-title font-semibold text-sm tracking-tight font-heading">
               alg0.dev - Algorithm Visualizer
             </span>
           )}
@@ -156,19 +157,23 @@ export default function Header({
             aria-label="Breadcrumb"
             className="flex items-center gap-1.5 min-w-0 overflow-hidden"
           >
-            <span className="text-neutral-600 shrink-0">/</span>
-            <span className="text-xs text-neutral-500 hidden md:inline shrink-0">
+            <span className="header-crumb-sep shrink-0" aria-hidden="true">
+              /
+            </span>
+            <span className="header-crumb-muted text-xs hidden md:inline shrink-0">
               {getCategoryName(locale, selectedAlgorithm.category)}
             </span>
-            <span className="text-neutral-600 hidden md:inline shrink-0">/</span>
-            <span className="text-xs font-medium text-neutral-300 truncate" aria-current="page">
+            <span className="header-crumb-sep hidden md:inline shrink-0" aria-hidden="true">
+              /
+            </span>
+            <span className="header-crumb-current text-xs font-medium truncate" aria-current="page">
               {selectedAlgorithm.name}
             </span>
           </nav>
         )}
       </div>
 
-      {/* Center: Controls (hidden on mobile, shown in bottom bar instead) */}
+      {/* Center: Controls */}
       {!isMobile && (
         <div className="flex-1 flex justify-center min-w-0 mx-2">
           <Controls
@@ -187,12 +192,12 @@ export default function Header({
         </div>
       )}
 
-      {/* Right: Language switcher + code panel toggle */}
-      <div className="flex items-center justify-end gap-2 min-w-0 shrink-0">
+      {/* Right: theme + language */}
+      <div className="flex items-center justify-end gap-1.5 min-w-0 shrink-0">
         <button
           type="button"
           onClick={toggleTheme}
-          className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/6 transition-[transform,color,background-color] duration-150 text-neutral-400 hover:text-white active:scale-[0.97]"
+          className="header-icon-btn"
           aria-label={locale === 'es' ? 'Cambiar tema de color' : 'Toggle color theme'}
         >
           <svg
@@ -227,7 +232,7 @@ export default function Header({
         {isMobile && selectedAlgorithm && (
           <button
             onClick={onToggleMobileCodePanel}
-            className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/6 transition-colors text-neutral-400 hover:text-white"
+            className="header-icon-btn"
             aria-label={t.viewCode}
           >
             <svg
@@ -249,7 +254,7 @@ export default function Header({
         {!isMobile && codePanelCollapsed && (
           <button
             onClick={onExpandCodePanel}
-            className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/6 transition-colors text-neutral-400 hover:text-white"
+            className="header-icon-btn"
             aria-label={t.expandCodePanel}
           >
             <svg
@@ -268,25 +273,24 @@ export default function Header({
             </svg>
           </button>
         )}
-        <nav
-          aria-label={t.languageLabel}
-          className="flex items-center gap-0.5 bg-white/6 rounded-lg p-0.5 border border-white/8"
-        >
-          {locales.map((l) => (
-            <a
-              key={l}
-              href={getLocaleUrl(l, selectedAlgorithm?.id)}
-              className={`px-2 md:px-2.5 py-1 text-[11px] font-medium rounded-md transition-all ${
-                l === locale
-                  ? 'bg-white text-black'
-                  : 'text-neutral-500 hover:text-white hover:bg-white/6'
-              }`}
-              aria-label={localeNames[l]}
-              aria-current={l === locale ? 'page' : undefined}
-              lang={l}
-            >
-              {l.toUpperCase()}
-            </a>
+        <nav aria-label={t.languageLabel} className="header-lang flex items-center">
+          {locales.map((l, i) => (
+            <span key={l} className="flex items-center">
+              {i > 0 && (
+                <span className="header-lang-sep text-[10px] px-0.5" aria-hidden="true">
+                  /
+                </span>
+              )}
+              <a
+                href={getLocaleUrl(l, selectedAlgorithm?.id)}
+                className={`header-lang-link ${l === locale ? 'is-active' : ''}`}
+                aria-label={localeNames[l]}
+                aria-current={l === locale ? 'page' : undefined}
+                lang={l}
+              >
+                {l.toUpperCase()}
+              </a>
+            </span>
           ))}
         </nav>
       </div>
