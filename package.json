@@ -4,7 +4,7 @@
   "version": "0.0.2",
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/generate-og.mjs && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "prepare": "husky",

@@ -2,6 +2,9 @@
  * Generate per-algorithm Open Graph images (1200×630 JPEG).
  * Requires ImageMagick (`magick`) and a system sans font.
  *
+ * Not part of `pnpm build` — assets are committed under `public/og/`.
+ * Run locally when catalog names change: `pnpm og:generate`
+ *
  * Usage: node scripts/generate-og.mjs
  */
 import { execFileSync } from 'node:child_process'
@@ -14,18 +17,50 @@ const outDir = join(root, 'public', 'og')
 mkdirSync(outDir, { recursive: true })
 
 const FONT_CANDIDATES = [
+  // Project font (portable — use if vendored later)
+  join(root, 'fonts-src', 'Inter-Bold.ttf'),
+  join(root, 'public', 'fonts', 'Inter-Bold.ttf'),
+  // macOS
   '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
   '/System/Library/Fonts/Supplemental/Arial.ttf',
   '/System/Library/Fonts/Helvetica.ttc',
   '/Library/Fonts/Arial.ttf',
+  // Linux / CI
   '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
   '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+  '/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf',
+  '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
+  '/usr/share/fonts/truetype/freefont/FreeSansBold.ttf',
+  '/usr/share/fonts/TTF/DejaVuSans-Bold.ttf',
 ]
 
+function hasMagick() {
+  try {
+    execFileSync('magick', ['-version'], { stdio: 'pipe' })
+    return true
+  } catch {
+    try {
+      execFileSync('convert', ['-version'], { stdio: 'pipe' })
+      return true
+    } catch {
+      return false
+    }
+  }
+}
+
 const font = FONT_CANDIDATES.find((path) => existsSync(path))
-if (!font) {
+const existingDefault = existsSync(join(outDir, 'default.jpg'))
+
+if (!font || !hasMagick()) {
+  if (existingDefault) {
+    console.warn(
+      '[og:generate] Skipping: no ImageMagick/font on this machine. Using committed public/og assets.',
+    )
+    process.exit(0)
+  }
   console.error(
-    'No usable font found for OG generation. Install Arial/DejaVu or edit FONT_CANDIDATES.',
+    'No usable font/ImageMagick for OG generation, and no existing public/og assets found.\n' +
+      'Install ImageMagick + a sans font, or commit prebuilt images under public/og/.',
   )
   process.exit(1)
 }
