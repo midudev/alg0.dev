@@ -1,7 +1,7 @@
 {
-  "name": "alg0.dev - Algorithm Visualizer",
-  "short_name": "alg0.dev",
-  "description": "Interactive, step-by-step algorithm visualizations.",
+  "name": "Algorithm Visualizer",
+  "short_name": "Algorithm Visualizer",
+  "description": "Interactive step-by-step algorithm visualizations. Learn sorting, graphs, DP, and more.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -4,10 +4,11 @@
   "version": "0.0.2",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/generate-og.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "prepare": "husky",
+    "og:generate": "node scripts/generate-og.mjs",
     "fonts:subset": "node scripts/subset-fonts.mjs",
     "format": "prettier . --write",
     "lint": "eslint . --fix"

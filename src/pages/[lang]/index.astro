@@ -22,6 +22,7 @@ const canonicalURL = new URL(`/${lang}/`, Astro.site).href
 <Layout
   locale={lang}
   canonicalURL={canonicalURL}
+  ogImage="/og/default.jpg"
   structuredData={getHomeStructuredData(lang, canonicalURL)}
 >
   <div class="h-screen flex flex-col overflow-hidden">

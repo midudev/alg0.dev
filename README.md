@@ -7,7 +7,7 @@
 [![Visit alg0.dev](https://img.shields.io/badge/Visit-alg0.dev-000?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTEyIDJ2MjAiLz48cGF0aCBkPSJNMiAxMmgyMCIvPjwvc3ZnPg==&labelColor=000&color=fff)](https://alg0.dev)
 [![Leer en español](https://img.shields.io/badge/Español-README__ES.md-000?style=for-the-badge&labelColor=000&color=555)](./README_ES.md)
 
-![alg0.dev — Algorithm Visualizer](https://alg0.dev/og-image.png)
+![alg0.dev — Algorithm Visualizer](https://alg0.dev/og-image.jpg)
 
 **Learn algorithms and data structures interactively.**
 Step-by-step visualizations, real-time code highlighting and detailed explanations. All in your browser, no setup needed.

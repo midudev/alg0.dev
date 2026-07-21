@@ -39,7 +39,7 @@ const hasAlgorithm = algorithm != null
     <a
       href={homeUrl}
       class="flex items-center gap-2 hover:opacity-70 transition-opacity duration-150 min-w-0"
-      aria-label="alg0.dev - Algorithm Visualizer — Home"
+      aria-label={locale === "es" ? "Visualizador de algoritmos — Inicio" : "Algorithm Visualizer — Home"}
     >
       <div class="header-logo w-6 h-6 rounded-md flex items-center justify-center shrink-0">
         <svg
@@ -72,7 +72,7 @@ const hasAlgorithm = algorithm != null
         class="header-title font-semibold text-sm tracking-tight font-heading max-md:hidden"
         hidden={hasAlgorithm}
       >
-        alg0.dev - Algorithm Visualizer
+        {locale === "es" ? "Visualizador de algoritmos" : "Algorithm Visualizer"}
       </span>
     </a>
 

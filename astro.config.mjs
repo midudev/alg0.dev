@@ -19,6 +19,15 @@ export default defineConfig({
           es: 'es',
         },
       },
+      serialize(item) {
+        // Mirror HTML hreflang: point x-default at the English (unprefixed) URL.
+        const links = item.links ?? []
+        const en = links.find((link) => link.lang === 'en')
+        if (en && !links.some((link) => link.lang === 'x-default')) {
+          item.links = [...links, { ...en, lang: 'x-default' }]
+        }
+        return item
+      },
     }),
   ],
   i18n: {

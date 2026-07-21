@@ -1,0 +1,116 @@
+---
+/**
+ * Compact crawlable index for the home page.
+ * Category hubs hold the full lists — keep this light so the showcase stays the hero.
+ */
+import type { Locale } from "@i18n/translations"
+import { getCategoryName, translations } from "@i18n/translations"
+import { catalogCategories, algorithmCatalog } from "@lib/algorithms/catalog"
+import { getCategorySlug } from "@lib/categories"
+import { getAlgorithmPath, getCategoryPath } from "@lib/locale-url"
+import { categoryIconPaths, getCategoryColor } from "@lib/sidebar-meta"
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = translations[locale]
+const isEs = locale === "es"
+
+const POPULAR_IDS = [
+  "bubble-sort",
+  "binary-search",
+  "quick-sort",
+  "bfs",
+  "dijkstra",
+  "linked-list",
+  "big-o-notation",
+  "recursion",
+] as const
+
+const popular = POPULAR_IDS.map((id) => algorithmCatalog.find((a) => a.id === id)).filter(
+  (a): a is NonNullable<typeof a> => a != null,
+)
+---
+
+<section
+  class="w-full max-w-2xl mx-auto shrink-0 px-1 pt-2 pb-1"
+  data-home-catalog
+  aria-label={isEs ? "Explorar algoritmos" : "Explore algorithms"}
+>
+  <h2 class="sr-only">
+    {isEs ? "Explorar algoritmos por categoría" : "Explore algorithms by category"}
+  </h2>
+
+  <!-- Category hubs: compact pills with sidebar icon + color -->
+  <div class="flex flex-wrap items-center justify-center gap-1.5 mb-3">
+    {
+      catalogCategories.map((category) => {
+        const slug = getCategorySlug(category.name)
+        if (!slug) return null
+        const colors = getCategoryColor(category.name)
+        const iconPath = categoryIconPaths[category.name]
+        return (
+          <a
+            href={getCategoryPath(locale, slug)}
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-white/[0.08] text-[11px] text-neutral-400 hover:text-neutral-200 hover:border-white/16 hover:bg-white/[0.04] transition-[color,border-color,background-color,transform] duration-150 active:scale-[0.97]"
+          >
+            {iconPath && (
+              <span class:list={["shrink-0", colors.icon]} aria-hidden="true">
+                <svg
+                  class="w-3 h-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d={iconPath} />
+                </svg>
+              </span>
+            )}
+            {getCategoryName(locale, category.name)}
+            <span class="text-neutral-700 tabular-nums text-[10px]" aria-hidden="true">
+              {category.algorithms.length}
+            </span>
+          </a>
+        )
+      })
+    }
+  </div>
+
+  <!-- Popular deep links (crawlable) -->
+  <nav
+    class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px]"
+    aria-label={isEs ? "Algoritmos populares" : "Popular algorithms"}
+  >
+    <span class="text-neutral-700 shrink-0">
+      {isEs ? "Popular:" : "Popular:"}
+    </span>
+    {
+      popular.map((algo, index) => (
+        <>
+          {index > 0 && (
+            <span class="text-neutral-800 select-none" aria-hidden="true">
+              ·
+            </span>
+          )}
+          <a
+            href={getAlgorithmPath(locale, algo.id)}
+            class="text-neutral-500 hover:text-white transition-colors duration-150"
+          >
+            {algo.name}
+          </a>
+        </>
+      ))
+    }
+  </nav>
+
+  <p class="sr-only">
+    {
+      isEs
+        ? `${t.algorithmsCount.replace("{count}", String(algorithmCatalog.length))} con visualización interactiva paso a paso.`
+        : `${t.algorithmsCount.replace("{count}", String(algorithmCatalog.length))} with interactive step-by-step visualizations.`
+    }
+  </p>
+</section>

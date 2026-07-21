@@ -7,7 +7,8 @@
 import type { Locale } from "@i18n/translations"
 import { translations, getCategoryName } from "@i18n/translations"
 import { catalogCategories } from "@lib/algorithms/catalog"
-import { getLocaleUrl } from "@lib/locale-url"
+import { getCategorySlug } from "@lib/categories"
+import { getCategoryPath, getLocaleUrl } from "@lib/locale-url"
 import {
   SIDEBAR_MAX_WIDTH,
   categoryDomId,
@@ -131,6 +132,8 @@ const panelWidth = `${SIDEBAR_MAX_WIDTH}px`
             const catId = categoryDomId(category.name)
             const localizedName = getCategoryName(locale, category.name)
             const iconPath = categoryIconPaths[category.name]
+            const categorySlug = getCategorySlug(category.name)
+            const categoryHref = categorySlug ? getCategoryPath(locale, categorySlug) : null
 
             return (
               <details
@@ -142,9 +145,9 @@ const panelWidth = `${SIDEBAR_MAX_WIDTH}px`
                 <summary
                   class="site-sidebar-summary w-full flex items-center justify-between px-2.5 py-2 text-[11px] font-semibold text-neutral-500 hover:text-neutral-400 transition-colors rounded-md hover:bg-white/3 uppercase tracking-widest cursor-pointer list-none"
                 >
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-2 min-w-0">
                     <svg
-                      class="site-sidebar-chevron w-3 h-3 text-neutral-600 transition-transform duration-200"
+                      class="site-sidebar-chevron w-3 h-3 text-neutral-600 transition-transform duration-200 shrink-0"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                       aria-hidden="true"
@@ -155,7 +158,7 @@ const panelWidth = `${SIDEBAR_MAX_WIDTH}px`
                         clip-rule="evenodd"
                       />
                     </svg>
-                    <span class="flex items-center gap-1.5">
+                    <span class="flex items-center gap-1.5 min-w-0">
                       <span class={colors.icon}>
                         {iconPath && (
                           <svg
@@ -174,7 +177,20 @@ const panelWidth = `${SIDEBAR_MAX_WIDTH}px`
                           </svg>
                         )}
                       </span>
-                      {localizedName}
+                      {
+                        categoryHref ? (
+                          <a
+                            href={categoryHref}
+                            class="truncate hover:text-neutral-300 transition-colors"
+                            data-sidebar-category-link
+                            onclick="event.stopPropagation()"
+                          >
+                            {localizedName}
+                          </a>
+                        ) : (
+                          localizedName
+                        )
+                      }
                     </span>
                   </div>
                   <span

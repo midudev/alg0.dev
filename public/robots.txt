@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# SPA helper fragments — not standalone pages
+Disallow: /algorithm-content/
+Disallow: /algorithm-code/
+
 Sitemap: https://alg0.dev/sitemap-index.xml

@@ -1,14 +1,9 @@
 /**
- * Plain-JS code panel (tabs, syntax viewer, languages, resize + mobile drawer).
+ * Plain-JS code panel (syntax viewer, languages, resize + mobile drawer).
  */
 import { $, $$ } from '@lib/dom'
 import { CODE_LANGUAGE_STORAGE_KEY, defaultCodeLanguage, isCodeLanguage } from '@lib/code-languages'
-import {
-  CODE_PANEL_STATE_EVENT,
-  CODE_PANEL_TAB_EVENT,
-  type CodePanelState,
-  type CodePanelTab,
-} from '@lib/code-panel-state'
+import { CODE_PANEL_STATE_EVENT, type CodePanelState } from '@lib/code-panel-state'
 import type { CodeLanguage } from '@lib/types'
 
 const CODE_PANEL_DEFAULT_WIDTH = 420
@@ -182,16 +177,31 @@ function syncLanguageButtons(): void {
   }
 }
 
-function selectLanguage(language: CodeLanguage): void {
-  activeLanguage = language
-  localStorage.setItem(CODE_LANGUAGE_STORAGE_KEY, language)
-  syncLanguageButtons()
+function applyLanguageVisibility(language: CodeLanguage): void {
   const root = contentRoot()
   if (!root) return
   for (const viewer of $$<HTMLElement>('[data-code-language-block]', root)) {
     viewer.hidden = viewer.dataset.codeLanguageBlock !== language
   }
   syncActiveLine({ scroll: false })
+}
+
+function selectLanguage(language: CodeLanguage): void {
+  activeLanguage = language
+  localStorage.setItem(CODE_LANGUAGE_STORAGE_KEY, language)
+  syncLanguageButtons()
+  const root = contentRoot()
+  if (!root) return
+
+  const hasBlock = Boolean($<HTMLElement>(`[data-code-language-block="${language}"]`, root))
+  const algorithmId = root.dataset.initialAlgorithmId || codePanelState.algorithm?.id
+  if (!hasBlock && algorithmId) {
+    // Language pack not in DOM yet (SSR only includes JS) — load full set.
+    void loadAlgorithmCode(algorithmId)
+    return
+  }
+
+  applyLanguageVisibility(language)
 }
 
 async function loadAlgorithmCode(algorithmId: string): Promise<void> {
@@ -210,38 +220,13 @@ async function loadAlgorithmCode(algorithmId: string): Promise<void> {
     if (version !== codeContentVersion) return
 
     variants.innerHTML = content.outerHTML
-    selectLanguage(activeLanguage)
+    // Reveal preferred language without re-entering the fetch path.
+    syncLanguageButtons()
+    applyLanguageVisibility(activeLanguage)
   } catch (error) {
     console.error(`Failed to load highlighted code for "${algorithmId}"`, error)
   } finally {
     if (version === codeContentVersion) setLoading(false)
-  }
-}
-
-function setTab(tab: CodePanelTab): void {
-  const root = contentRoot()
-  if (!root) return
-
-  for (const button of $$<HTMLButtonElement>('[data-code-panel-tab]', root)) {
-    const selected = button.dataset.codePanelTab === tab
-    button.classList.toggle('is-active', selected)
-    button.setAttribute('aria-selected', selected ? 'true' : 'false')
-    button.tabIndex = selected ? 0 : -1
-  }
-
-  for (const panel of $$<HTMLElement>('[data-code-panel-tabpanel]', root)) {
-    const panelName = panel.dataset.codePanelTabpanel
-    const selected = panelName === tab
-    panel.classList.toggle('hidden', !selected)
-    // Both panels live in a flex column parent and need `flex` + `flex-1` when visible.
-    // Previously only the code panel got `flex`, so About could end up with zero height.
-    panel.classList.toggle('flex', selected)
-    if (panelName === 'code') {
-      panel.classList.toggle('flex-col', selected)
-    } else if (panelName === 'about') {
-      panel.classList.toggle('flex-col', selected)
-    }
-    panel.setAttribute('aria-hidden', selected ? 'false' : 'true')
   }
 }
 
@@ -256,23 +241,21 @@ function applyCodePanelState(nextState: CodePanelState): void {
   renderVariables(nextState.variables)
   renderConsole(nextState.consoleOutput)
 
-  // Only replace About content when we actually have a new string.
-  // Empty string would wipe the SSR description during SPA handoff.
-  if (typeof nextState.aboutHtml === 'string' && nextState.aboutHtml.length > 0) {
-    const about = root
-      ? $<HTMLElement>('[data-code-panel-about]', root)
-      : $<HTMLElement>('[data-code-panel-about]')
-    if (about) about.innerHTML = nextState.aboutHtml
-  }
-
   const nextId = nextState.algorithm?.id
   if (!nextState.algorithm) return
 
   if (nextId !== previousId) {
-    setTab('code')
     if (isHydratingInitial) {
-      selectLanguage(activeLanguage)
-      syncActiveLine({ scroll: false })
+      const rootEl = contentRoot()
+      const hasPreferred = Boolean(
+        rootEl && $<HTMLElement>(`[data-code-language-block="${activeLanguage}"]`, rootEl),
+      )
+      if (hasPreferred) {
+        selectLanguage(activeLanguage)
+        syncActiveLine({ scroll: false })
+      } else {
+        void loadAlgorithmCode(nextId)
+      }
     } else {
       void loadAlgorithmCode(nextId)
     }
@@ -496,47 +479,34 @@ export function initCodePanelShell(): void {
 
   if (root) {
     // Prefer stored language; only fall back to JavaScript when nothing is saved.
-    // SSR leaves no language selected and all code blocks hidden to avoid a JS flash.
+    // SSR leaves no language selected and typically only ships JS HTML (light SSR).
     activeLanguage = resolvePreferredLanguage()
-    selectLanguage(activeLanguage)
-    if ($('[data-code-language-block]', root)) setLoading(false)
+    const hasPreferredBlock = Boolean(
+      $<HTMLElement>(`[data-code-language-block="${activeLanguage}"]`, root),
+    )
+    const initialId = root.dataset.initialAlgorithmId
+    if (hasPreferredBlock) {
+      selectLanguage(activeLanguage)
+      if ($('[data-code-language-block]', root)) setLoading(false)
+    } else if (initialId) {
+      // Preferred language not in SSR HTML — fetch full multi-language pack.
+      void loadAlgorithmCode(initialId)
+    } else {
+      selectLanguage(activeLanguage)
+    }
 
     root.addEventListener('click', (event) => {
       const target = event.target
       if (!(target instanceof Element)) return
 
-      const tab = target.closest<HTMLElement>('[data-code-panel-tab]')?.dataset.codePanelTab
-      if (tab === 'code' || tab === 'about') {
-        setTab(tab)
-        return
-      }
-
       const language = target.closest<HTMLElement>('[data-code-language]')?.dataset.codeLanguage
       if (isCodeLanguage(language)) selectLanguage(language)
-    })
-
-    root.addEventListener('keydown', (event) => {
-      const target = event.target
-      if (!(target instanceof Element) || !target.closest('[role="tab"]')) return
-      const tabs: CodePanelTab[] = ['code', 'about']
-      const selected = $<HTMLElement>('[data-code-panel-tab].is-active', root)?.dataset.codePanelTab
-      const index = selected === 'about' ? 1 : 0
-      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
-      event.preventDefault()
-      const direction = event.key === 'ArrowRight' ? 1 : -1
-      const next = tabs[(index + direction + tabs.length) % tabs.length]
-      setTab(next)
-      $<HTMLButtonElement>(`[data-code-panel-tab="${next}"]`, root)?.focus()
     })
   }
 
   window.addEventListener(CODE_PANEL_STATE_EVENT, (event) => {
     applyCodePanelState((event as CustomEvent<CodePanelState>).detail)
   })
-  window.addEventListener(CODE_PANEL_TAB_EVENT, (event) => {
-    setTab((event as CustomEvent<CodePanelTab>).detail)
-  })
-
   // Algorithm routes SSR with panel open — mark algorithm present on first paint
   if (!initialCollapsed) {
     document.documentElement.setAttribute('data-has-algorithm', '')

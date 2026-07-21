@@ -13,6 +13,8 @@ interface AlgorithmSource {
 interface RenderAlgorithmCodeOptions {
   activeJsLine?: number
   variables?: Record<string, string | number | boolean | null>
+  /** Limit which languages are rendered (SSR can pass only javascript to cut HTML weight). */
+  languages?: CodeLanguage[]
 }
 
 function jsLinesForSourceLine(source: AlgorithmSource, sourceLine: number): number[] {
@@ -123,10 +125,17 @@ function codeViewerTransformer(
   }
 }
 
-async function loadAlgorithmSources(algorithmId: string): Promise<AlgorithmSource[]> {
+async function loadAlgorithmSources(
+  algorithmId: string,
+  languages?: CodeLanguage[],
+): Promise<AlgorithmSource[]> {
   const algorithm = await loadAlgorithm(algorithmId)
+  const selected = languages?.length
+    ? codeLanguages.filter((language) => languages.includes(language.id))
+    : codeLanguages
+
   const implementations = await Promise.all(
-    codeLanguages.map(async ({ id, label }) => {
+    selected.map(async ({ id, label }) => {
       if (id === 'javascript') {
         return { language: id, label, code: algorithm.code } satisfies AlgorithmSource
       }
@@ -155,12 +164,16 @@ async function renderSource(
   })
 }
 
-/** Build-only rendering of every supported language for one algorithm. */
+/**
+ * Build highlighted code HTML for one algorithm.
+ * Pass `languages: ['javascript']` on algorithm pages to keep SSR HTML light;
+ * the full multi-language pack is served from `/algorithm-code/[id]`.
+ */
 export async function renderAlgorithmCodeHtml(
   algorithmId: string,
   options: RenderAlgorithmCodeOptions = {},
 ): Promise<string> {
-  const sources = await loadAlgorithmSources(algorithmId)
+  const sources = await loadAlgorithmSources(algorithmId, options.languages)
   const blocks = await Promise.all(sources.map((source) => renderSource(source, options)))
   return `<div data-algorithm-code data-algorithm-id="${algorithmId}">${blocks.join('')}</div>`
 }

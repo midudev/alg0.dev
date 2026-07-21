@@ -1,12 +1,55 @@
 ---
-import Layout from '@layouts/Layout.astro'
-import { translations, defaultLocale, type Locale, locales } from '@i18n/translations'
+/**
+ * Recovery-oriented 404: search, path suggestions, popular algos, categories.
+ * Static host serves this for unknown URLs — suggestions resolve client-side from location.pathname.
+ */
+import Layout from "@layouts/Layout.astro"
+import {
+  translations,
+  defaultLocale,
+  type Locale,
+  locales,
+  getCategoryName,
+} from "@i18n/translations"
+import { algorithmCatalog } from "@lib/algorithms/catalog"
+import { catalogCategories } from "@lib/algorithms/catalog"
+import { getCategorySlug } from "@lib/categories"
+import { getAlgorithmPath, getCategoryPath, getHomeUrl } from "@lib/locale-url"
 
 const pathName = Astro.url.pathname
-const maybeLocale = pathName.split('/')[1] as Locale
+const maybeLocale = pathName.split("/")[1] as Locale
 const locale = locales.includes(maybeLocale) ? maybeLocale : defaultLocale
 const t = translations[locale]
-const pathnameToRedirect = locale === defaultLocale ? `/` : `/${locale}/`
+const homeHref = getHomeUrl(locale)
+const isEs = locale === "es"
+
+const POPULAR_IDS = [
+  "bubble-sort",
+  "binary-search",
+  "quick-sort",
+  "merge-sort",
+  "bfs",
+  "dfs",
+  "dijkstra",
+  "linked-list",
+  "big-o-notation",
+  "recursion",
+  "two-pointers",
+  "knapsack",
+] as const
+
+const popular = POPULAR_IDS.map((id) => algorithmCatalog.find((a) => a.id === id)).filter(
+  (a): a is NonNullable<typeof a> => a != null,
+)
+
+const catalogJson = JSON.stringify(
+  algorithmCatalog.map((a) => ({
+    id: a.id,
+    name: a.name,
+    category: getCategoryName(locale, a.category),
+    href: getAlgorithmPath(locale, a.id),
+  })),
+).replace(/</g, "\\u003c")
 ---
 
 <Layout
@@ -15,50 +58,393 @@ const pathnameToRedirect = locale === defaultLocale ? `/` : `/${locale}/`
   description={t.notFoundDescription}
   robots="noindex, nofollow"
 >
-  <div class="h-screen flex flex-col items-center justify-center gap-6 bg-black text-white px-4">
-    <div
-      class="w-12 h-12 rounded-xl bg-white/4 flex items-center justify-center border border-white/8"
-    >
-      <svg
-        class="w-6 h-6 text-white/40"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="1.5"
-        aria-hidden="true"
+  <div class="h-full flex flex-col bg-black text-white" data-not-found data-locale={locale}>
+    <!-- Minimal brand chrome -->
+    <header class="shrink-0 h-12 flex items-center px-4 md:px-6 border-b border-white/[0.06]">
+      <a
+        href={homeHref}
+        class="flex items-center gap-2 hover:opacity-80 transition-opacity duration-150"
+        aria-label={isEs ? "Visualizador de algoritmos — Inicio" : "Algorithm Visualizer — Home"}
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-        ></path>
-      </svg>
-    </div>
+        <div class="header-logo w-6 h-6 rounded-md flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <g stroke="currentColor" stroke-linejoin="round" stroke-width="1.5">
+              <path
+                stroke-linecap="round"
+                d="M10.5 2v2m3-2v2M8 6.5H6m2 3H6m12-3h-2m2 3h-2M13.333 4h-2.666C9.41 4 8.78 4 8.39 4.39C8 4.782 8 5.41 8 6.668v2.666c0 1.257 0 1.886.39 2.277c.391.39 1.02.39 2.277.39h2.666c1.257 0 1.886 0 2.277-.39c.39-.391.39-1.02.39-2.277V6.667c0-1.257 0-1.886-.39-2.276C15.219 4 14.59 4 13.333 4"
+              ></path>
+              <path
+                d="M3.617 21.924c.184.076.417.076.883.076s.699 0 .883-.076a1 1 0 0 0 .54-.541C6 21.199 6 20.966 6 20.5s0-.699-.076-.883a1 1 0 0 0-.541-.54C5.199 19 4.966 19 4.5 19s-.699 0-.883.076a1 1 0 0 0-.54.541C3 19.801 3 20.034 3 20.5s0 .699.076.883a1 1 0 0 0 .541.54Zm7.5 0c.184.076.417.076.883.076s.699 0 .883-.076a1 1 0 0 0 .54-.541c.077-.184.077-.417.077-.883s0-.699-.076-.883a1 1 0 0 0-.541-.54C12.699 19 12.466 19 12 19s-.699 0-.883.076a1 1 0 0 0-.54.541c-.077.184-.077.417-.077.883s0 .699.076.883a1 1 0 0 0 .541.54Z"
+              ></path>
+              <path
+                stroke-linecap="round"
+                d="M12 19v-7m-7.5 7c0-1.404 0-2.107.337-2.611a2 2 0 0 1 .552-.552C5.893 15.5 6.596 15.5 8 15.5h8c1.404 0 2.107 0 2.611.337c.218.146.406.334.552.552c.337.504.337 1.207.337 2.611"
+              ></path>
+              <path
+                d="M18.617 21.924c.184.076.417.076.883.076s.699 0 .883-.076a1 1 0 0 0 .54-.541c.077-.184.077-.417.077-.883s0-.699-.076-.883a1 1 0 0 0-.541-.54C20.199 19 19.966 19 19.5 19s-.699 0-.883.076a1 1 0 0 0-.54.541c-.077.184-.077.417-.077.883s0 .699.076.883a1 1 0 0 0 .541.54Z"
+              ></path>
+            </g>
+          </svg>
+        </div>
+        <span class="text-sm font-semibold tracking-tight font-heading">
+          {isEs ? "Visualizador de algoritmos" : "Algorithm Visualizer"}
+        </span>
+      </a>
+    </header>
 
-    <div class="text-center max-w-sm">
-      <p class="text-xs text-neutral-600 font-mono mb-2 tracking-widest uppercase">Error 404</p>
-      <h1 class="text-xl font-semibold text-white mb-3 font-heading">{t.notFoundTitle}</h1>
-      <p class="text-sm text-neutral-500 leading-relaxed">
-        {t.notFoundDescription}
-      </p>
-    </div>
-
-    <a
-      href={pathnameToRedirect}
-      class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/6 border border-white/10 text-sm text-neutral-300 hover:text-white hover:bg-white/10 transition-colors"
+    <main
+      id="main-content"
+      class="flex-1 overflow-auto px-4 py-10 md:px-6 md:py-14"
+      aria-labelledby="not-found-title"
     >
-      <svg
-        class="w-4 h-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-        aria-hidden="true"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-        ></path>
-      </svg>
-      {t.backToHome}
-    </a>
+      <div class="max-w-2xl mx-auto w-full">
+        <!-- Status -->
+        <div class="mb-8 md:mb-10">
+          <p
+            class="text-[11px] text-neutral-600 font-mono tracking-[0.2em] uppercase mb-3"
+            data-not-found-hint
+          >
+            {t.notFoundHint}
+          </p>
+          <h1
+            id="not-found-title"
+            class="text-2xl md:text-3xl font-semibold text-white font-heading mb-3 text-balance"
+          >
+            {t.notFoundTitle}
+          </h1>
+          <p class="text-sm text-neutral-500 leading-relaxed max-w-lg text-pretty">
+            {t.notFoundDescription}
+          </p>
+          <p
+            class="mt-2 text-xs font-mono text-neutral-700 truncate hidden"
+            data-not-found-path
+            aria-hidden="true"
+          >
+          </p>
+        </div>
+
+        <!-- Did you mean? (filled client-side from pathname) -->
+        <section
+          class="mb-8 hidden"
+          data-not-found-suggestions
+          aria-label={t.notFoundDidYouMean}
+        >
+          <h2 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 mb-3">
+            {t.notFoundDidYouMean}
+          </h2>
+          <ul class="flex flex-col gap-1.5 list-none m-0 p-0" data-not-found-suggestions-list>
+          </ul>
+        </section>
+
+        <!-- Search -->
+        <section class="mb-10" aria-label={t.notFoundSearchLabel}>
+          <label for="not-found-search" class="sr-only">{t.notFoundSearchLabel}</label>
+          <div class="relative">
+            <svg
+              class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600 pointer-events-none"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+              ></path>
+            </svg>
+            <input
+              id="not-found-search"
+              type="search"
+              data-not-found-search
+              autocomplete="off"
+              spellcheck="false"
+              placeholder={t.notFoundSearchPlaceholder}
+              class="not-found-search w-full h-11 pl-10 pr-3 rounded-xl bg-white/[0.04] border border-white/10 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-white/25 focus:bg-white/[0.06] transition-[border-color,background-color] duration-150"
+            />
+          </div>
+          <div
+            class="mt-2 hidden"
+            data-not-found-search-results
+            role="listbox"
+            aria-label={t.notFoundSearchLabel}
+          >
+          </div>
+          <p class="mt-3 text-xs text-neutral-600 hidden" data-not-found-empty>
+            {t.notFoundNoResults}
+          </p>
+        </section>
+
+        <!-- Popular -->
+        <section class="mb-10" data-not-found-popular aria-labelledby="not-found-popular-heading">
+          <div class="flex items-baseline justify-between gap-3 mb-3">
+            <h2
+              id="not-found-popular-heading"
+              class="text-[11px] font-semibold uppercase tracking-wider text-neutral-500"
+            >
+              {t.notFoundPopular}
+            </h2>
+            <a
+              href={homeHref}
+              class="text-[11px] text-neutral-600 hover:text-neutral-300 transition-colors duration-150"
+            >
+              {t.notFoundViewAll}
+            </a>
+          </div>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 list-none m-0 p-0">
+            {
+              popular.map((algo) => (
+                <li>
+                  <a
+                    href={getAlgorithmPath(locale, algo.id)}
+                    class="not-found-link group flex items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-3 hover:border-white/16 hover:bg-white/[0.04] transition-[border-color,background-color,transform] duration-150 active:scale-[0.98]"
+                  >
+                    <span class="min-w-0">
+                      <span class="block text-sm font-medium text-neutral-200 group-hover:text-white font-heading truncate">
+                        {algo.name}
+                      </span>
+                      <span class="block text-[11px] text-neutral-600 mt-0.5">
+                        {getCategoryName(locale, algo.category)}
+                      </span>
+                    </span>
+                    <span
+                      class="text-neutral-700 group-hover:text-neutral-400 shrink-0 transition-colors"
+                      aria-hidden="true"
+                    >
+                      →
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <!-- Categories -->
+        <section class="mb-10" aria-labelledby="not-found-categories-heading">
+          <h2
+            id="not-found-categories-heading"
+            class="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 mb-3"
+          >
+            {t.notFoundBrowseCategories}
+          </h2>
+          <ul class="flex flex-wrap gap-1.5 list-none m-0 p-0">
+            {
+              catalogCategories.map((category) => {
+                const slug = getCategorySlug(category.name)
+                if (!slug) return null
+                return (
+                  <li>
+                    <a
+                      href={getCategoryPath(locale, slug)}
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/[0.08] text-[12px] text-neutral-400 hover:text-white hover:border-white/16 hover:bg-white/[0.04] transition-[color,border-color,background-color,transform] duration-150 active:scale-[0.97]"
+                    >
+                      {getCategoryName(locale, category.name)}
+                      <span class="text-neutral-700 tabular-nums text-[10px]">
+                        {category.algorithms.length}
+                      </span>
+                    </a>
+                  </li>
+                )
+              })
+            }
+          </ul>
+        </section>
+
+        <!-- Home CTA -->
+        <div class="pt-2 border-t border-white/[0.06]">
+          <a
+            href={homeHref}
+            class="inline-flex items-center gap-2 mt-5 px-4 py-2.5 rounded-lg bg-white text-black text-sm font-medium hover:bg-neutral-200 transition-colors duration-150 active:scale-[0.97]"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
+            </svg>
+            {t.backToHome}
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <script type="application/json" data-not-found-catalog set:html={catalogJson} />
   </div>
 </Layout>
+
+<script>
+  type CatalogEntry = { id: string; name: string; category: string; href: string }
+
+  function normalize(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim()
+  }
+
+  function scoreMatch(query: string, entry: CatalogEntry): number {
+    const q = normalize(query)
+    if (!q) return 0
+    const id = normalize(entry.id)
+    const name = normalize(entry.name)
+    const hay = `${id} ${name}`
+    if (id === q || name === q) return 100
+    if (id.startsWith(q) || name.startsWith(q)) return 80
+    if (id.includes(q) || name.includes(q)) return 60
+    // token overlap
+    const tokens = q.split(' ').filter(Boolean)
+    let hits = 0
+    for (const token of tokens) {
+      if (hay.includes(token)) hits++
+    }
+    if (hits === 0) return 0
+    return 20 + (hits / tokens.length) * 30
+  }
+
+  function pathSlug(pathname: string): string {
+    const parts = pathname.replace(/\/+$/, '').split('/').filter(Boolean)
+    if (parts[0] === 'es' || parts[0] === 'en') parts.shift()
+    return parts.join(' ') || parts[parts.length - 1] || ''
+  }
+
+  function renderLinks(
+    container: HTMLElement,
+    entries: CatalogEntry[],
+    { showCategory = true }: { showCategory?: boolean } = {},
+  ): void {
+    container.replaceChildren()
+    for (const entry of entries) {
+      const a = document.createElement('a')
+      a.href = entry.href
+      a.className =
+        'not-found-link group flex items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-3 hover:border-white/16 hover:bg-white/[0.04] transition-[border-color,background-color,transform] duration-150 active:scale-[0.98]'
+      a.setAttribute('role', 'option')
+
+      const left = document.createElement('span')
+      left.className = 'min-w-0'
+      const title = document.createElement('span')
+      title.className =
+        'block text-sm font-medium text-neutral-200 group-hover:text-white font-heading truncate'
+      title.textContent = entry.name
+      left.append(title)
+      if (showCategory) {
+        const cat = document.createElement('span')
+        cat.className = 'block text-[11px] text-neutral-600 mt-0.5'
+        cat.textContent = entry.category
+        left.append(cat)
+      }
+
+      const arrow = document.createElement('span')
+      arrow.className =
+        'text-neutral-700 group-hover:text-neutral-400 shrink-0 transition-colors'
+      arrow.setAttribute('aria-hidden', 'true')
+      arrow.textContent = '→'
+
+      a.append(left, arrow)
+      container.append(a)
+    }
+  }
+
+  function initNotFound(): void {
+    const root = document.querySelector<HTMLElement>('[data-not-found]')
+    if (!root) return
+
+    const catalogEl = root.querySelector<HTMLScriptElement>('[data-not-found-catalog]')
+    let catalog: CatalogEntry[] = []
+    try {
+      catalog = catalogEl?.textContent ? (JSON.parse(catalogEl.textContent) as CatalogEntry[]) : []
+    } catch {
+      catalog = []
+    }
+
+    // Show attempted path
+    const pathEl = root.querySelector<HTMLElement>('[data-not-found-path]')
+    if (pathEl && location.pathname && location.pathname !== '/404' && location.pathname !== '/404/') {
+      pathEl.textContent = location.pathname
+      pathEl.classList.remove('hidden')
+      pathEl.removeAttribute('aria-hidden')
+    }
+
+    // Did you mean?
+    const slug = pathSlug(location.pathname)
+    if (slug && catalog.length > 0) {
+      const suggestions = catalog
+        .map((entry) => ({ entry, score: scoreMatch(slug, entry) }))
+        .filter((row) => row.score >= 40)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .map((row) => row.entry)
+
+      const section = root.querySelector<HTMLElement>('[data-not-found-suggestions]')
+      const list = root.querySelector<HTMLElement>('[data-not-found-suggestions-list]')
+      if (section && list && suggestions.length > 0) {
+        renderLinks(list, suggestions)
+        section.classList.remove('hidden')
+      }
+    }
+
+    // Search
+    const input = root.querySelector<HTMLInputElement>('[data-not-found-search]')
+    const results = root.querySelector<HTMLElement>('[data-not-found-search-results]')
+    const empty = root.querySelector<HTMLElement>('[data-not-found-empty]')
+    const popular = root.querySelector<HTMLElement>('[data-not-found-popular]')
+    if (!input || !results) return
+
+    const runSearch = () => {
+      const q = input.value.trim()
+      if (!q) {
+        results.classList.add('hidden')
+        results.replaceChildren()
+        empty?.classList.add('hidden')
+        popular?.classList.remove('hidden')
+        return
+      }
+
+      popular?.classList.add('hidden')
+      const matches = catalog
+        .map((entry) => ({ entry, score: scoreMatch(q, entry) }))
+        .filter((row) => row.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 8)
+        .map((row) => row.entry)
+
+      if (matches.length === 0) {
+        results.classList.add('hidden')
+        results.replaceChildren()
+        empty?.classList.remove('hidden')
+        return
+      }
+
+      empty?.classList.add('hidden')
+      results.classList.remove('hidden')
+      results.className =
+        'mt-2 flex flex-col gap-1.5 rounded-xl border border-white/[0.08] bg-black/40 p-1.5'
+      renderLinks(results, matches)
+    }
+
+    input.addEventListener('input', runSearch)
+    // Autofocus on desktop only
+    if (window.matchMedia('(pointer: fine)').matches) {
+      requestAnimationFrame(() => input.focus())
+    }
+  }
+
+  initNotFound()
+</script>
+
+<style>
+  .not-found-search::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+</style>

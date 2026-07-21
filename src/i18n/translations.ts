@@ -66,6 +66,14 @@ export interface Translations {
   notFoundTitle: string
   notFoundDescription: string
   backToHome: string
+  notFoundHint: string
+  notFoundSearchLabel: string
+  notFoundSearchPlaceholder: string
+  notFoundDidYouMean: string
+  notFoundPopular: string
+  notFoundBrowseCategories: string
+  notFoundNoResults: string
+  notFoundViewAll: string
 
   // Graph visualizer
   queue: string
@@ -79,13 +87,13 @@ export interface Translations {
 
 export const translations: Record<Locale, Translations> = {
   en: {
-    siteTitle: 'alg0.dev - Algorithm Visualizer',
+    siteTitle: 'Algorithm Visualizer — Sorting, Graphs, DP & More',
     siteDescription:
-      'A modern, interactive algorithm visualizer. Learn algorithms through beautiful step-by-step visualizations.',
+      'Free interactive algorithm visualizer. Learn sorting, searching, graphs, dynamic programming, and data structures with step-by-step animations.',
 
-    welcomeTitle: 'Welcome to alg0.dev',
+    welcomeTitle: 'Algorithm Visualizer',
     welcomeDescription:
-      'Select an algorithm from the sidebar to start visualizing.\nWatch algorithms come to life with step-by-step animations.',
+      'Learn algorithms through step-by-step visualizations — sorting, graphs, dynamic programming, data structures, and more. Pick one from the sidebar to begin.',
     playPauseShortcut: 'Play / Pause',
     stepShortcut: 'Step',
 
@@ -127,9 +135,18 @@ export const translations: Record<Locale, Translations> = {
     viewCode: 'View code',
     languageLabel: 'Language',
 
-    notFoundTitle: '404 — Page not found',
-    notFoundDescription: "The page you're looking for doesn't exist or has been moved.",
+    notFoundTitle: 'Page not found',
+    notFoundDescription:
+      "That URL didn't match any algorithm or page. Search below or jump to a popular visualization.",
     backToHome: 'Back to home',
+    notFoundHint: 'No match · O(1) not found',
+    notFoundSearchLabel: 'Search algorithms',
+    notFoundSearchPlaceholder: 'Try bubble sort, dijkstra, binary search…',
+    notFoundDidYouMean: 'Did you mean?',
+    notFoundPopular: 'Popular visualizations',
+    notFoundBrowseCategories: 'Browse by category',
+    notFoundNoResults: 'No algorithms match that search.',
+    notFoundViewAll: 'View all algorithms',
 
     queue: 'Queue',
     stack: 'Stack',
@@ -150,13 +167,13 @@ export const translations: Record<Locale, Translations> = {
   },
 
   es: {
-    siteTitle: 'alg0.dev - Visualizador de Algoritmos',
+    siteTitle: 'Visualizador de algoritmos — Ordenamiento, Grafos, DP y más',
     siteDescription:
-      'Un visualizador de algoritmos moderno e interactivo. Aprende algoritmos con hermosas visualizaciones paso a paso.',
+      'Visualizador de algoritmos interactivo y gratis. Aprende ordenamiento, búsqueda, grafos, programación dinámica y estructuras de datos con animaciones paso a paso.',
 
-    welcomeTitle: 'Bienvenido a alg0.dev',
+    welcomeTitle: 'Visualizador de algoritmos',
     welcomeDescription:
-      'Selecciona un algoritmo de la barra lateral para comenzar a visualizar.\nObserva cómo los algoritmos cobran vida con animaciones paso a paso.',
+      'Aprende algoritmos con visualizaciones paso a paso: ordenamiento, grafos, programación dinámica, estructuras de datos y más. Elige uno en la barra lateral para empezar.',
     playPauseShortcut: 'Reproducir / Pausar',
     stepShortcut: 'Paso',
 
@@ -198,9 +215,18 @@ export const translations: Record<Locale, Translations> = {
     viewCode: 'Ver código',
     languageLabel: 'Idioma',
 
-    notFoundTitle: '404 — Página no encontrada',
-    notFoundDescription: 'Lo sentimos, no pudimos encontrar la página que estás buscando.',
+    notFoundTitle: 'Página no encontrada',
+    notFoundDescription:
+      'Esa URL no coincide con ningún algoritmo ni página. Busca abajo o ve a una visualización popular.',
     backToHome: 'Volver al inicio',
+    notFoundHint: 'Sin coincidencias · O(1) not found',
+    notFoundSearchLabel: 'Buscar algoritmos',
+    notFoundSearchPlaceholder: 'Prueba bubble sort, dijkstra, búsqueda binaria…',
+    notFoundDidYouMean: '¿Quisiste decir?',
+    notFoundPopular: 'Visualizaciones populares',
+    notFoundBrowseCategories: 'Explorar por categoría',
+    notFoundNoResults: 'Ningún algoritmo coincide con esa búsqueda.',
+    notFoundViewAll: 'Ver todos los algoritmos',
 
     queue: 'Cola',
     stack: 'Pila',

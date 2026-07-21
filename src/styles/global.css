@@ -206,7 +206,6 @@
 }
 
 /* Static syntax viewer — preserves the previous rhythm and colours without an editor runtime. */
-.code-panel-tab,
 .code-language-button {
   color: #525252;
   transition:
@@ -215,12 +214,10 @@
     transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.code-panel-tab:active,
 .code-language-button:active {
   transform: scale(0.97);
 }
 
-.code-panel-tab.is-active,
 .code-language-button.is-active {
   color: var(--foreground);
 }
@@ -229,29 +226,7 @@
   background: var(--subtle-strong);
 }
 
-.code-panel-tab__key {
-  color: #525252;
-  border-color: var(--viz-border);
-  background: var(--subtle);
-}
-
-.code-panel-tab.is-active .code-panel-tab__key {
-  color: var(--viz-label);
-  border-color: var(--viz-axis);
-  background: var(--subtle-strong);
-}
-
-.code-panel-tab__indicator {
-  background: var(--foreground);
-  opacity: 0;
-}
-
-.code-panel-tab.is-active .code-panel-tab__indicator {
-  opacity: 1;
-}
-
 @media (hover: hover) and (pointer: fine) {
-  .code-panel-tab:hover,
   .code-language-button:hover {
     color: var(--foreground);
   }

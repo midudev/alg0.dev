@@ -4,8 +4,9 @@
  */
 import type { Locale } from '@i18n/translations'
 import { translations, getCategoryName, defaultLocale, locales } from '@i18n/translations'
-import { getCatalogEntry } from '@lib/algorithms/catalog'
-import { $ } from '@lib/dom'
+import { getCatalogEntry, isKnownAlgorithmId } from '@lib/algorithms/catalog'
+import { difficultyPresentation } from '@lib/difficulty'
+import { $, $$ } from '@lib/dom'
 import { syncHeaderChrome } from '@lib/header-chrome'
 import {
   SELECT_ALGORITHM_EVENT,
@@ -53,11 +54,17 @@ function getAlgorithmUrl(locale: string, algoId: string): string {
 function getAlgorithmIdFromPath(pathname: string): string | null {
   const cleaned = pathname.replace(/\/$/, '')
   if (cleaned === '') return null
+  let id: string | null = null
   for (const locale of locales) {
     if (cleaned === `/${locale}`) return null
-    if (cleaned.startsWith(`/${locale}/`)) return cleaned.slice(locale.length + 2)
+    if (cleaned.startsWith(`/${locale}/`)) {
+      id = cleaned.slice(locale.length + 2)
+      break
+    }
   }
-  return cleaned.slice(1)
+  if (id == null) id = cleaned.slice(1)
+  // Category hubs share the same URL shape — only treat known algorithm ids as SPA targets.
+  return isKnownAlgorithmId(id) ? id : null
 }
 
 async function loadAlgorithmPageContent(
@@ -168,6 +175,54 @@ function syncSrTitle(root: HTMLElement, locale: Locale, algorithm: AlgorithmSumm
   el.textContent = `${algorithm.name} — ${getCategoryName(locale, algorithm.category)}`
 }
 
+function syncAlgorithmExplanation(root: HTMLElement, html: string): void {
+  const content = $<HTMLElement>('[data-algorithm-explanation-content]', root)
+  if (!content) return
+
+  content.innerHTML = html
+  const scrollRegion = $<HTMLElement>('[data-algorithm-explanation-scroll]', root)
+  if (scrollRegion) scrollRegion.scrollTop = 0
+}
+
+function syncExplanationHeader(
+  root: HTMLElement,
+  locale: Locale,
+  algorithm: AlgorithmSummary | null,
+): void {
+  if (!algorithm) return
+
+  const title = $('[data-algorithm-explanation-title]', root)
+  if (title) title.textContent = algorithm.name
+
+  const badge = $<HTMLElement>('[data-algorithm-difficulty]', root)
+  const dot = $<HTMLElement>('[data-algorithm-difficulty-dot]', root)
+  const label = $('[data-algorithm-difficulty-label]', root)
+  const difficulty = difficultyPresentation[algorithm.difficulty]
+
+  if (badge) {
+    badge.dataset.algorithmDifficulty = algorithm.difficulty
+    badge.className = `inline-flex shrink-0 items-center gap-1.5 px-2 py-0.5 text-[10px] font-semibold rounded-full border ${difficulty.background} ${difficulty.color}`
+  }
+  if (dot) dot.className = `w-1.5 h-1.5 rounded-full ${difficulty.dot}`
+  if (label) label.textContent = difficulty.label[locale]
+}
+
+function setExplanationCollapsed(root: HTMLElement, collapsed: boolean): void {
+  root.toggleAttribute('data-explanation-collapsed', collapsed)
+
+  const button = $<HTMLButtonElement>('[data-algorithm-explanation-toggle]', root)
+  if (!button) return
+  button.setAttribute('aria-expanded', collapsed ? 'false' : 'true')
+  button.setAttribute(
+    'aria-label',
+    collapsed ? (button.dataset.labelExpand ?? '') : (button.dataset.labelCollapse ?? ''),
+  )
+  const collapseIcon = $('[data-explanation-icon-collapse]', button)
+  const expandIcon = $('[data-explanation-icon-expand]', button)
+  collapseIcon?.toggleAttribute('hidden', collapsed)
+  expandIcon?.toggleAttribute('hidden', !collapsed)
+}
+
 function syncMobileTransport(
   root: HTMLElement,
   playback: PlaybackController,
@@ -212,7 +267,6 @@ export function initAlgoPage(root: HTMLElement): () => void {
   const hydrated = hydrateAlgorithm(initialSummary, initialSteps)
 
   let headerAlgorithm: AlgorithmSummary | null = initialSummary
-  let aboutHtml: string | null = null
 
   const playback = createPlayback({
     locale,
@@ -231,6 +285,7 @@ export function initAlgoPage(root: HTMLElement): () => void {
     syncSidebarSelection(headerAlgorithm?.id ?? null)
     syncCodePanelForAlgorithm(headerAlgorithm != null)
     syncSrTitle(root, locale, headerAlgorithm)
+    syncExplanationHeader(root, locale, headerAlgorithm)
     syncStepDescription(root, locale, snap.currentStep, snap.currentStepData?.description)
     syncMobileTransport(root, playback, headerAlgorithm != null)
     publishCodePanelState({
@@ -238,7 +293,6 @@ export function initAlgoPage(root: HTMLElement): () => void {
       currentLine: snap.currentStepData?.codeLine,
       variables: snap.currentStepData?.variables,
       consoleOutput: snap.currentStepData?.consoleOutput,
-      ...(aboutHtml !== null ? { aboutHtml } : {}),
     })
   }
 
@@ -252,7 +306,7 @@ export function initAlgoPage(root: HTMLElement): () => void {
   ) => {
     headerAlgorithm = algo
     playback.selectAlgorithm(algo)
-    aboutHtml = pageContent?.html ?? ''
+    if (pageContent?.html) syncAlgorithmExplanation(root, pageContent.html)
     closeMobileSidebar()
     expandCodePanel()
     if (pushUrl) {
@@ -261,8 +315,8 @@ export function initAlgoPage(root: HTMLElement): () => void {
     document.title =
       pageContent?.pageTitle ||
       (locale === 'es'
-        ? `${algo.name}: Visualizador | alg0.dev`
-        : `${algo.name} Visualizer | alg0.dev`)
+        ? `${algo.name} — Visualizador de algoritmos`
+        : `${algo.name} — Algorithm Visualizer`)
     updateMetaDescription(pageContent?.metaDescription || t.siteDescription)
     publishChrome()
   }
@@ -272,8 +326,7 @@ export function initAlgoPage(root: HTMLElement): () => void {
     options: { pushUrl: boolean; summary?: AlgorithmSummary } = { pushUrl: true },
   ) => {
     if (options.summary) headerAlgorithm = options.summary
-    // Keep previous about HTML until the new page content arrives (avoids empty Explanation tab).
-    // Mark as "pending" only for code/title sync; aboutHtml is replaced in activateAlgorithm.
+    // Keep the current explanation visible until the new static fragment arrives.
     publishChrome()
     try {
       const [algo, pageContent] = await Promise.all([
@@ -308,12 +361,19 @@ export function initAlgoPage(root: HTMLElement): () => void {
     // Navigated to home via history — full page usually; clear if still mounted
     playback.clearSelection()
     headerAlgorithm = null
-    aboutHtml = null
     document.title = t.siteTitle
     updateMetaDescription(t.siteDescription)
     publishChrome()
   }
   window.addEventListener('popstate', onPopState)
+
+  const onExplanationClick = (event: Event) => {
+    const target = event.target
+    if (!(target instanceof Element)) return
+    if (!target.closest('[data-algorithm-explanation-toggle]')) return
+    setExplanationCollapsed(root, !root.hasAttribute('data-explanation-collapsed'))
+  }
+  root.addEventListener('click', onExplanationClick)
 
   const onMobileClick = (event: Event) => {
     const target = event.target
@@ -352,6 +412,7 @@ export function initAlgoPage(root: HTMLElement): () => void {
     playback.dispose()
     window.removeEventListener(SELECT_ALGORITHM_EVENT, onSelect)
     window.removeEventListener('popstate', onPopState)
+    root.removeEventListener('click', onExplanationClick)
     document.removeEventListener('click', onMobileClick)
     mq.removeEventListener('change', onMq)
   }
@@ -359,7 +420,7 @@ export function initAlgoPage(root: HTMLElement): () => void {
 
 /** Auto-init every `[data-algo-page]` on the document. */
 export function initAllAlgoPages(): void {
-  for (const root of document.querySelectorAll<HTMLElement>('[data-algo-page]')) {
+  for (const root of $$<HTMLElement>('[data-algo-page]')) {
     initAlgoPage(root)
   }
 }

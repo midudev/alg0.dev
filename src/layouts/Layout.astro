@@ -20,13 +20,13 @@ const ogLocale = locale === "es" ? "es_ES" : "en_US"
 const {
   title = t.siteTitle,
   description = t.siteDescription,
-  ogImage = "/og-image.png",
+  ogImage = "/og/default.jpg",
   canonicalURL = new URL(normalizePath(Astro.url.pathname), Astro.site).href,
   robots = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
   structuredData,
 } = Astro.props
 
-const siteName = "alg0.dev"
+const siteName = "Algorithm Visualizer"
 const twitterAuthor = "@midudev"
 
 function normalizePath(path: string) {
@@ -135,6 +135,7 @@ const defaultStructuredData = {
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content={twitterAuthor} />
+    <meta name="twitter:creator" content={twitterAuthor} />
     <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

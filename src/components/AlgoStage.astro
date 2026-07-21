@@ -3,8 +3,10 @@
  * Static algorithm stage (viz host + step description + mobile transport).
  * Behavior: `src/lib/algo-page.ts` via client bootstrap.
  */
+import AlgorithmDescription from "@components/AlgorithmDescription.astro"
 import type { Locale } from "@i18n/translations"
-import { translations, getCategoryName } from "@i18n/translations"
+import { translations } from "@i18n/translations"
+import { difficultyPresentation } from "@lib/difficulty"
 import type { AlgorithmSummary, Step } from "@lib/types"
 
 interface Props {
@@ -12,11 +14,23 @@ interface Props {
   algorithm: AlgorithmSummary
   /** Precomputed steps for first paint + bootstrap JSON. */
   steps: Step[]
+  /** Full educational description for crawlable summary. */
+  description?: string
+  pageTitle?: string
+  metaDescription?: string
 }
 
-const { locale, algorithm, steps } = Astro.props
+const {
+  locale,
+  algorithm,
+  steps,
+  description = "",
+  pageTitle,
+  metaDescription,
+} = Astro.props
 const t = translations[locale]
 const first = steps[0]
+const difficulty = difficultyPresentation[algorithm.difficulty]
 // Escape `<` so step strings never close the script tag early
 const bootstrapJson = JSON.stringify({ locale, algorithm, steps }).replace(/</g, "\\u003c")
 ---
@@ -28,41 +42,129 @@ const bootstrapJson = JSON.stringify({ locale, algorithm, steps }).replace(/</g,
 >
   <script type="application/json" data-algo-bootstrap set:html={bootstrapJson} />
 
-  <div class="flex-1 flex overflow-hidden relative min-h-0">
-    <main
-      id="main-content"
-      class="flex-1 flex flex-col overflow-hidden min-w-0"
-      aria-label={t.visualizationLabel}
-    >
+  <main
+    id="main-content"
+    class="flex-1 flex flex-col overflow-hidden min-h-0 min-w-0"
+    aria-label={t.visualizationLabel}
+  >
       <h1 class="sr-only" data-algo-sr-title>
-        {algorithm.name} — {getCategoryName(locale, algorithm.category)}
+        {algorithm.name} —{" "}
+        {locale === "es" ? "Visualizador de algoritmos" : "Algorithm Visualizer"}
       </h1>
-      <div class="flex-1 flex flex-col px-3 py-3 md:px-5 md:py-4 overflow-auto min-h-0">
-        <div data-step-viz class="flex-1 flex min-h-0 w-full"></div>
-      </div>
 
-      <div
-        class="px-3 pb-3 md:px-5 md:pb-4"
-        aria-live="polite"
-        aria-atomic="true"
-        data-step-description-host
+      <section
+        class="shrink-0 flex flex-col h-[52%] min-h-[260px] max-h-[520px] overflow-hidden"
+        aria-label={t.visualizationLabel}
+        data-algorithm-demo
       >
-        {
-          first?.description ? (
-            <div
-              data-step-description
-              class="text-xs md:text-sm text-neutral-300 bg-white/5 rounded-lg px-3 py-2 md:px-5 md:py-3 border border-white/12"
-            >
-              <span class="text-amber-300/90 font-medium mr-2" data-step-label>
-                {t.step.replace("{n}", "1")}
+        <div class="flex-1 flex flex-col px-3 py-3 md:px-5 md:py-4 min-h-0 overflow-hidden">
+          <div data-step-viz class="flex-1 flex min-h-0 w-full" style="min-height: 200px"></div>
+        </div>
+
+        <div
+          class="px-3 pb-3 md:px-5 md:pb-4 shrink-0"
+          aria-live="polite"
+          aria-atomic="true"
+          data-step-description-host
+        >
+          {
+            first?.description ? (
+              <div
+                data-step-description
+                class="text-xs md:text-sm text-neutral-300 bg-white/5 rounded-lg px-3 py-2 md:px-5 md:py-3 border border-white/12"
+              >
+                <span class="text-amber-300/90 font-medium mr-2" data-step-label>
+                  {t.step.replace("{n}", "1")}
+                </span>
+                <span data-step-text>{first.description}</span>
+              </div>
+            ) : null
+          }
+        </div>
+
+      </section>
+
+      {
+        description ? (
+          <section
+            class="flex-1 min-h-[160px] flex flex-col border-t border-white/8 bg-black/40"
+            aria-label={locale === "es" ? "Explicación" : "Explanation"}
+            data-algorithm-explanation
+          >
+            <header class="shrink-0 flex items-center gap-2.5 px-4 py-3 md:px-6 border-b border-white/8">
+              <h2
+                class="min-w-0 truncate text-sm font-semibold text-white font-heading"
+                data-algorithm-explanation-title
+              >
+                {algorithm.name}
+              </h2>
+              <span
+                class:list={[
+                  "inline-flex shrink-0 items-center gap-1.5 px-2 py-0.5 text-[10px] font-semibold rounded-full border",
+                  difficulty.background,
+                  difficulty.color,
+                ]}
+                data-algorithm-difficulty={algorithm.difficulty}
+              >
+                <span
+                  class:list={["w-1.5 h-1.5 rounded-full", difficulty.dot]}
+                  data-algorithm-difficulty-dot
+                />
+                <span data-algorithm-difficulty-label>{difficulty.label[locale]}</span>
               </span>
-              <span data-step-text>{first.description}</span>
+              <button
+                type="button"
+                class="ml-auto shrink-0 inline-flex size-7 items-center justify-center rounded-md text-neutral-500 hover:text-white hover:bg-white/6 transition-colors"
+                aria-expanded="true"
+                aria-controls="algorithm-explanation-body"
+                aria-label={locale === "es" ? "Minimizar explicación" : "Minimize explanation"}
+                data-label-expand={locale === "es" ? "Mostrar explicación" : "Show explanation"}
+                data-label-collapse={locale === "es" ? "Minimizar explicación" : "Minimize explanation"}
+                data-algorithm-explanation-toggle
+              >
+                <svg
+                  class="size-3.5"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" d="M3.5 8h9" data-explanation-icon-collapse />
+                  <path
+                    stroke-linecap="round"
+                    d="M8 3.5v9M3.5 8h9"
+                    data-explanation-icon-expand
+                    hidden
+                  />
+                </svg>
+              </button>
+            </header>
+            <div
+              id="algorithm-explanation-body"
+              class="flex-1 min-h-0 overflow-y-auto"
+              tabindex="0"
+              data-algorithm-explanation-scroll
+            >
+              <div
+                class="max-w-3xl px-4 py-5 md:px-6 md:py-6"
+                data-algorithm-explanation-content
+              >
+                <AlgorithmDescription
+                  description={description}
+                  difficulty={algorithm.difficulty}
+                  locale={locale}
+                  pageTitle={pageTitle}
+                  metaDescription={metaDescription}
+                  showHeader={false}
+                  algorithm={algorithm}
+                />
+              </div>
             </div>
-          ) : null
-        }
-      </div>
-    </main>
-  </div>
+          </section>
+        ) : null
+      }
+  </main>
 
   <!-- Mobile transport bar (shown by plain JS when md:max) -->
   <div
@@ -179,3 +281,20 @@ const bootstrapJson = JSON.stringify({ locale, algorithm, steps }).replace(/</g,
     </button>
   </div>
 </div>
+
+<style is:global>
+  [data-algo-page][data-explanation-collapsed] [data-algorithm-demo] {
+    flex: 1 1 0%;
+    height: auto;
+    max-height: none;
+  }
+
+  [data-algo-page][data-explanation-collapsed] [data-algorithm-explanation] {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  [data-algo-page][data-explanation-collapsed] [data-algorithm-explanation-scroll] {
+    display: none;
+  }
+</style>

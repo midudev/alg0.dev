@@ -15,10 +15,12 @@ const { locale, initialAlgorithmId, initialStep } = Astro.props
 const t = translations[locale]
 const initialVariables = Object.entries(initialStep?.variables ?? {})
 const initialConsole = initialStep?.consoleOutput ?? []
+// SSR only JavaScript to keep HTML light; other languages load on demand.
 const algorithmCodeHtml = initialAlgorithmId
   ? await renderAlgorithmCodeHtml(initialAlgorithmId, {
       activeJsLine: initialStep?.codeLine,
       variables: initialStep?.variables,
+      languages: ["javascript"],
     })
   : ""
 ---
@@ -29,48 +31,7 @@ const algorithmCodeHtml = initialAlgorithmId
   data-initial-algorithm-id={initialAlgorithmId}
   class="flex flex-col h-full"
 >
-  <div
-    class="flex border-b border-white/8 shrink-0"
-    role="tablist"
-    aria-label={locale === "es" ? "Pestañas de código y detalles" : "Code and details tabs"}
-  >
-    {
-      (["code", "about"] as const).map((tab) => (
-        <button
-          type="button"
-          data-code-panel-tab={tab}
-          role="tab"
-          aria-selected={tab === "code" ? "true" : "false"}
-          aria-controls={`tabpanel-${tab}`}
-          id={`tab-${tab}`}
-          tabindex={tab === "code" ? 0 : -1}
-          class:list={[
-            "code-panel-tab px-3 py-2.5 md:px-5 md:py-3 text-xs font-medium relative capitalize",
-            { "is-active": tab === "code" },
-          ]}
-        >
-          <span class="flex items-center gap-2">
-            {tab === "code" ? t.tabCode : t.tabAbout}
-            <kbd
-              class="code-panel-tab__key inline-flex items-center justify-center w-[18px] h-[18px] text-[10px] font-mono rounded border"
-              aria-hidden="true"
-            >
-              {tab === "code" ? "C" : "E"}
-            </kbd>
-          </span>
-          <span class="code-panel-tab__indicator absolute bottom-0 left-2 right-2 h-px" aria-hidden="true" />
-        </button>
-      ))
-    }
-  </div>
-
-  <div
-    data-code-panel-tabpanel="code"
-    class="flex flex-1 flex-col overflow-hidden"
-    role="tabpanel"
-    id="tabpanel-code"
-    aria-labelledby="tab-code"
-  >
+  <div class="flex flex-1 flex-col overflow-hidden">
     <div
       class="flex items-center gap-1 shrink-0 px-2 md:px-3 py-1.5 border-b border-white/[0.06]"
       role="group"
@@ -168,14 +129,4 @@ const algorithmCodeHtml = initialAlgorithmId
     </div>
   </div>
 
-  <div
-    data-code-panel-tabpanel="about"
-    class="hidden flex-1 flex-col overflow-auto p-4 md:p-6 min-h-0"
-    role="tabpanel"
-    id="tabpanel-about"
-    aria-labelledby="tab-about"
-    aria-hidden="true"
-  >
-    <div data-code-panel-about class="min-h-0"><slot /></div>
-  </div>
 </div>

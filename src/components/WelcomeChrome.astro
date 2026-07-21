@@ -12,101 +12,17 @@ interface Props {
 
 const { locale } = Astro.props
 const t = translations[locale]
+// Description may include a newline for source readability — flatten for display.
+const description = t.welcomeDescription.replace(/\n+/g, " ").trim()
 ---
 
-{/* Title + description */}
-<div class="text-center max-w-md shrink-0 px-4 md:px-0" data-welcome-chrome>
-  <div
-    class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/4 flex items-center justify-center border border-white/8 mx-auto mb-3 md:mb-4"
+<div class="text-center max-w-xl shrink-0 px-4 md:px-0" data-welcome-chrome>
+  <h1
+    class="text-lg md:text-xl font-semibold text-white mb-2 text-balance font-heading tracking-tight"
   >
-    <svg
-      class="w-5 h-5 md:w-6 md:h-6 text-white/60"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      stroke-width="1.5"
-      aria-hidden="true"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"></path>
-    </svg>
-  </div>
-  <h1 class="text-lg md:text-xl font-semibold text-white mb-2 text-balance font-heading">
     {t.welcomeTitle}
   </h1>
-  <p
-    class="text-xs md:text-sm text-neutral-500 leading-relaxed max-w-lg text-balance inline-block"
-  >
-    {t.welcomeDescription}
+  <p class="text-xs md:text-sm text-neutral-500 leading-relaxed max-w-lg mx-auto text-pretty">
+    {description}
   </p>
-</div>
-
-{/* Keyboard shortcuts — desktop only */}
-<div
-  class="hidden md:flex items-center justify-center gap-3 text-xs text-neutral-600 shrink-0"
-  data-welcome-shortcuts
->
-  <div class="flex items-center gap-2">
-    <kbd
-      class="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80"
-    >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M4 10v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1 -1v-3"></path>
-      </svg>
-    </kbd>
-    <span>{t.playPauseShortcut}</span>
-  </div>
-  <div class="flex items-center gap-2">
-    <div class="flex items-center gap-1">
-      <kbd
-        class="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80"
-      >
-        <svg
-          width="16"
-          height="16"
-          stroke-linejoin="round"
-          viewBox="0 0 16 16"
-          style="color: currentcolor"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M6.46966 13.7803L6.99999 14.3107L8.06065 13.25L7.53032 12.7197L3.56065 8.75001H14.25H15V7.25001H14.25H3.56065L7.53032 3.28034L8.06065 2.75001L6.99999 1.68935L6.46966 2.21968L1.39644 7.2929C1.00592 7.68342 1.00592 8.31659 1.39644 8.70711L6.46966 13.7803Z"
-            fill="currentColor"></path>
-        </svg>
-      </kbd>
-      <kbd
-        class="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80"
-      >
-        <svg
-          width="16"
-          height="16"
-          stroke-linejoin="round"
-          viewBox="0 0 16 16"
-          style="color: currentcolor"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M9.53033 2.21968L9 1.68935L7.93934 2.75001L8.46967 3.28034L12.4393 7.25001H1.75H1V8.75001H1.75H12.4393L8.46967 12.7197L7.93934 13.25L9 14.3107L9.53033 13.7803L14.6036 8.70711C14.9941 8.31659 14.9941 7.68342 14.6036 7.2929L9.53033 2.21968Z"
-            fill="currentColor"></path>
-        </svg>
-      </kbd>
-    </div>
-    <span>{t.stepShortcut}</span>
-  </div>
 </div>

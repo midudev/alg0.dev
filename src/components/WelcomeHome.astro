@@ -1,33 +1,40 @@
 ---
 /**
- * Home empty state: static chrome + showcase shell (plain JS).
+ * Home: centered hero (copy + showcase + shortcuts) + compact SEO catalog strip.
  */
 import type { Locale } from "@i18n/translations"
+import { translations } from "@i18n/translations"
 import WelcomeChrome from "@components/WelcomeChrome.astro"
+import HomeCatalog from "@components/HomeCatalog.astro"
 
 interface Props {
   locale: Locale
 }
 
 const { locale } = Astro.props
+const t = translations[locale]
 ---
 
 <div
-  class="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6 min-h-0 px-3 py-3 md:px-5 md:py-4 overflow-auto"
+  class="flex-1 flex flex-col min-h-0 overflow-auto"
   data-welcome-home
 >
-  <div class="contents" data-welcome-layout>
+  <!-- Hero: vertically centered when space allows -->
+  <div
+    class="grow shrink-0 flex flex-col items-center justify-center gap-4 md:gap-5 px-3 py-4 md:px-5 md:py-6"
+    data-welcome-hero
+  >
     <WelcomeChrome locale={locale} />
 
     <div
-      class="order-2 w-full flex justify-center min-h-0"
+      class="w-full flex justify-center shrink-0"
       data-showcase
       data-showcase-locale={locale}
     >
       <div
         data-showcase-stage
         class="relative w-full max-w-2xl rounded-xl md:rounded-2xl border border-white/6 bg-white/2 overflow-hidden group hover:border-white/12 hover:bg-white/4 transition-colors duration-300 is-loading"
-        style="height: clamp(240px, 45vw, 360px)"
+        style="height: clamp(220px, 38vh, 340px)"
       >
         <div
           data-showcase-fade
@@ -39,11 +46,11 @@ const { locale } = Astro.props
               data-showcase-category
               class="text-[11px] font-medium text-neutral-500 uppercase tracking-wider"
             ></span>
-            <h3
+            <p
               data-showcase-name
               class="text-sm font-semibold text-white font-heading mt-0.5"
             >
-            </h3>
+            </p>
           </div>
           <div
             data-showcase-viz
@@ -58,9 +65,9 @@ const { locale } = Astro.props
           <a
             data-showcase-open
             href="#"
-            class="pointer-events-auto px-3 py-1.5 text-[11px] font-medium rounded-md bg-white text-black hover:bg-neutral-200 transition-colors"
+            class="pointer-events-auto px-3 py-1.5 text-[11px] font-medium rounded-md bg-white text-black hover:bg-neutral-200 transition-colors active:scale-[0.97]"
           >
-            Open
+            {locale === "es" ? "Abrir" : "Open"}
           </a>
         </div>
 
@@ -77,35 +84,81 @@ const { locale } = Astro.props
         </div>
       </div>
     </div>
+
+    <!-- Keyboard shortcuts — desktop only -->
+    <div
+      class="hidden md:flex items-center justify-center gap-3 text-xs text-neutral-600 shrink-0"
+      data-welcome-shortcuts
+    >
+      <div class="flex items-center gap-2">
+        <kbd
+          class="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 10v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1 -1v-3"></path>
+          </svg>
+        </kbd>
+        <span>{t.playPauseShortcut}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1">
+          <kbd
+            class="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80"
+          >
+            <svg
+              width="16"
+              height="16"
+              stroke-linejoin="round"
+              viewBox="0 0 16 16"
+              style="color: currentcolor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M6.46966 13.7803L6.99999 14.3107L8.06065 13.25L7.53032 12.7197L3.56065 8.75001H14.25H15V7.25001H14.25H3.56065L7.53032 3.28034L8.06065 2.75001L6.99999 1.68935L6.46966 2.21968L1.39644 7.2929C1.00592 7.68342 1.00592 8.31659 1.39644 8.70711L6.46966 13.7803Z"
+                fill="currentColor"></path>
+            </svg>
+          </kbd>
+          <kbd
+            class="w-8 h-8 flex items-center justify-center bg-white/6 rounded-lg border border-white/10 text-white/80"
+          >
+            <svg
+              width="16"
+              height="16"
+              stroke-linejoin="round"
+              viewBox="0 0 16 16"
+              style="color: currentcolor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M9.53033 2.21968L9 1.68935L7.93934 2.75001L8.46967 3.28034L12.4393 7.25001H1.75H1V8.75001H1.75H12.4393L8.46967 12.7197L7.93934 13.25L9 14.3107L9.53033 13.7803L14.6036 8.70711C14.9941 8.31659 14.9941 7.68342 14.6036 7.2929L9.53033 2.21968Z"
+                fill="currentColor"></path>
+            </svg>
+          </kbd>
+        </div>
+        <span>{t.stepShortcut}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEO / discovery strip — stays under the hero, never overlaps the viz -->
+  <div
+    class="shrink-0 border-t border-white/[0.06] px-3 py-4 md:px-5 md:py-5"
+    data-welcome-footer
+  >
+    <HomeCatalog locale={locale} />
   </div>
 </div>
-
-<style>
-  [data-welcome-layout] {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    width: 100%;
-    min-height: 0;
-    flex: 1;
-  }
-  @media (min-width: 768px) {
-    [data-welcome-layout] {
-      gap: 1.5rem;
-    }
-  }
-  [data-welcome-layout] [data-welcome-chrome] {
-    order: 1;
-  }
-  [data-welcome-layout] [data-showcase] {
-    order: 2;
-  }
-  [data-welcome-layout] [data-welcome-shortcuts] {
-    order: 3;
-  }
-  [data-showcase-stage].is-loading {
-    /* empty shell while algorithms load */
-  }
-</style>

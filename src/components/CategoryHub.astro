@@ -1,0 +1,124 @@
+---
+import type { Locale } from "@i18n/translations"
+import { getCategoryName, translations } from "@i18n/translations"
+import { getCategoryIntro } from "@lib/categories"
+import { difficultyPresentation } from "@lib/difficulty"
+import { getAlgorithmPath, getHomeUrl } from "@lib/locale-url"
+import { categoryIconPaths, getCategoryColor } from "@lib/sidebar-meta"
+import type { CategorySummary } from "@lib/types"
+
+interface Props {
+  locale: Locale
+  category: CategorySummary
+}
+
+const { locale, category } = Astro.props
+const t = translations[locale]
+const label = getCategoryName(locale, category.name)
+const intro = getCategoryIntro(locale, category.name)
+const isEs = locale === "es"
+const categoryColor = getCategoryColor(category.name)
+const categoryIcon = categoryIconPaths[category.name]
+---
+
+<main
+  id="main-content"
+  class="flex-1 flex flex-col overflow-auto min-w-0 px-4 py-6 md:px-8 md:py-10"
+  aria-label={label}
+>
+  <div
+    class="category-hub max-w-3xl w-full mx-auto"
+    style={`--category-accent: ${categoryColor.selectedCss}`}
+  >
+    <nav class="mb-4 text-[11px] text-neutral-500" aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        <li>
+          <a href={getHomeUrl(locale)} class="hover:text-neutral-300 transition-colors">
+            {isEs ? "Inicio" : "Home"}
+          </a>
+        </li>
+        <li aria-hidden="true" class="text-neutral-700">/</li>
+        <li class="category-hub__accent" aria-current="page">{label}</li>
+      </ol>
+    </nav>
+
+    <div class="flex items-center gap-3 mb-3">
+      {
+        categoryIcon && (
+          <span
+            class:list={[
+              "category-hub__icon inline-flex size-9 items-center justify-center rounded-lg border",
+              categoryColor.icon,
+            ]}
+            aria-hidden="true"
+          >
+            <svg
+              class="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d={categoryIcon} />
+            </svg>
+          </span>
+        )
+      }
+      <h1 class="category-hub__accent text-2xl md:text-3xl font-semibold font-heading">
+        {label}
+      </h1>
+    </div>
+    <p class="text-sm text-neutral-400 leading-relaxed mb-2 max-w-2xl">
+      {intro}
+    </p>
+    <p class="text-xs text-neutral-600 mb-8">
+      {t.algorithmsCount.replace("{count}", String(category.algorithms.length))}
+    </p>
+
+    <ul class="grid gap-2 sm:grid-cols-2 list-none m-0 p-0">
+      {
+        category.algorithms.map((algo) => {
+          const difficulty = difficultyPresentation[algo.difficulty]
+          return (
+            <li>
+              <a
+                href={getAlgorithmPath(locale, algo.id)}
+                class="category-hub__card flex items-center justify-between gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 transition-colors group"
+              >
+                <span class="text-sm font-medium text-neutral-200 group-hover:text-white font-heading">
+                  {algo.name}
+                </span>
+                <span
+                  class:list={[
+                    "inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full border shrink-0",
+                    difficulty.background,
+                    difficulty.color,
+                  ]}
+                >
+                  <span class:list={["size-1.5 rounded-full", difficulty.dot]}></span>
+                  {difficulty.label[locale]}
+                </span>
+              </a>
+            </li>
+          )
+        })
+      }
+    </ul>
+  </div>
+</main>
+
+<style>
+  .category-hub__accent {
+    color: var(--category-accent);
+  }
+
+  .category-hub__icon {
+    border-color: color-mix(in srgb, var(--category-accent) 24%, transparent);
+    background: color-mix(in srgb, var(--category-accent) 8%, transparent);
+  }
+
+  .category-hub__card:hover {
+    border-color: color-mix(in srgb, var(--category-accent) 28%, transparent);
+    background: color-mix(in srgb, var(--category-accent) 4%, transparent);
+  }
+</style>

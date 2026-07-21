@@ -29,18 +29,30 @@ export function getAlgorithmMetaTitle(
 ): string {
   const firstLine = description.split('\n')[0].trim()
   const name = firstLine || fallbackName
-  const suffix = locale === 'es' ? ': Visualizador | alg0.dev' : ' Visualizer | alg0.dev'
-  const maxNameLength = 60 - suffix.length
-  const conciseName = name.length > maxNameLength ? name.split(' (')[0] : name
-  return `${conciseName.slice(0, maxNameLength).trim()}${suffix}`
+  const conciseName = name.split(' (')[0].trim()
+  // Keyword-first titles; brand omitted so SERP focus stays on the algorithm.
+  if (locale === 'es') {
+    const title = `${conciseName} — Visualizador de algoritmos`
+    return title.length <= 60 ? title : `${conciseName} — Visualizador`
+  }
+  const title = `${conciseName} — Algorithm Visualizer`
+  return title.length <= 60 ? title : `${conciseName} Visualizer`
 }
 
 export function getAlgorithmMetaDescription(locale: Locale, description: string): string {
   if (!description) return translations[locale].siteDescription
   const paragraphs = description.split('\n\n')
   const content = paragraphs.length > 1 ? paragraphs[1] : paragraphs[0]
-  const cleaned = content.replace(/\n/g, ' ').trim()
-  if (cleaned.length <= 160) return cleaned
+  const cleaned = content.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+  const suffix =
+    locale === 'es'
+      ? ' Visualización interactiva paso a paso.'
+      : ' Free interactive step-by-step visualization.'
+
+  const withSuffix =
+    cleaned.length + suffix.length > 160 ? cleaned : `${cleaned.replace(/\.$/, '')}.${suffix}`
+
+  if (withSuffix.length <= 160) return withSuffix
   const truncated = cleaned.slice(0, 157)
   const lastSpace = truncated.lastIndexOf(' ')
   return `${truncated.slice(0, lastSpace > 120 ? lastSpace : 157)}...`
