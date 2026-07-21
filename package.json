@@ -23,6 +23,7 @@
     "tailwindcss": "4.3.3"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@stylistic/eslint-plugin": "5.10.0",
     "eslint": "10.7.0",
     "eslint-plugin-n": "18.2.2",

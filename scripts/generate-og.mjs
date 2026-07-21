@@ -1,68 +1,66 @@
 /**
- * Generate per-algorithm Open Graph images (1200×630 JPEG).
- * Requires ImageMagick (`magick`) and a system sans font.
+ * Generate Open Graph images (1200×630) matching the site look:
+ * Geist fonts, category colour, and category icon.
  *
- * Not part of `pnpm build` — assets are committed under `public/og/`.
- * Run locally when catalog names change: `pnpm og:generate`
+ * Local only — assets are committed under public/og/.
+ *   pnpm og:generate
  *
- * Usage: node scripts/generate-og.mjs
+ * Requires: ImageMagick (`magick`) for JPEG encode.
+ * Fonts: fonts-src/og/*.ttf (converted from site Geist woff2 sources).
  */
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, statSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Resvg } from '@resvg/resvg-js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const outDir = join(root, 'public', 'og')
+const fontDir = join(root, 'fonts-src', 'og')
 mkdirSync(outDir, { recursive: true })
+mkdirSync(fontDir, { recursive: true })
 
-const FONT_CANDIDATES = [
-  // Project font (portable — use if vendored later)
-  join(root, 'fonts-src', 'Inter-Bold.ttf'),
-  join(root, 'public', 'fonts', 'Inter-Bold.ttf'),
-  // macOS
-  '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
-  '/System/Library/Fonts/Supplemental/Arial.ttf',
-  '/System/Library/Fonts/Helvetica.ttc',
-  '/Library/Fonts/Arial.ttf',
-  // Linux / CI
-  '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
-  '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
-  '/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf',
-  '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
-  '/usr/share/fonts/truetype/freefont/FreeSansBold.ttf',
-  '/usr/share/fonts/TTF/DejaVuSans-Bold.ttf',
-]
+const FONT_PIXEL = join(fontDir, 'GeistPixel-Square.ttf')
+const FONT_MONO = join(fontDir, 'GeistMono.ttf')
 
-function hasMagick() {
-  try {
-    execFileSync('magick', ['-version'], { stdio: 'pipe' })
-    return true
-  } catch {
-    try {
-      execFileSync('convert', ['-version'], { stdio: 'pipe' })
-      return true
-    } catch {
-      return false
-    }
-  }
-}
-
-const font = FONT_CANDIDATES.find((path) => existsSync(path))
-const existingDefault = existsSync(join(outDir, 'default.jpg'))
-
-if (!font || !hasMagick()) {
-  if (existingDefault) {
-    console.warn(
-      '[og:generate] Skipping: no ImageMagick/font on this machine. Using committed public/og assets.',
-    )
-    process.exit(0)
-  }
-  console.error(
-    'No usable font/ImageMagick for OG generation, and no existing public/og assets found.\n' +
-      'Install ImageMagick + a sans font, or commit prebuilt images under public/og/.',
-  )
-  process.exit(1)
+/** Tailwind-400 palette matching sidebar category colours */
+const CATEGORY_META = {
+  Concepts: {
+    color: '#38bdf8',
+    icon: 'M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18',
+  },
+  'Data Structures': {
+    color: '#a78bfa',
+    icon: 'm21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9',
+  },
+  Sorting: {
+    color: '#34d399',
+    icon: 'M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5',
+  },
+  Searching: {
+    color: '#fbbf24',
+    icon: 'M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z',
+  },
+  Graphs: {
+    color: '#22d3ee',
+    icon: 'M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5',
+  },
+  'Dynamic Programming': {
+    color: '#fb923c',
+    icon: 'M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 0v.375',
+  },
+  Backtracking: {
+    color: '#fb7185',
+    icon: 'M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3',
+  },
+  'Divide and Conquer': {
+    color: '#818cf8',
+    icon: 'M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+  },
+  Math: {
+    color: '#e879f9',
+    icon: 'M5 5h14M9 5c0 4-1.5 10-3 14M15 5c0 4 1.5 10 3 14',
+  },
 }
 
 const algorithms = [
@@ -120,82 +118,217 @@ const categories = [
   ['math', 'Math'],
 ]
 
-function renderOg(outPath, title, subtitle) {
-  // ImageMagick caption/annotate pipeline — dark card matching site chrome
+function ensureFonts() {
+  if (existsSync(FONT_PIXEL) && existsSync(FONT_MONO)) return
+
+  // Convert site woff2 sources → TTF for resvg (one-time local helper)
+  try {
+    execFileSync(
+      'python3',
+      [
+        '-c',
+        `
+from fontTools.ttLib import TTFont
+from pathlib import Path
+pairs = [
+  ('fonts-src/GeistPixel-Square.woff2', 'fonts-src/og/GeistPixel-Square.ttf'),
+  ('fonts-src/GeistMono-Variable.woff2', 'fonts-src/og/GeistMono.ttf'),
+]
+for src, dst in pairs:
+  font = TTFont(src)
+  font.flavor = None
+  Path(dst).parent.mkdir(parents=True, exist_ok=True)
+  font.save(dst)
+  print('wrote', dst)
+`,
+      ],
+      { cwd: root, stdio: 'pipe' },
+    )
+  } catch (error) {
+    console.error(
+      'Missing Geist TTF fonts and could not convert from woff2.\n' +
+        'Run once with fonttools: python3 -m pip install fonttools brotli\n' +
+        `Expected: ${FONT_PIXEL}`,
+    )
+    process.exit(1)
+  }
+
+  if (!existsSync(FONT_PIXEL) || !existsSync(FONT_MONO)) {
+    console.error('Font conversion failed.')
+    process.exit(1)
+  }
+}
+
+function hasMagick() {
+  try {
+    execFileSync('magick', ['-version'], { stdio: 'pipe' })
+    return true
+  } catch {
+    return false
+  }
+}
+
+function escapeXml(text) {
+  return text
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+}
+
+function titleFontSize(title) {
+  if (title.length > 30) return 42
+  if (title.length > 24) return 48
+  if (title.length > 18) return 56
+  return 64
+}
+
+/**
+ * @param {{ title: string, categoryLabel: string, categoryKey: string, kicker?: string }} opts
+ */
+function buildSvg({ title, categoryLabel, categoryKey, kicker = 'Algorithm Visualizer' }) {
+  const meta = CATEGORY_META[categoryKey] ?? {
+    color: '#a3a3a3',
+    icon: 'M12 6v12m6-6H6',
+  }
+  const { color, icon } = meta
+  const size = titleFontSize(title)
+  const titleY = 348 + (64 - size) * 0.35
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="82%" cy="68%" r="58%">
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.32"/>
+      <stop offset="40%" stop-color="${color}" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c0c0c"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Canvas -->
+  <rect width="1200" height="630" fill="#000000"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Card -->
+  <rect x="72" y="72" width="1056" height="486" rx="28" fill="url(#card)" stroke="rgba(255,255,255,0.09)" stroke-width="1.5"/>
+  <rect x="72" y="72" width="1056" height="486" rx="28" fill="url(#sheen)"/>
+
+  <!-- Icon badge -->
+  <rect x="120" y="156" width="120" height="120" rx="30" fill="${color}" fill-opacity="0.12" stroke="${color}" stroke-opacity="0.4" stroke-width="1.5"/>
+  <g transform="translate(150 186) scale(2.5)" fill="none" stroke="${color}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="${icon}"/>
+  </g>
+
+  <!-- Category -->
+  <text x="276" y="208" fill="${color}" font-family="Geist Pixel Square, GeistPixel, sans-serif" font-size="22" letter-spacing="0.22em">${escapeXml(categoryLabel.toUpperCase())}</text>
+
+  <!-- Title -->
+  <text x="120" y="${titleY}" fill="#fafafa" font-family="Geist Pixel Square, GeistPixel, sans-serif" font-size="${size}">${escapeXml(title)}</text>
+
+  <!-- Product line -->
+  <text x="120" y="430" fill="#a3a3a3" font-family="Geist Mono, ui-monospace, monospace" font-size="28">${escapeXml(kicker)}</text>
+
+  <!-- Meta -->
+  <text x="120" y="498" fill="#525252" font-family="Geist Mono, ui-monospace, monospace" font-size="22">Step-by-step · Interactive</text>
+
+  <!-- Accent bar -->
+  <rect x="120" y="520" width="64" height="3" rx="1.5" fill="${color}" fill-opacity="0.85"/>
+</svg>`
+}
+
+function renderJpg(svg, outPath) {
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: 'width', value: 1200 },
+    font: {
+      fontFiles: [FONT_PIXEL, FONT_MONO],
+      loadSystemFonts: false,
+      defaultFontFamily: 'Geist Pixel Square',
+    },
+    background: '#000000',
+  })
+  const png = resvg.render().asPng()
+  const tmpPng = outPath.replace(/\.jpe?g$/i, '.tmp.png')
+  writeFileSync(tmpPng, png)
   execFileSync(
     'magick',
-    [
-      '-size',
-      '1200x630',
-      'xc:#0a0a0a',
-      '-fill',
-      '#1a1a1a',
-      '-draw',
-      'roundrectangle 48,48 1152,582 28,28',
-      '-stroke',
-      '#333333',
-      '-strokewidth',
-      '2',
-      '-fill',
-      'none',
-      '-draw',
-      'roundrectangle 48,48 1152,582 28,28',
-      '-stroke',
-      'none',
-      '-font',
-      font,
-      '-fill',
-      '#a3a3a3',
-      '-pointsize',
-      '28',
-      '-gravity',
-      'NorthWest',
-      '-annotate',
-      '+96+120',
-      subtitle.toUpperCase(),
-      '-fill',
-      '#fafafa',
-      '-pointsize',
-      title.length > 28 ? '48' : '60',
-      '-annotate',
-      '+96+200',
-      title,
-      '-fill',
-      '#737373',
-      '-pointsize',
-      '28',
-      '-annotate',
-      '+96+320',
-      'Interactive step-by-step visualization',
-      '-fill',
-      '#e5e5e5',
-      '-pointsize',
-      '32',
-      '-annotate',
-      '+96+480',
-      'alg0.dev',
-      '-quality',
-      '85',
-      '-strip',
-      outPath,
-    ],
+    [tmpPng, '-quality', '90', '-strip', '-sampling-factor', '4:2:0', outPath],
     { stdio: 'pipe' },
   )
+  try {
+    unlinkSync(tmpPng)
+  } catch {
+    /* ignore */
+  }
 }
 
-renderOg(join(outDir, 'default.jpg'), 'Algorithm Visualizer', 'alg0.dev')
-renderOg(join(root, 'public', 'og-image.jpg'), 'Algorithm Visualizer', 'alg0.dev')
+function main() {
+  ensureFonts()
+  if (!hasMagick()) {
+    console.error('ImageMagick (`magick`) is required to write JPEG OG images.')
+    process.exit(1)
+  }
 
-for (const [id, name, category] of algorithms) {
-  renderOg(join(outDir, `${id}.jpg`), name, category)
+  // Default / home
+  renderJpg(
+    buildSvg({
+      title: 'Algorithm Visualizer',
+      categoryLabel: 'Interactive',
+      categoryKey: 'Concepts',
+      kicker: 'Sorting · Graphs · DP · More',
+    }),
+    join(outDir, 'default.jpg'),
+  )
+  // Root social fallback
+  copyFileSync(join(outDir, 'default.jpg'), join(root, 'public', 'og-image.jpg'))
+
+  for (const [id, name, category] of algorithms) {
+    renderJpg(
+      buildSvg({
+        title: name,
+        categoryLabel: category,
+        categoryKey: category,
+      }),
+      join(outDir, `${id}.jpg`),
+    )
+  }
+
+  for (const [slug, name] of categories) {
+    renderJpg(
+      buildSvg({
+        title: name,
+        categoryLabel: 'Category',
+        categoryKey: name,
+        kicker: 'Algorithm Visualizer',
+      }),
+      join(outDir, `category-${slug}.jpg`),
+    )
+  }
+
+  // Cleanup accidental preview junk
+  for (const junk of ['_preview-test.jpg', '_icon-preview.png']) {
+    const p = join(outDir, junk)
+    if (existsSync(p)) {
+      try {
+        unlinkSync(p)
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  console.log(
+    `Generated OG images → public/og/ (${algorithms.length} algorithms + ${categories.length} categories)`,
+  )
+  console.log(`Fonts: Geist Pixel Square + Geist Mono`)
+  console.log(`Sample: ${Math.round(statSync(join(outDir, 'bubble-sort.jpg')).size / 1024)} KB`)
 }
 
-for (const [slug, name] of categories) {
-  renderOg(join(outDir, `category-${slug}.jpg`), name, 'Category')
-}
-
-console.log(
-  `Generated OG images → public/og/ (${algorithms.length} algorithms + ${categories.length} categories)`,
-)
-console.log(`Font: ${font}`)
-console.log(`Sample size: ${Math.round(statSync(join(outDir, 'bubble-sort.jpg')).size / 1024)} KB`)
+main()
