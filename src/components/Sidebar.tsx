@@ -157,60 +157,51 @@ const categoryIcons: Record<string, React.ReactNode> = {
   ),
 }
 
-const categoryColors: Record<string, { icon: string; badge: string; line: string; active: string }> = {
+const categoryColors: Record<string, { icon: string; badge: string; line: string }> = {
   Concepts: {
     icon: 'text-sky-400',
     badge: 'bg-sky-500/10 text-sky-400/70',
     line: 'border-sky-500/20',
-    active: 'border-l-sky-400',
   },
   'Data Structures': {
     icon: 'text-violet-400',
     badge: 'bg-violet-500/10 text-violet-400/70',
     line: 'border-violet-500/20',
-    active: 'border-l-violet-400',
   },
   Sorting: {
     icon: 'text-emerald-400',
     badge: 'bg-emerald-500/10 text-emerald-400/70',
     line: 'border-emerald-500/20',
-    active: 'border-l-emerald-400',
   },
   Searching: {
     icon: 'text-amber-400',
     badge: 'bg-amber-500/10 text-amber-400/70',
     line: 'border-amber-500/20',
-    active: 'border-l-amber-400',
   },
   Graphs: {
     icon: 'text-cyan-400',
     badge: 'bg-cyan-500/10 text-cyan-400/70',
     line: 'border-cyan-500/20',
-    active: 'border-l-cyan-400',
   },
   Backtracking: {
     icon: 'text-rose-400',
     badge: 'bg-rose-500/10 text-rose-400/70',
     line: 'border-rose-500/20',
-    active: 'border-l-rose-400',
   },
   'Dynamic Programming': {
     icon: 'text-orange-400',
     badge: 'bg-orange-500/10 text-orange-400/70',
     line: 'border-orange-500/20',
-    active: 'border-l-orange-400',
   },
   'Divide and Conquer': {
     icon: 'text-indigo-400',
     badge: 'bg-indigo-500/10 text-indigo-400/70',
     line: 'border-indigo-500/20',
-    active: 'border-l-indigo-400',
   },
   Math: {
     icon: 'text-fuchsia-400',
     badge: 'bg-fuchsia-500/10 text-fuchsia-400/70',
     line: 'border-fuchsia-500/20',
-    active: 'border-l-fuchsia-400',
   },
 }
 
@@ -218,7 +209,6 @@ const defaultCategoryColor = {
   icon: 'text-neutral-400',
   badge: 'bg-white/[0.04] text-neutral-600',
   line: 'border-white/[0.08]',
-  active: 'border-l-neutral-400',
 }
 
 export default function Sidebar({ categories, selectedId, onSelect, locale = 'en' }: SidebarProps) {
@@ -353,9 +343,7 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                     />
                   </svg>
                   <span className="flex items-center gap-1.5">
-                    <span className={colors.icon}>
-                      {categoryIcons[category.name]}
-                    </span>
+                    <span className={colors.icon}>{categoryIcons[category.name]}</span>
                     {getCategoryName(locale, category.name)}
                   </span>
                 </div>
@@ -390,13 +378,19 @@ export default function Sidebar({ categories, selectedId, onSelect, locale = 'en
                         onSelect(algo)
                       }}
                       aria-current={selectedId === algo.id ? 'page' : undefined}
-                      className={`block px-3 py-1.5 text-[13px] rounded-md transition-all duration-150 border-l-2 ${
+                      className={`flex items-center justify-between gap-3 px-3 py-1.5 text-[13px] rounded-md transition-colors duration-150 ${
                         selectedId === algo.id
-                          ? `${colors.active} bg-white/8 text-white font-medium`
-                          : 'border-transparent text-neutral-500 hover:text-neutral-300 hover:bg-white/4'
+                          ? 'text-sky-300 font-medium'
+                          : 'text-neutral-500 hover:text-neutral-300 hover:bg-white/4'
                       }`}
                     >
-                      {algo.name}
+                      <span>{algo.name}</span>
+                      {selectedId === algo.id && (
+                        <span
+                          className="size-1 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.45)] shrink-0"
+                          aria-hidden="true"
+                        />
+                      )}
                     </a>
                   ))}
                 </div>

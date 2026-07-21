@@ -4,6 +4,7 @@ import AlgoViz from "@components/AlgoViz"
 import { locales, defaultLocale } from "@i18n/translations"
 import type { GetStaticPaths } from "astro"
 import type { Locale } from "@i18n/translations"
+import { getHomeStructuredData } from "@lib/seo"
 
 export const getStaticPaths: GetStaticPaths = () => {
   return locales
@@ -12,9 +13,13 @@ export const getStaticPaths: GetStaticPaths = () => {
 }
 
 const { lang } = Astro.params as { lang: Locale }
-
+const canonicalURL = new URL(`/${lang}/`, Astro.site).href
 ---
 
-<Layout locale={lang}>
+<Layout
+  locale={lang}
+  canonicalURL={canonicalURL}
+  structuredData={getHomeStructuredData(lang, canonicalURL)}
+>
   <AlgoViz locale={lang} client:load />
 </Layout>

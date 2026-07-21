@@ -9,6 +9,8 @@ interface Props {
   description?: string
   ogImage?: string
   canonicalURL?: string
+  robots?: string
+  structuredData?: Record<string, unknown>
 }
 
 const locale = (Astro.props.locale ?? "en") as Locale
@@ -19,19 +21,46 @@ const {
   title = t.siteTitle,
   description = t.siteDescription,
   ogImage = "/og-image.png",
-  canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+  canonicalURL = new URL(normalizePath(Astro.url.pathname), Astro.site).href,
+  robots = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  structuredData,
 } = Astro.props
 
 const siteName = "alg0.dev"
 const twitterAuthor = "@midudev"
 
-// Compute dynamic hreflang alternates
-const pathname = Astro.url.pathname.replace(/\/$/, '') || '/'
-const basePath = locale === 'es' && pathname.startsWith('/es')
-  ? pathname.slice(3) || '/'
+function normalizePath(path: string) {
+  if (path === "/") return path
+  return `${path.replace(/\/+$/, "")}/`
+}
+
+const pathname = normalizePath(Astro.url.pathname)
+const basePath = locale === "es" && pathname.startsWith("/es/")
+  ? pathname.slice(3) || "/"
   : pathname
 const enAlternateUrl = new URL(basePath, Astro.site).href
-const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Astro.site).href
+const esAlternateUrl = new URL(basePath === "/" ? "/es/" : `/es${basePath}`, Astro.site).href
+const alternateOgLocale = locale === "es" ? "en_US" : "es_ES"
+const defaultStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: siteName,
+  description,
+  url: canonicalURL,
+  applicationCategory: "EducationalApplication",
+  operatingSystem: "Any",
+  inLanguage: locale,
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  author: {
+    "@type": "Person",
+    name: "Miguel Ángel Durán",
+    url: "https://midu.dev",
+  },
+}
 ---
 
 <!doctype html>
@@ -48,6 +77,7 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
     <meta name="theme-color" content="#000000" />
     <script is:inline>
       const savedTheme = document.cookie
@@ -81,6 +111,7 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:locale" content={ogLocale} />
+    <meta property="og:locale:alternate" content={alternateOgLocale} />
     <link rel="alternate" hreflang="en" href={enAlternateUrl} />
     <link rel="alternate" hreflang="es" href={esAlternateUrl} />
     <link rel="alternate" hreflang="x-default" href={enAlternateUrl} />
@@ -92,28 +123,12 @@ const esAlternateUrl = new URL(basePath === '/' ? '/es/' : `/es${basePath}`, Ast
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(ogImage, Astro.site).href} />
+    <meta name="twitter:image:alt" content={title} />
 
     <!-- Structured Data -->
     <script
       type="application/ld+json"
-      set:html={JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        name: siteName,
-        description: description,
-        url: canonicalURL,
-        applicationCategory: "EducationalApplication",
-        operatingSystem: "Any",
-        offers: {
-          "@type": "Offer",
-          price: "0",
-          priceCurrency: "USD",
-        },
-        author: {
-          "@type": "Organization",
-          name: siteName,
-        },
-      })}
+      set:html={JSON.stringify(structuredData ?? defaultStructuredData)}
     />
   </head>
   <body class="bg-black text-gray-100 font-sans antialiased">

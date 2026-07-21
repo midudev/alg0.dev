@@ -1,8 +1,9 @@
 {
-  "name": "alg0.dev",
-  "short_name": "alg0",
-  "description": "Interactive algorithm visualizations",
+  "name": "alg0.dev - Algorithm Visualizer",
+  "short_name": "alg0.dev",
+  "description": "Interactive, step-by-step algorithm visualizations.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
