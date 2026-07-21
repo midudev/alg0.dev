@@ -1,8 +1,17 @@
-import { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } from 'react'
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  lazy,
+  Suspense,
+  type ReactNode,
+} from 'react'
 import type { Monaco } from '@monaco-editor/react'
 import type { Locale } from '@i18n/translations'
 import { translations } from '@i18n/translations'
-import type { Algorithm, CodeImplementation, CodeLanguage, Difficulty } from '@lib/types'
+import type { Algorithm, CodeImplementation, CodeLanguage } from '@lib/types'
 import {
   getAvailableLanguages,
   getCode,
@@ -10,36 +19,13 @@ import {
   getCodeLine,
 } from '@lib/code-languages'
 import { loadLanguageImplementation } from '@lib/algorithms/loaders'
-import ComplexityChart from '@components/ComplexityChart'
+import { $ } from '@lib/dom'
 
 const LazyEditor = lazy(() => import('@monaco-editor/react'))
 
-const DIFFICULTY_CONFIG: Record<Difficulty, { en: string; es: string; color: string; bg: string }> =
-  {
-    easy: {
-      en: 'Easy',
-      es: 'Fácil',
-      color: 'text-emerald-400',
-      bg: 'bg-emerald-400/10 border-emerald-400/20',
-    },
-    intermediate: {
-      en: 'Intermediate',
-      es: 'Intermedio',
-      color: 'text-amber-400',
-      bg: 'bg-amber-400/10 border-amber-400/20',
-    },
-    advanced: {
-      en: 'Advanced',
-      es: 'Avanzado',
-      color: 'text-red-400',
-      bg: 'bg-red-400/10 border-red-400/20',
-    },
-  }
-
 interface CodePanelProps {
   algorithm: Algorithm
-  description: string
-  difficulty?: Difficulty
+  aboutContent?: ReactNode
   /** Line of the JavaScript source the current step points at */
   currentLine?: number
   variables?: Record<string, string | number | boolean | null>
@@ -83,8 +69,7 @@ function defineThemes(monaco: Monaco) {
 
 export default function CodePanel({
   algorithm,
-  description,
-  difficulty,
+  aboutContent,
   currentLine,
   variables,
   consoleOutput,
@@ -161,7 +146,9 @@ export default function CodePanel({
   useEffect(() => {
     const updateEditorTheme = (event?: Event) => {
       const theme =
-        event instanceof CustomEvent ? event.detail : document.documentElement.dataset.theme
+        event instanceof CustomEvent
+          ? event.detail
+          : ($('html')?.dataset.theme ?? document.documentElement.dataset.theme)
       monacoRef.current?.editor.setTheme(theme === 'light' ? 'algoviz-light' : 'algoviz-dark')
     }
     window.addEventListener('themechange', updateEditorTheme)
@@ -310,12 +297,13 @@ export default function CodePanel({
       </div>
 
       {/* Content */}
-      {activeTab === 'code' ? (
+      <>
         <div
-          className="flex-1 flex flex-col overflow-hidden"
+          className={`${activeTab === 'code' ? 'flex' : 'hidden'} flex-1 flex-col overflow-hidden`}
           role="tabpanel"
           id="tabpanel-code"
           aria-labelledby="tab-code"
+          aria-hidden={activeTab !== 'code'}
         >
           {/* Language switcher — sits between the tabs and the editor */}
           {availableLanguages.length > 1 && (
@@ -535,121 +523,16 @@ export default function CodePanel({
             </div>
           )}
         </div>
-      ) : (
         <div
-          className="flex-1 overflow-auto p-4 md:p-6"
+          className={`${activeTab === 'about' ? 'block' : 'hidden'} flex-1 overflow-auto p-4 md:p-6`}
           role="tabpanel"
           id="tabpanel-about"
           aria-labelledby="tab-about"
+          aria-hidden={activeTab !== 'about'}
         >
-          <article className="text-[13px] text-neutral-400 leading-relaxed whitespace-pre-wrap font-[inherit]">
-            {(() => {
-              const lines = description.split('\n')
-              const elements: React.ReactElement[] = []
-              let listItems: React.ReactElement[] = []
-
-              const flushList = () => {
-                if (listItems.length > 0) {
-                  elements.push(
-                    <ul key={`list-${elements.length}`} className="list-none m-0 p-0" role="list">
-                      {listItems}
-                    </ul>,
-                  )
-                  listItems = []
-                }
-              }
-
-              lines.forEach((line, i) => {
-                const isBullet = line.trim().startsWith('-') || line.trim().startsWith('\u2022')
-
-                if (!isBullet) flushList()
-
-                if (i === 0 && line.trim()) {
-                  elements.push(
-                    <div key={i} className="mb-4">
-                      <h3 className="text-lg font-semibold text-white font-heading">{line}</h3>
-                      {difficulty &&
-                        (() => {
-                          const cfg = DIFFICULTY_CONFIG[difficulty]
-                          const label = locale === 'es' ? cfg.es : cfg.en
-                          return (
-                            <span
-                              className={`inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 text-[11px] font-semibold rounded-full border ${cfg.bg} ${cfg.color}`}
-                            >
-                              <span
-                                className={`w-1.5 h-1.5 rounded-full ${difficulty === 'easy' ? 'bg-emerald-400' : difficulty === 'intermediate' ? 'bg-amber-400' : 'bg-red-400'}`}
-                              />
-                              {label}
-                            </span>
-                          )
-                        })()}
-                    </div>,
-                  )
-                } else if (
-                  line.match(
-                    /^[A-Z\u00C1-\u00DA][a-zA-Z\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\s]+:$/,
-                  )
-                ) {
-                  elements.push(
-                    <h4
-                      key={i}
-                      className="text-sm font-semibold text-neutral-200 mt-5 mb-2 font-heading"
-                    >
-                      {line}
-                    </h4>,
-                  )
-                } else if (isBullet) {
-                  listItems.push(
-                    <li key={i} className="flex gap-2 ml-2 my-0.5">
-                      <span className="text-neutral-600 shrink-0" aria-hidden="true">
-                        {'\u2022'}
-                      </span>
-                      <span>{line.trim().replace(/^[-\u2022]\s*/, '')}</span>
-                    </li>,
-                  )
-                } else if (line.match(/^\s{2,}/)) {
-                  elements.push(
-                    <div key={i} className="font-mono text-xs text-neutral-500 ml-4 my-0.5">
-                      {line.trim()}
-                    </div>,
-                  )
-                } else if (line.trim().match(/^\d+\./)) {
-                  elements.push(
-                    <div key={i} className="flex gap-2 ml-2 my-0.5">
-                      <span>{line.trim()}</span>
-                    </div>,
-                  )
-                } else if (!line.trim()) {
-                  elements.push(<div key={i} className="h-2" />)
-                } else {
-                  elements.push(
-                    <p key={i} className="my-1">
-                      {line}
-                    </p>,
-                  )
-                }
-              })
-
-              flushList()
-
-              // Insert complexity chart right after the title
-              if (elements.length > 0) {
-                elements.splice(
-                  1,
-                  0,
-                  <ComplexityChart
-                    key="complexity-chart"
-                    description={description}
-                    locale={locale}
-                  />,
-                )
-              }
-
-              return elements
-            })()}
-          </article>
+          {aboutContent}
         </div>
-      )}
+      </>
     </div>
   )
 }

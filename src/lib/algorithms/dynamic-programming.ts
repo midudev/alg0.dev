@@ -20,19 +20,6 @@ const fibonacciDp: Algorithm = {
 
   return dp;
 }`,
-  description: `Fibonacci DP (Bottom-Up Tabulation)
-
-The Fibonacci sequence is one of the most classic examples of Dynamic Programming. Each number is the sum of the two preceding ones: F(0)=0, F(1)=1, F(n) = F(n-1) + F(n-2).
-
-How it works (Bottom-Up Tabulation):
-1. Create an array dp of size n+1, initialize dp[0]=0, dp[1]=1
-2. For each i from 2 to n, compute dp[i] = dp[i-1] + dp[i-2]
-3. Each subproblem is solved exactly once and stored
-
-Time Complexity: O(n)
-Space Complexity: O(n)
-
-This approach avoids the exponential time of naive recursion by storing previously computed values. It demonstrates the core DP principle: solve smaller subproblems first and build up to the answer.`,
 
   generateSteps(locale = 'en') {
     const n = 10
@@ -44,7 +31,11 @@ This approach avoids the exponential time of naive recursion by storing previous
       array: [...arr],
       highlights: { 0: 'sorted', 1: 'sorted' },
       sorted: [0, 1],
-      description: d(locale, 'Initial array: dp[0]=0, dp[1]=1. Fill remaining using dp[i] = dp[i-1] + dp[i-2].', 'Arreglo inicial: dp[0]=0, dp[1]=1. Rellenar usando dp[i] = dp[i-1] + dp[i-2].'),
+      description: d(
+        locale,
+        'Initial array: dp[0]=0, dp[1]=1. Fill remaining using dp[i] = dp[i-1] + dp[i-2].',
+        'Arreglo inicial: dp[0]=0, dp[1]=1. Rellenar usando dp[i] = dp[i-1] + dp[i-2].',
+      ),
       codeLine: 1,
       variables: { n, 'dp[0]': 0, 'dp[1]': 1 },
     })
@@ -54,7 +45,11 @@ This approach avoids the exponential time of naive recursion by storing previous
         array: [...arr],
         highlights: { [i - 1]: 'comparing', [i - 2]: 'comparing', [i]: 'current' },
         sorted: [...sorted],
-        description: d(locale, `Computing dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${arr[i - 1]} + ${arr[i - 2]}`, `Calculando dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${arr[i - 1]} + ${arr[i - 2]}`),
+        description: d(
+          locale,
+          `Computing dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${arr[i - 1]} + ${arr[i - 2]}`,
+          `Calculando dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${arr[i - 1]} + ${arr[i - 2]}`,
+        ),
         codeLine: 5,
         variables: { i, 'dp[i-1]': arr[i - 1], 'dp[i-2]': arr[i - 2] },
       })
@@ -76,7 +71,11 @@ This approach avoids the exponential time of naive recursion by storing previous
       array: [...arr],
       highlights: {},
       sorted: Array.from({ length: n + 1 }, (_, i) => i),
-      description: d(locale, `Fibonacci sequence complete! F(${n}) = ${arr[n]}`, `¡Secuencia de Fibonacci completa! F(${n}) = ${arr[n]}`),
+      description: d(
+        locale,
+        `Fibonacci sequence complete! F(${n}) = ${arr[n]}`,
+        `¡Secuencia de Fibonacci completa! F(${n}) = ${arr[n]}`,
+      ),
       codeLine: 8,
       variables: { n, 'F(n)': arr[n], dp: `[${arr.join(', ')}]` },
     })
@@ -114,22 +113,6 @@ const knapsack: Algorithm = {
 
   return dp[n][capacity];
 }`,
-  description: `Knapsack 0/1
-
-The 0/1 Knapsack problem: given items with weights and values, and a knapsack with a weight capacity, find the maximum value that can be carried. Each item can either be taken (1) or left (0).
-
-How it works:
-1. Create a DP table of (n+1) rows × (capacity+1) columns
-2. dp[i][w] = maximum value using first i items with capacity w
-3. For each item, either skip it (dp[i-1][w]) or take it (dp[i-1][w-weight] + value)
-4. Choose the maximum of both options
-
-Items: weights=[2, 3, 4, 5], values=[3, 4, 5, 6], capacity=8
-
-Time Complexity: O(n × W) where n = items, W = capacity
-Space Complexity: O(n × W)
-
-Classic DP optimization problem used in resource allocation, budgeting, and cargo loading.`,
 
   generateSteps(locale = 'en') {
     const weights = [2, 3, 4, 5]
@@ -146,7 +129,11 @@ Classic DP optimization problem used in resource allocation, budgeting, and carg
         values: dp.map((r) => [...r]),
         highlights: {},
       },
-      description: d(locale, 'DP table initialized to 0. Rows = items (0..4), Cols = capacity (0..8).', 'Tabla DP inicializada en 0. Filas = artículos (0..4), Columnas = capacidad (0..8).'),
+      description: d(
+        locale,
+        'DP table initialized to 0. Rows = items (0..4), Cols = capacity (0..8).',
+        'Tabla DP inicializada en 0. Filas = artículos (0..4), Columnas = capacidad (0..8).',
+      ),
       codeLine: 1,
       variables: { weights: '[2,3,4,5]', values: '[3,4,5,6]', capacity },
     })
@@ -170,7 +157,11 @@ Classic DP optimization problem used in resource allocation, budgeting, and carg
               values: dp.map((r) => [...r]),
               highlights: h,
             },
-            description: d(locale, `Item ${i} (w=${weights[i - 1]}, v=${values[i - 1]}), cap=${w}: max(skip=${skip}, take=${take}) = ${dp[i][w]}`, `Artículo ${i} (p=${weights[i - 1]}, v=${values[i - 1]}), cap=${w}: max(omitir=${skip}, tomar=${take}) = ${dp[i][w]}`),
+            description: d(
+              locale,
+              `Item ${i} (w=${weights[i - 1]}, v=${values[i - 1]}), cap=${w}: max(skip=${skip}, take=${take}) = ${dp[i][w]}`,
+              `Artículo ${i} (p=${weights[i - 1]}, v=${values[i - 1]}), cap=${w}: max(omitir=${skip}, tomar=${take}) = ${dp[i][w]}`,
+            ),
             codeLine: 9,
             variables: { i, w, skip, take, 'dp[i][w]': dp[i][w] },
           })
@@ -185,7 +176,11 @@ Classic DP optimization problem used in resource allocation, budgeting, and carg
               values: dp.map((r) => [...r]),
               highlights: h,
             },
-            description: d(locale, `Item ${i} (w=${weights[i - 1]}) too heavy for cap=${w}. dp[${i}][${w}] = ${dp[i][w]}`, `Artículo ${i} (p=${weights[i - 1]}) muy pesado para cap=${w}. dp[${i}][${w}] = ${dp[i][w]}`),
+            description: d(
+              locale,
+              `Item ${i} (w=${weights[i - 1]}) too heavy for cap=${w}. dp[${i}][${w}] = ${dp[i][w]}`,
+              `Artículo ${i} (p=${weights[i - 1]}) muy pesado para cap=${w}. dp[${i}][${w}] = ${dp[i][w]}`,
+            ),
             codeLine: 14,
             variables: { i, w, weight: weights[i - 1], 'dp[i][w]': dp[i][w] },
           })
@@ -202,7 +197,11 @@ Classic DP optimization problem used in resource allocation, budgeting, and carg
         values: dp.map((r) => [...r]),
         highlights: finalH,
       },
-      description: d(locale, `Knapsack complete! Maximum value: ${dp[n][capacity]}`, `¡Mochila completada! Valor máximo: ${dp[n][capacity]}`),
+      description: d(
+        locale,
+        `Knapsack complete! Maximum value: ${dp[n][capacity]}`,
+        `¡Mochila completada! Valor máximo: ${dp[n][capacity]}`,
+      ),
       codeLine: 20,
       variables: { max_value: dp[n][capacity] },
     })
@@ -238,22 +237,6 @@ const lcs: Algorithm = {
 
   return dp[m][n];
 }`,
-  description: `Longest Common Subsequence (LCS)
-
-The LCS problem finds the longest subsequence common to two sequences. A subsequence appears in the same relative order but not necessarily contiguously.
-
-How it works:
-1. Create a DP table of (m+1) × (n+1) where m, n are string lengths
-2. If characters match: dp[i][j] = dp[i-1][j-1] + 1
-3. If they don't: dp[i][j] = max(dp[i-1][j], dp[i][j-1])
-4. The answer is in dp[m][n]
-
-Strings: "ABCB" and "BDCB"
-
-Time Complexity: O(m × n)
-Space Complexity: O(m × n)
-
-Used in diff tools, DNA sequence alignment, version control systems, and spell checking.`,
 
   generateSteps(locale = 'en') {
     const str1 = 'ABCB'
@@ -270,7 +253,11 @@ Used in diff tools, DNA sequence alignment, version control systems, and spell c
         values: dp.map((r) => [...r]),
         highlights: {},
       },
-      description: d(locale, `DP table initialized. Comparing "${str1}" (rows) with "${str2}" (cols).`, `Tabla DP inicializada. Comparando "${str1}" (filas) con "${str2}" (columnas).`),
+      description: d(
+        locale,
+        `DP table initialized. Comparing "${str1}" (rows) with "${str2}" (cols).`,
+        `Tabla DP inicializada. Comparando "${str1}" (filas) con "${str2}" (columnas).`,
+      ),
       codeLine: 1,
       variables: { str1, str2, m, n },
     })
@@ -291,7 +278,11 @@ Used in diff tools, DNA sequence alignment, version control systems, and spell c
               values: dp.map((r) => [...r]),
               highlights: { ...h, [`${i},${j}`]: 'found' },
             },
-            description: d(locale, `'${str1[i - 1]}' = '${str2[j - 1]}' — Match! dp[${i}][${j}] = dp[${i - 1}][${j - 1}] + 1 = ${dp[i][j]}`, `'${str1[i - 1]}' = '${str2[j - 1]}' — ¡Coincidencia! dp[${i}][${j}] = dp[${i - 1}][${j - 1}] + 1 = ${dp[i][j]}`),
+            description: d(
+              locale,
+              `'${str1[i - 1]}' = '${str2[j - 1]}' — Match! dp[${i}][${j}] = dp[${i - 1}][${j - 1}] + 1 = ${dp[i][j]}`,
+              `'${str1[i - 1]}' = '${str2[j - 1]}' — ¡Coincidencia! dp[${i}][${j}] = dp[${i - 1}][${j - 1}] + 1 = ${dp[i][j]}`,
+            ),
             codeLine: 10,
             variables: { i, j, char1: str1[i - 1], char2: str2[j - 1], 'dp[i][j]': dp[i][j] },
           })
@@ -307,7 +298,11 @@ Used in diff tools, DNA sequence alignment, version control systems, and spell c
               values: dp.map((r) => [...r]),
               highlights: h,
             },
-            description: d(locale, `'${str1[i - 1]}' ≠ '${str2[j - 1]}' — dp[${i}][${j}] = max(${dp[i - 1][j]}, ${dp[i][j - 1]}) = ${dp[i][j]}`, `'${str1[i - 1]}' ≠ '${str2[j - 1]}' — dp[${i}][${j}] = max(${dp[i - 1][j]}, ${dp[i][j - 1]}) = ${dp[i][j]}`),
+            description: d(
+              locale,
+              `'${str1[i - 1]}' ≠ '${str2[j - 1]}' — dp[${i}][${j}] = max(${dp[i - 1][j]}, ${dp[i][j - 1]}) = ${dp[i][j]}`,
+              `'${str1[i - 1]}' ≠ '${str2[j - 1]}' — dp[${i}][${j}] = max(${dp[i - 1][j]}, ${dp[i][j - 1]}) = ${dp[i][j]}`,
+            ),
             codeLine: 12,
             variables: { i, j, char1: str1[i - 1], char2: str2[j - 1], 'dp[i][j]': dp[i][j] },
           })
@@ -324,7 +319,11 @@ Used in diff tools, DNA sequence alignment, version control systems, and spell c
         values: dp.map((r) => [...r]),
         highlights: finalH,
       },
-      description: d(locale, `LCS complete! Length of longest common subsequence: ${dp[m][n]}`, `¡LCS completado! Longitud de la subsecuencia común más larga: ${dp[m][n]}`),
+      description: d(
+        locale,
+        `LCS complete! Length of longest common subsequence: ${dp[m][n]}`,
+        `¡LCS completado! Longitud de la subsecuencia común más larga: ${dp[m][n]}`,
+      ),
       codeLine: 18,
       variables: { LCS_length: dp[m][n] },
     })

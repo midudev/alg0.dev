@@ -1,11 +1,6 @@
 import type { Locale } from '@i18n/translations'
-import {
-  getAlgorithmDescription,
-  getAlgorithmMetaDescription,
-  getAlgorithmMetaTitle,
-  getCategoryName,
-  translations,
-} from '@i18n/translations'
+import { getCategoryName, translations } from '@i18n/translations'
+import { getAlgorithmMetaDescription, getAlgorithmMetaTitle } from '@lib/algorithm-content'
 import { algorithmCatalog } from '@lib/algorithms/catalog'
 import type { AlgorithmSummary } from '@lib/types'
 
@@ -60,10 +55,9 @@ export function getAlgorithmStructuredData(
   locale: Locale,
   algorithm: AlgorithmSummary,
   canonicalURL: string,
+  description: string,
 ) {
-  const name = (
-    getAlgorithmDescription(locale, algorithm.id)?.split('\n')[0] || algorithm.name
-  ).trim()
+  const name = (description.split('\n')[0] || algorithm.name).trim()
   const homeURL = new URL(locale === 'es' ? '/es/' : '/', canonicalURL).href
 
   return {
@@ -73,8 +67,8 @@ export function getAlgorithmStructuredData(
         '@type': 'LearningResource',
         '@id': `${canonicalURL}#learning-resource`,
         name,
-        headline: getAlgorithmMetaTitle(locale, algorithm.id, algorithm.name),
-        description: getAlgorithmMetaDescription(locale, algorithm.id),
+        headline: getAlgorithmMetaTitle(locale, algorithm.name, description),
+        description: getAlgorithmMetaDescription(locale, description),
         url: canonicalURL,
         inLanguage: locale,
         learningResourceType:

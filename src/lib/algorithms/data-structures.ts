@@ -1,10 +1,4 @@
-import type {
-  Algorithm,
-  Step,
-  LinkedListNodeData,
-  HashEntry,
-  TreeNodeData,
-} from '@lib/types'
+import type { Algorithm, Step, LinkedListNodeData, HashEntry, TreeNodeData } from '@lib/types'
 import { d } from '@lib/algorithms/shared'
 
 // Re-export stack and queue (moved from concepts)
@@ -85,35 +79,14 @@ class LinkedList {
     }
   }
 }`,
-  description: `Linked List
-
-A Linked List is a linear data structure where each element (node) contains a value and a pointer (reference) to the next node.
-
-Unlike arrays, linked lists don't store elements in contiguous memory — each node can be anywhere in memory, connected by pointers.
-
-Operations:
-  - append: add node at the end — O(1) with tail pointer
-  - prepend: add node at the beginning — O(1)
-  - search: traverse to find a value — O(n)
-  - delete: remove a node by value — O(n)
-  - access by index: traverse from head — O(n)
-
-Advantages:
-  - O(1) insertion/deletion at known positions
-  - Dynamic size, no wasted memory
-  - Efficient insertion at head
-
-Disadvantages:
-  - O(n) access by index (no random access)
-  - Extra memory for pointers
-  - Not cache-friendly`,
 
   generateSteps(locale = 'en') {
     const steps: Step[] = []
 
     steps.push({
       concept: { type: 'linkedList', nodes: [] },
-      description: d(locale,
+      description: d(
+        locale,
         'An empty linked list. Head and tail are both null.',
         'Una lista enlazada vacía. Head y tail son null.',
       ),
@@ -127,7 +100,8 @@ Disadvantages:
         nodes: ll([{ value: 10, state: 'new' }]),
         operation: 'append(10)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'append(10): First node. Both head and tail point to it.',
         'append(10): Primer nodo. Tanto head como tail apuntan a él.',
       ),
@@ -144,7 +118,8 @@ Disadvantages:
         ]),
         operation: 'append(20)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'append(20): New node added after tail. Tail now points to 20.',
         'append(20): Nuevo nodo añadido después de tail. Tail ahora apunta a 20.',
       ),
@@ -162,7 +137,8 @@ Disadvantages:
         ]),
         operation: 'append(30)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'append(30): Chain grows. Each node points to the next via .next pointer.',
         'append(30): La cadena crece. Cada nodo apunta al siguiente via el puntero .next.',
       ),
@@ -181,7 +157,8 @@ Disadvantages:
         ]),
         operation: 'prepend(5)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'prepend(5): New node becomes the head. O(1) — no shifting needed!',
         'prepend(5): El nuevo nodo se convierte en head. ¡O(1) — no se necesita desplazar!',
       ),
@@ -201,7 +178,8 @@ Disadvantages:
         ]),
         operation: 'search(20)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'search(20): Start at head (5). Not 20, follow .next pointer...',
         'search(20): Empezar en head (5). No es 20, seguir el puntero .next...',
       ),
@@ -220,7 +198,8 @@ Disadvantages:
         ]),
         operation: 'search(20)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'search(20): At node 10. Not 20, keep traversing...',
         'search(20): En nodo 10. No es 20, seguir recorriendo...',
       ),
@@ -239,7 +218,8 @@ Disadvantages:
         ]),
         operation: 'search(20) → found!',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'search(20): Found it! O(n) worst case — must traverse from head.',
         'search(20): ¡Encontrado! O(n) en el peor caso — se debe recorrer desde head.',
       ),
@@ -259,8 +239,9 @@ Disadvantages:
         ]),
         operation: 'delete(20)',
       },
-      description: d(locale,
-        'delete(20): Found node 20. Set previous node\'s .next to skip it (10.next = 30).',
+      description: d(
+        locale,
+        "delete(20): Found node 20. Set previous node's .next to skip it (10.next = 30).",
         'delete(20): Nodo 20 encontrado. Actualizar .next del anterior para saltarlo (10.next = 30).',
       ),
       codeLine: 42,
@@ -277,7 +258,8 @@ Disadvantages:
         ]),
         operation: 'delete(20) → done',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'Node 20 removed. The list is now [5 → 10 → 30]. O(n) to find the node.',
         'Nodo 20 eliminado. La lista ahora es [5 → 10 → 30]. O(n) para encontrar el nodo.',
       ),
@@ -349,29 +331,6 @@ export const hashTable: Algorithm = {
     if (i !== -1) bucket.splice(i, 1);
   }
 }`,
-  description: `Hash Table
-
-A Hash Table (or Hash Map) maps keys to values using a hash function. It provides near-constant time O(1) for insert, lookup, and delete.
-
-How it works:
-1. A hash function converts the key into an array index
-2. The value is stored at that index (bucket)
-3. If two keys hash to the same index → collision
-
-Collision handling (chaining):
-  - Each bucket stores a list of entries
-  - Multiple keys can share the same bucket
-
-Time Complexity:
-  - Average: O(1) for set, get, delete
-  - Worst case: O(n) when all keys collide
-
-Space Complexity: O(n)
-
-Applications:
-  - Caches, databases, symbol tables
-  - Counting frequencies
-  - Deduplication`,
 
   generateSteps(locale = 'en') {
     const steps: Step[] = []
@@ -379,7 +338,8 @@ Applications:
 
     steps.push({
       concept: { type: 'hashTable', buckets: makeBuckets(SIZE, []), size: SIZE },
-      description: d(locale,
+      description: d(
+        locale,
         'An empty hash table with 7 buckets. The hash function maps keys to bucket indices.',
         'Una tabla hash vacía con 7 buckets. La función hash mapea claves a índices de bucket.',
       ),
@@ -398,7 +358,8 @@ Applications:
         hashResult: catH,
         operation: 'set("cat", 3)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         `set("cat", 3): hash("cat") = ${catH}. Store in bucket ${catH}.`,
         `set("cat", 3): hash("cat") = ${catH}. Almacenar en bucket ${catH}.`,
       ),
@@ -411,13 +372,17 @@ Applications:
     steps.push({
       concept: {
         type: 'hashTable',
-        buckets: makeBuckets(SIZE, [['cat', 3, 'normal'], ['dog', 5, 'new']]),
+        buckets: makeBuckets(SIZE, [
+          ['cat', 3, 'normal'],
+          ['dog', 5, 'new'],
+        ]),
         size: SIZE,
         hashingKey: 'dog',
         hashResult: dogH,
         operation: 'set("dog", 5)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         `set("dog", 5): hash("dog") = ${dogH}. Different bucket, no collision.`,
         `set("dog", 5): hash("dog") = ${dogH}. Diferente bucket, sin colisión.`,
       ),
@@ -430,13 +395,18 @@ Applications:
     steps.push({
       concept: {
         type: 'hashTable',
-        buckets: makeBuckets(SIZE, [['cat', 3, 'normal'], ['dog', 5, 'normal'], ['ant', 1, 'new']]),
+        buckets: makeBuckets(SIZE, [
+          ['cat', 3, 'normal'],
+          ['dog', 5, 'normal'],
+          ['ant', 1, 'new'],
+        ]),
         size: SIZE,
         hashingKey: 'ant',
         hashResult: antH,
         operation: 'set("ant", 1)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         `set("ant", 1): hash("ant") = ${antH}. Placed in bucket ${antH}.`,
         `set("ant", 1): hash("ant") = ${antH}. Colocado en bucket ${antH}.`,
       ),
@@ -450,14 +420,18 @@ Applications:
       concept: {
         type: 'hashTable',
         buckets: makeBuckets(SIZE, [
-          ['cat', 3, 'normal'], ['dog', 5, 'collision'], ['ant', 1, 'normal'], ['fish', 8, 'new'],
+          ['cat', 3, 'normal'],
+          ['dog', 5, 'collision'],
+          ['ant', 1, 'normal'],
+          ['fish', 8, 'new'],
         ]),
         size: SIZE,
         hashingKey: 'fish',
         hashResult: fishH,
         operation: 'set("fish", 8) — COLLISION!',
       },
-      description: d(locale,
+      description: d(
+        locale,
         `set("fish", 8): hash("fish") = ${fishH}. Collision with "dog"! Both go in the same bucket using chaining.`,
         `set("fish", 8): hash("fish") = ${fishH}. ¡Colisión con "dog"! Ambos van al mismo bucket usando encadenamiento.`,
       ),
@@ -471,15 +445,19 @@ Applications:
       concept: {
         type: 'hashTable',
         buckets: makeBuckets(SIZE, [
-          ['cat', 3, 'normal'], ['dog', 5, 'normal'], ['ant', 1, 'normal'],
-          ['fish', 8, 'collision'], ['bee', 2, 'new'],
+          ['cat', 3, 'normal'],
+          ['dog', 5, 'normal'],
+          ['ant', 1, 'normal'],
+          ['fish', 8, 'collision'],
+          ['bee', 2, 'new'],
         ]),
         size: SIZE,
         hashingKey: 'bee',
         hashResult: beeH,
         operation: 'set("bee", 2) — COLLISION!',
       },
-      description: d(locale,
+      description: d(
+        locale,
         `set("bee", 2): hash("bee") = ${beeH}. Another collision! Bucket ${beeH} now has a chain of 3 entries.`,
         `set("bee", 2): hash("bee") = ${beeH}. ¡Otra colisión! Bucket ${beeH} ahora tiene una cadena de 3 entradas.`,
       ),
@@ -492,15 +470,19 @@ Applications:
       concept: {
         type: 'hashTable',
         buckets: makeBuckets(SIZE, [
-          ['cat', 3, 'found'], ['dog', 5, 'normal'], ['ant', 1, 'normal'],
-          ['fish', 8, 'normal'], ['bee', 2, 'normal'],
+          ['cat', 3, 'found'],
+          ['dog', 5, 'normal'],
+          ['ant', 1, 'normal'],
+          ['fish', 8, 'normal'],
+          ['bee', 2, 'normal'],
         ]),
         size: SIZE,
         hashingKey: 'cat',
         hashResult: catH,
         operation: 'get("cat") → 3',
       },
-      description: d(locale,
+      description: d(
+        locale,
         `get("cat"): hash → bucket ${catH}. Only one entry, found immediately. O(1)!`,
         `get("cat"): hash → bucket ${catH}. Solo una entrada, encontrada de inmediato. ¡O(1)!`,
       ),
@@ -513,15 +495,19 @@ Applications:
       concept: {
         type: 'hashTable',
         buckets: makeBuckets(SIZE, [
-          ['cat', 3, 'normal'], ['dog', 5, 'normal'], ['ant', 1, 'normal'],
-          ['fish', 8, 'found'], ['bee', 2, 'normal'],
+          ['cat', 3, 'normal'],
+          ['dog', 5, 'normal'],
+          ['ant', 1, 'normal'],
+          ['fish', 8, 'found'],
+          ['bee', 2, 'normal'],
         ]),
         size: SIZE,
         hashingKey: 'fish',
         hashResult: fishH,
         operation: 'get("fish") → 8',
       },
-      description: d(locale,
+      description: d(
+        locale,
         `get("fish"): hash → bucket ${fishH}. Must traverse the chain: "dog" → "fish". Found! Still fast with short chains.`,
         `get("fish"): hash → bucket ${fishH}. Recorrer la cadena: "dog" → "fish". ¡Encontrado! Sigue siendo rápido con cadenas cortas.`,
       ),
@@ -605,34 +591,14 @@ class BST {
     return null;
   }
 }`,
-  description: `Binary Search Tree (BST)
-
-A BST is a tree where each node has at most two children, and for every node:
-  - Left subtree contains only values less than the node
-  - Right subtree contains only values greater than the node
-
-This ordering property enables efficient search by halving the search space at each step.
-
-Operations:
-  - insert: compare and go left/right — O(h)
-  - search: compare and go left/right — O(h)
-  - delete: find and restructure — O(h)
-
-Where h = height of the tree:
-  - Balanced tree: h = O(log n) → efficient!
-  - Degenerate (all one side): h = O(n) → like a linked list
-
-Applications:
-  - Ordered data storage
-  - Range queries
-  - Priority queues (with balancing)`,
 
   generateSteps(locale = 'en') {
     const steps: Step[] = []
 
     steps.push({
       concept: { type: 'binaryTree', nodes: [], treeType: 'bst' },
-      description: d(locale,
+      description: d(
+        locale,
         'An empty BST. The first inserted value becomes the root.',
         'Un BST vacío. El primer valor insertado se convierte en la raíz.',
       ),
@@ -642,8 +608,14 @@ Applications:
 
     // Insert 8 (root)
     steps.push({
-      concept: { type: 'binaryTree', nodes: makeTree([[8, 'new']]), treeType: 'bst', operation: 'insert(8)' },
-      description: d(locale,
+      concept: {
+        type: 'binaryTree',
+        nodes: makeTree([[8, 'new']]),
+        treeType: 'bst',
+        operation: 'insert(8)',
+      },
+      description: d(
+        locale,
         'insert(8): Tree is empty, 8 becomes the root.',
         'insert(8): El árbol está vacío, 8 se convierte en la raíz.',
       ),
@@ -655,11 +627,15 @@ Applications:
     steps.push({
       concept: {
         type: 'binaryTree',
-        nodes: makeTree([[8, 'comparing'], [3, 'new']]),
+        nodes: makeTree([
+          [8, 'comparing'],
+          [3, 'new'],
+        ]),
         treeType: 'bst',
         operation: 'insert(3)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(3): 3 < 8, go left. Left is empty → place here.',
         'insert(3): 3 < 8, ir a la izquierda. Izquierda vacía → colocar aquí.',
       ),
@@ -671,11 +647,16 @@ Applications:
     steps.push({
       concept: {
         type: 'binaryTree',
-        nodes: makeTree([[8, 'comparing'], [3, 'normal'], [10, 'new']]),
+        nodes: makeTree([
+          [8, 'comparing'],
+          [3, 'normal'],
+          [10, 'new'],
+        ]),
         treeType: 'bst',
         operation: 'insert(10)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(10): 10 ≥ 8, go right. Right is empty → place here.',
         'insert(10): 10 ≥ 8, ir a la derecha. Derecha vacía → colocar aquí.',
       ),
@@ -687,11 +668,17 @@ Applications:
     steps.push({
       concept: {
         type: 'binaryTree',
-        nodes: makeTree([[8, 'normal'], [3, 'comparing'], [10, 'normal'], [1, 'new']]),
+        nodes: makeTree([
+          [8, 'normal'],
+          [3, 'comparing'],
+          [10, 'normal'],
+          [1, 'new'],
+        ]),
         treeType: 'bst',
         operation: 'insert(1)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(1): 1 < 8 → left to 3. 1 < 3 → left again. Empty → place here.',
         'insert(1): 1 < 8 → izquierda a 3. 1 < 3 → izquierda de nuevo. Vacío → colocar aquí.',
       ),
@@ -703,11 +690,18 @@ Applications:
     steps.push({
       concept: {
         type: 'binaryTree',
-        nodes: makeTree([[8, 'normal'], [3, 'comparing'], [10, 'normal'], [1, 'normal'], [6, 'new']]),
+        nodes: makeTree([
+          [8, 'normal'],
+          [3, 'comparing'],
+          [10, 'normal'],
+          [1, 'normal'],
+          [6, 'new'],
+        ]),
         treeType: 'bst',
         operation: 'insert(6)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(6): 6 < 8 → left to 3. 6 ≥ 3 → right. Empty → place here.',
         'insert(6): 6 < 8 → izquierda a 3. 6 ≥ 3 → derecha. Vacío → colocar aquí.',
       ),
@@ -720,13 +714,18 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: makeTree([
-          [8, 'normal'], [3, 'normal'], [10, 'comparing'],
-          [1, 'normal'], [6, 'normal'], [14, 'new'],
+          [8, 'normal'],
+          [3, 'normal'],
+          [10, 'comparing'],
+          [1, 'normal'],
+          [6, 'normal'],
+          [14, 'new'],
         ]),
         treeType: 'bst',
         operation: 'insert(14)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(14): 14 ≥ 8 → right to 10. 14 ≥ 10 → right. Empty → place here.',
         'insert(14): 14 ≥ 8 → derecha a 10. 14 ≥ 10 → derecha. Vacío → colocar aquí.',
       ),
@@ -739,13 +738,18 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: makeTree([
-          [8, 'current'], [3, 'normal'], [10, 'normal'],
-          [1, 'normal'], [6, 'normal'], [14, 'normal'],
+          [8, 'current'],
+          [3, 'normal'],
+          [10, 'normal'],
+          [1, 'normal'],
+          [6, 'normal'],
+          [14, 'normal'],
         ]),
         treeType: 'bst',
         operation: 'search(6): at root 8',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'search(6): Start at root (8). 6 < 8, go left...',
         'search(6): Empezar en la raíz (8). 6 < 8, ir a la izquierda...',
       ),
@@ -757,13 +761,18 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: makeTree([
-          [8, 'normal'], [3, 'current'], [10, 'normal'],
-          [1, 'normal'], [6, 'normal'], [14, 'normal'],
+          [8, 'normal'],
+          [3, 'current'],
+          [10, 'normal'],
+          [1, 'normal'],
+          [6, 'normal'],
+          [14, 'normal'],
         ]),
         treeType: 'bst',
         operation: 'search(6): at node 3',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'search(6): At node 3. 6 ≥ 3, go right...',
         'search(6): En nodo 3. 6 ≥ 3, ir a la derecha...',
       ),
@@ -775,13 +784,18 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: makeTree([
-          [8, 'normal'], [3, 'normal'], [10, 'normal'],
-          [1, 'normal'], [6, 'found'], [14, 'normal'],
+          [8, 'normal'],
+          [3, 'normal'],
+          [10, 'normal'],
+          [1, 'normal'],
+          [6, 'found'],
+          [14, 'normal'],
         ]),
         treeType: 'bst',
         operation: 'search(6) → found!',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'search(6): Found! Only 3 comparisons (root → 3 → 6). O(log n) on a balanced tree.',
         'search(6): ¡Encontrado! Solo 3 comparaciones (raíz → 3 → 6). O(log n) en un árbol balanceado.',
       ),
@@ -797,7 +811,10 @@ Applications:
 //  HEAP (MIN HEAP)
 // ════════════════════════════════════════════════════════════════
 
-function heapNodes(values: number[], highlights: Record<number, TreeNodeData['state']> = {}): (TreeNodeData | null)[] {
+function heapNodes(
+  values: number[],
+  highlights: Record<number, TreeNodeData['state']> = {},
+): (TreeNodeData | null)[] {
   return values.map((v, i) => ({
     value: v,
     state: highlights[i] ?? 'normal',
@@ -852,36 +869,14 @@ export const heap: Algorithm = {
     }
   }
 }`,
-  description: `Heap (Min Heap)
-
-A Heap is a complete binary tree where every parent is smaller (min-heap) or larger (max-heap) than its children. It's stored as an array.
-
-Array-to-tree mapping (0-indexed):
-  - Parent of i: Math.floor((i - 1) / 2)
-  - Left child of i: 2 * i + 1
-  - Right child of i: 2 * i + 2
-
-Operations:
-  - insert: add at end, bubble up — O(log n)
-  - extractMin: remove root, bubble down — O(log n)
-  - peek: return root — O(1)
-
-The heap property is maintained by:
-  - bubbleUp: swap with parent while smaller
-  - bubbleDown: swap with smallest child while larger
-
-Applications:
-  - Priority queues
-  - Heap Sort
-  - Dijkstra's algorithm
-  - Finding k-th smallest/largest`,
 
   generateSteps(locale = 'en') {
     const steps: Step[] = []
 
     steps.push({
       concept: { type: 'binaryTree', nodes: [], treeType: 'heap', heapType: 'min' },
-      description: d(locale,
+      description: d(
+        locale,
         'An empty min-heap. The smallest element is always at the root.',
         'Un min-heap vacío. El elemento más pequeño siempre está en la raíz.',
       ),
@@ -894,10 +889,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([8], { 0: 'new' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'insert(8)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(8): First element, becomes the root.',
         'insert(8): Primer elemento, se convierte en la raíz.',
       ),
@@ -910,10 +907,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([8, 5], { 1: 'new', 0: 'comparing' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'insert(5): bubble up?',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(5): Added at end. 5 < 8 (parent) → must bubble up!',
         'insert(5): Añadido al final. 5 < 8 (padre) → ¡debe subir!',
       ),
@@ -925,10 +924,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([5, 8], { 0: 'placed', 1: 'normal' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'insert(5): swapped!',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'Swapped! 5 is now the root. Heap property restored.',
         '¡Intercambiado! 5 es ahora la raíz. Propiedad del heap restaurada.',
       ),
@@ -941,10 +942,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([5, 8, 10], { 2: 'new' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'insert(10)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(10): Added at end. 10 ≥ 5 (parent) → no bubble up needed.',
         'insert(10): Añadido al final. 10 ≥ 5 (padre) → no necesita subir.',
       ),
@@ -957,10 +960,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([5, 8, 10, 1], { 3: 'new', 1: 'comparing' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'insert(1): bubble up...',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(1): Added at end. 1 < 8 (parent) → bubble up!',
         'insert(1): Añadido al final. 1 < 8 (padre) → ¡subir!',
       ),
@@ -972,10 +977,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([5, 1, 10, 8], { 1: 'current', 0: 'comparing' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'insert(1): keep bubbling...',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'Swapped 1 and 8. Now 1 < 5 (parent) → keep bubbling up!',
         'Intercambiados 1 y 8. Ahora 1 < 5 (padre) → ¡seguir subiendo!',
       ),
@@ -987,10 +994,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([1, 5, 10, 8], { 0: 'placed' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'insert(1): done!',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'Swapped 1 and 5. Now 1 is the root — the minimum! Heap property restored.',
         'Intercambiados 1 y 5. Ahora 1 es la raíz — ¡el mínimo! Propiedad del heap restaurada.',
       ),
@@ -1003,10 +1012,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([1, 5, 10, 8, 7], { 4: 'new' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'insert(7)',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'insert(7): Added at end. 7 ≥ 5 (parent) → stays in place.',
         'insert(7): Añadido al final. 7 ≥ 5 (padre) → se queda en su sitio.',
       ),
@@ -1019,10 +1030,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([7, 5, 10, 8], { 0: 'current', 1: 'comparing', 2: 'comparing' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'extractMin(): removed 1, bubble down...',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'extractMin(): Remove root (1), move last element (7) to root. Now bubble down — compare with children.',
         'extractMin(): Eliminar raíz (1), mover último (7) a la raíz. Ahora descender — comparar con hijos.',
       ),
@@ -1034,10 +1047,12 @@ Applications:
       concept: {
         type: 'binaryTree',
         nodes: heapNodes([5, 7, 10, 8], { 0: 'placed', 1: 'placed' }),
-        treeType: 'heap', heapType: 'min',
+        treeType: 'heap',
+        heapType: 'min',
         operation: 'extractMin(): done!',
       },
-      description: d(locale,
+      description: d(
+        locale,
         'Swapped 7 and 5 (smallest child). Heap property restored! New min is 5.',
         'Intercambiados 7 y 5 (hijo más pequeño). ¡Propiedad del heap restaurada! Nuevo mínimo es 5.',
       ),

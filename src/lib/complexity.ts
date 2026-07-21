@@ -1,6 +1,14 @@
-import { useMemo } from 'react'
+/**
+ * Time-complexity chart model.
+ *
+ * Parses the "Time Complexity" block out of an algorithm description and turns it
+ * into ready-to-render SVG geometry. Server-only: `ComplexityChart.astro` is the
+ * single consumer, so none of this reaches the browser — keep it that way and do
+ * not import this module from a React component.
+ */
+import type { Locale } from '@i18n/translations'
 
-type ComplexityKey =
+export type ComplexityKey =
   | 'O(1)'
   | 'O(log n)'
   | 'O(√n)'
@@ -50,15 +58,15 @@ function normalizeToKey(raw: string): ComplexityKey | null {
   return null
 }
 
-interface Entry {
+export interface ComplexityEntry {
   label: string
   raw: string
   key: ComplexityKey
   color: string
 }
 
-function parseTimeComplexity(description: string): Entry[] {
-  const entries: Entry[] = []
+function parseTimeComplexity(description: string): ComplexityEntry[] {
+  const entries: ComplexityEntry[] = []
 
   const idxEn = description.indexOf('Time Complexity')
   const idxEs = description.indexOf('Complejidad Temporal')
@@ -84,28 +92,31 @@ function parseTimeComplexity(description: string): Entry[] {
   if (best || avg || worst) {
     if (best) {
       const k = normalizeToKey(best[1])
-      if (k)
+      if (k) {
         entries.push({
           label: isSpanish ? 'Mejor' : 'Best',
           raw: best[1],
           key: k,
           color: '#34d399',
         })
+      }
     }
     if (avg) {
       const k = normalizeToKey(avg[1])
-      if (k)
+      if (k) {
         entries.push({ label: isSpanish ? 'Prom' : 'Avg', raw: avg[1], key: k, color: '#fbbf24' })
+      }
     }
     if (worst) {
       const k = normalizeToKey(worst[1])
-      if (k)
+      if (k) {
         entries.push({
           label: isSpanish ? 'Peor' : 'Worst',
           raw: worst[1],
           key: k,
           color: '#f87171',
         })
+      }
     }
   } else {
     const single = block.match(O_RE)
@@ -119,11 +130,11 @@ function parseTimeComplexity(description: string): Entry[] {
 }
 
 /* ── SVG layout constants ── */
-const W = 300
-const H = 130
-const PAD = { top: 14, right: 68, bottom: 18, left: 6 }
-const plotW = W - PAD.left - PAD.right
-const plotH = H - PAD.top - PAD.bottom
+export const W = 300
+export const H = 130
+export const PAD = { top: 14, right: 68, bottom: 18, left: 6 }
+export const plotW = W - PAD.left - PAD.right
+export const plotH = H - PAD.top - PAD.bottom
 const N_MAX = 20
 const STEPS = 60
 const Y_CAP = N_MAX * N_MAX
@@ -156,10 +167,14 @@ function endY(fn: (n: number) => number): number {
   return toScreenY(fn(N_MAX))
 }
 
-function resolveOverlaps(
-  labels: { y: number; text: string; color: string; opacity: number }[],
-  minGap: number,
-) {
+interface ChartLabel {
+  y: number
+  text: string
+  color: string
+  opacity: number
+}
+
+function resolveOverlaps(labels: ChartLabel[], minGap: number): ChartLabel[] {
   const sorted = [...labels].sort((a, b) => a.y - b.y)
   for (let pass = 0; pass < 4; pass++) {
     for (let i = 1; i < sorted.length; i++) {
@@ -174,27 +189,47 @@ function resolveOverlaps(
   return sorted
 }
 
-export default function ComplexityChart({
-  description,
-  locale = 'en',
-}: {
-  description: string
-  locale?: string
-}) {
-  const entries = useMemo(() => parseTimeComplexity(description), [description])
+/** Stable, collision-free gradient id per curve (`O(n log n)` → `cg-onlogn`). */
+function slugify(key: ComplexityKey): string {
+  return `cg-${key.toLowerCase().replace(/[^a-z0-9]/g, '')}`
+}
 
+export interface ComplexitySeries {
+  key: ComplexityKey
+  gradientId: string
+  color: string
+  linePath: string
+  areaPath: string
+}
+
+export interface ComplexityChartModel {
+  entries: ComplexityEntry[]
+  /** Faint context curves for the keys this algorithm does not hit. */
+  referencePaths: string[]
+  series: ComplexitySeries[]
+  labels: ChartLabel[]
+  heading: string
+  ariaLabel: string
+}
+
+/** Returns `null` when the description has no parseable time complexity. */
+export function buildComplexityChart(
+  description: string,
+  locale: Locale,
+): ComplexityChartModel | null {
+  const entries = parseTimeComplexity(description)
   if (entries.length === 0) return null
 
   const highlightedKeys = new Set(entries.map((e) => e.key))
 
-  const grouped = new Map<ComplexityKey, Entry[]>()
-  for (const e of entries) {
-    const arr = grouped.get(e.key) || []
-    arr.push(e)
-    grouped.set(e.key, arr)
+  const grouped = new Map<ComplexityKey, ComplexityEntry[]>()
+  for (const entry of entries) {
+    const group = grouped.get(entry.key) ?? []
+    group.push(entry)
+    grouped.set(entry.key, group)
   }
 
-  const labels: { y: number; text: string; color: string; opacity: number }[] = []
+  const labels: ChartLabel[] = []
   for (const key of REFERENCE_KEYS) {
     if (!highlightedKeys.has(key)) {
       labels.push({
@@ -213,124 +248,26 @@ export default function ComplexityChart({
       opacity: 1,
     })
   }
-  const resolvedLabels = resolveOverlaps(labels, 11)
 
-  const chartTitle = locale === 'es' ? 'Complejidad temporal' : 'Time complexity'
-  const chartLabel = `${chartTitle}: ${entries
-    .map((e) => (e.label ? `${e.label} ${e.raw}` : e.raw))
-    .join(', ')}`
+  const isSpanish = locale === 'es'
+  const chartTitle = isSpanish ? 'Complejidad temporal' : 'Time complexity'
 
-  return (
-    <div className="mt-5 mb-3">
-      <div className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold mb-2">
-        {locale === 'es' ? 'Complejidad Temporal' : 'Time Complexity'}
-      </div>
-
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="w-full"
-        style={{ maxHeight: 150 }}
-        role="img"
-        aria-label={chartLabel}
-      >
-        {/* Gradient definitions for area fills */}
-        <defs>
-          {[...grouped].map(([key, group], i) => {
-            const color = group.length === 1 ? group[0].color : group[group.length - 1].color
-            return (
-              <linearGradient key={key} id={`cg-${i}`} x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor={color} stopOpacity={0.1} />
-                <stop offset="100%" stopColor={color} stopOpacity={0} />
-              </linearGradient>
-            )
-          })}
-        </defs>
-
-        {/* Plot area background */}
-        <rect
-          x={PAD.left}
-          y={PAD.top}
-          width={plotW}
-          height={plotH}
-          rx={4}
-          fill="white"
-          fillOpacity={0.02}
-        />
-
-        {/* Reference curves (faint) */}
-        {REFERENCE_KEYS.filter((k) => !highlightedKeys.has(k)).map((key) => (
-          <path
-            key={key}
-            d={buildPath(COMPLEXITY_FNS[key])}
-            fill="none"
-            stroke="white"
-            strokeOpacity={0.06}
-            strokeWidth={1}
-          />
-        ))}
-
-        {/* Highlighted area fills */}
-        {[...grouped].map(([key], i) => (
-          <path key={`area-${key}`} d={buildAreaPath(COMPLEXITY_FNS[key])} fill={`url(#cg-${i})`} />
-        ))}
-
-        {/* Highlighted curves */}
-        {[...grouped].map(([key, group]) => {
-          const color = group.length === 1 ? group[0].color : group[group.length - 1].color
-          return (
-            <path
-              key={`line-${key}`}
-              d={buildPath(COMPLEXITY_FNS[key])}
-              fill="none"
-              stroke={color}
-              strokeWidth={1.5}
-              strokeLinecap="round"
-            />
-          )
-        })}
-
-        {/* Right-side labels */}
-        {resolvedLabels.map((l, i) => (
-          <text
-            key={i}
-            x={PAD.left + plotW + 6}
-            y={l.y}
-            fill={l.color}
-            fillOpacity={l.opacity}
-            fontSize={8}
-            fontFamily="ui-monospace, monospace"
-            dominantBaseline="middle"
-          >
-            {l.text}
-          </text>
-        ))}
-
-        {/* Axis hint */}
-        <text
-          x={PAD.left + plotW}
-          y={H - 2}
-          fill="white"
-          fillOpacity={0.12}
-          fontSize={7.5}
-          textAnchor="end"
-          fontStyle="italic"
-        >
-          n →
-        </text>
-      </svg>
-
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-        {entries.map((e, i) => (
-          <div key={i} className="flex items-center gap-1.5">
-            <div className="w-3 h-0.5 rounded-full shrink-0" style={{ backgroundColor: e.color }} />
-            <span className="text-[10px] text-neutral-500">
-              {e.label ? `${e.label}: ` : ''}
-              <span className="font-mono text-neutral-400">{e.raw}</span>
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+  return {
+    entries,
+    referencePaths: REFERENCE_KEYS.filter((key) => !highlightedKeys.has(key)).map((key) =>
+      buildPath(COMPLEXITY_FNS[key]),
+    ),
+    series: [...grouped].map(([key, group]) => ({
+      key,
+      gradientId: slugify(key),
+      color: group[group.length - 1].color,
+      linePath: buildPath(COMPLEXITY_FNS[key]),
+      areaPath: buildAreaPath(COMPLEXITY_FNS[key]),
+    })),
+    labels: resolveOverlaps(labels, 11),
+    heading: isSpanish ? 'Complejidad Temporal' : 'Time Complexity',
+    ariaLabel: `${chartTitle}: ${entries
+      .map((e) => (e.label ? `${e.label} ${e.raw}` : e.raw))
+      .join(', ')}`,
+  }
 }

@@ -1,10 +1,30 @@
 import type { Algorithm, CodeImplementation, CodeLanguage } from '@lib/types'
+import { getCatalogEntry } from '@lib/algorithms/catalog'
 
 type LangPack = Exclude<CodeLanguage, 'javascript'>
+type ImplementationLoader = (id: string) => Promise<CodeImplementation | undefined>
+type ImplementationGroup =
+  | 'concepts'
+  | 'data-structures'
+  | 'sorting'
+  | 'searching'
+  | 'graphs'
+  | 'dynamic-programming'
+  | 'backtracking'
+  | 'divide-and-conquer'
+  | 'math'
 
 /** Cache so revisiting an algorithm does not re-download its chunk. */
 const algorithmCache = new Map<string, Promise<Algorithm>>()
-const languagePackCache = new Map<LangPack, Promise<Record<string, CodeImplementation>>>()
+const implementationCache = new Map<string, Promise<CodeImplementation | undefined>>()
+
+function readDefaultAlgorithm(module: unknown): Algorithm {
+  return (module as { default: Algorithm }).default
+}
+
+function readImplementationLoader(module: unknown): ImplementationLoader {
+  return (module as { loadImplementation: ImplementationLoader }).loadImplementation
+}
 
 /**
  * Dynamic importers keyed by algorithm id.
@@ -13,69 +33,151 @@ const languagePackCache = new Map<LangPack, Promise<Record<string, CodeImplement
  */
 const ALGORITHM_LOADERS: Record<string, () => Promise<Algorithm>> = {
   // Concepts (+ stack/queue which also live in concepts.ts)
-  'big-o-notation': () => import('./concepts').then((m) => m.bigONotation),
-  recursion: () => import('./concepts').then((m) => m.recursion),
-  'two-pointers': () => import('./concepts').then((m) => m.twoPointers),
-  'sliding-window': () => import('./concepts').then((m) => m.slidingWindow),
-  'space-complexity': () => import('./concepts').then((m) => m.spaceComplexity),
-  memoization: () => import('./concepts').then((m) => m.memoization),
-  'greedy-vs-dp': () => import('./concepts').then((m) => m.greedyVsDp),
-  stack: () => import('./concepts').then((m) => m.stack),
-  queue: () => import('./concepts').then((m) => m.queue),
+  'big-o-notation': () => import('./concepts?algorithm=bigONotation').then(readDefaultAlgorithm),
+  recursion: () => import('./concepts?algorithm=recursion').then(readDefaultAlgorithm),
+  'two-pointers': () => import('./concepts?algorithm=twoPointers').then(readDefaultAlgorithm),
+  'sliding-window': () => import('./concepts?algorithm=slidingWindow').then(readDefaultAlgorithm),
+  'space-complexity': () =>
+    import('./concepts?algorithm=spaceComplexity').then(readDefaultAlgorithm),
+  memoization: () => import('./concepts?algorithm=memoization').then(readDefaultAlgorithm),
+  'greedy-vs-dp': () => import('./concepts?algorithm=greedyVsDp').then(readDefaultAlgorithm),
+  stack: () => import('./concepts?algorithm=stack').then(readDefaultAlgorithm),
+  queue: () => import('./concepts?algorithm=queue').then(readDefaultAlgorithm),
 
   // Data structures
-  'linked-list': () => import('./data-structures').then((m) => m.linkedList),
-  'hash-table': () => import('./data-structures').then((m) => m.hashTable),
-  'binary-search-tree': () => import('./data-structures').then((m) => m.binarySearchTree),
-  heap: () => import('./data-structures').then((m) => m.heap),
+  'linked-list': () => import('./data-structures?algorithm=linkedList').then(readDefaultAlgorithm),
+  'hash-table': () => import('./data-structures?algorithm=hashTable').then(readDefaultAlgorithm),
+  'binary-search-tree': () =>
+    import('./data-structures?algorithm=binarySearchTree').then(readDefaultAlgorithm),
+  heap: () => import('./data-structures?algorithm=heap').then(readDefaultAlgorithm),
 
   // Sorting
-  'bubble-sort': () => import('./sorting').then((m) => m.bubbleSort),
-  'selection-sort': () => import('./sorting').then((m) => m.selectionSort),
-  'insertion-sort': () => import('./sorting').then((m) => m.insertionSort),
-  'quick-sort': () => import('./sorting').then((m) => m.quickSort),
-  'merge-sort': () => import('./sorting').then((m) => m.mergeSort),
-  'heap-sort': () => import('./sorting').then((m) => m.heapSort),
-  'counting-sort': () => import('./sorting').then((m) => m.countingSort),
-  'radix-sort': () => import('./sorting').then((m) => m.radixSort),
-  'shell-sort': () => import('./sorting').then((m) => m.shellSort),
-  'bucket-sort': () => import('./sorting').then((m) => m.bucketSort),
+  'bubble-sort': () => import('./sorting?algorithm=bubbleSort').then(readDefaultAlgorithm),
+  'selection-sort': () => import('./sorting?algorithm=selectionSort').then(readDefaultAlgorithm),
+  'insertion-sort': () => import('./sorting?algorithm=insertionSort').then(readDefaultAlgorithm),
+  'quick-sort': () => import('./sorting?algorithm=quickSort').then(readDefaultAlgorithm),
+  'merge-sort': () => import('./sorting?algorithm=mergeSort').then(readDefaultAlgorithm),
+  'heap-sort': () => import('./sorting?algorithm=heapSort').then(readDefaultAlgorithm),
+  'counting-sort': () => import('./sorting?algorithm=countingSort').then(readDefaultAlgorithm),
+  'radix-sort': () => import('./sorting?algorithm=radixSort').then(readDefaultAlgorithm),
+  'shell-sort': () => import('./sorting?algorithm=shellSort').then(readDefaultAlgorithm),
+  'bucket-sort': () => import('./sorting?algorithm=bucketSort').then(readDefaultAlgorithm),
 
   // Searching
-  'binary-search': () => import('./searching').then((m) => m.binarySearch),
-  'linear-search': () => import('./searching').then((m) => m.linearSearch),
-  'jump-search': () => import('./searching').then((m) => m.jumpSearch),
-  'interpolation-search': () => import('./searching').then((m) => m.interpolationSearch),
+  'binary-search': () => import('./searching?algorithm=binarySearch').then(readDefaultAlgorithm),
+  'linear-search': () => import('./searching?algorithm=linearSearch').then(readDefaultAlgorithm),
+  'jump-search': () => import('./searching?algorithm=jumpSearch').then(readDefaultAlgorithm),
+  'interpolation-search': () =>
+    import('./searching?algorithm=interpolationSearch').then(readDefaultAlgorithm),
 
   // Graphs
-  bfs: () => import('./graphs').then((m) => m.bfs),
-  dfs: () => import('./graphs').then((m) => m.dfs),
-  dijkstra: () => import('./graphs').then((m) => m.dijkstra),
-  prim: () => import('./graphs').then((m) => m.prim),
-  'topological-sort': () => import('./graphs').then((m) => m.topologicalSort),
+  bfs: () => import('./graphs?algorithm=bfs').then(readDefaultAlgorithm),
+  dfs: () => import('./graphs?algorithm=dfs').then(readDefaultAlgorithm),
+  dijkstra: () => import('./graphs?algorithm=dijkstra').then(readDefaultAlgorithm),
+  prim: () => import('./graphs?algorithm=prim').then(readDefaultAlgorithm),
+  'topological-sort': () => import('./graphs?algorithm=topologicalSort').then(readDefaultAlgorithm),
 
   // Dynamic programming
-  'fibonacci-dp': () => import('./dynamic-programming').then((m) => m.fibonacciDp),
-  knapsack: () => import('./dynamic-programming').then((m) => m.knapsack),
-  lcs: () => import('./dynamic-programming').then((m) => m.lcs),
+  'fibonacci-dp': () =>
+    import('./dynamic-programming?algorithm=fibonacciDp').then(readDefaultAlgorithm),
+  knapsack: () => import('./dynamic-programming?algorithm=knapsack').then(readDefaultAlgorithm),
+  lcs: () => import('./dynamic-programming?algorithm=lcs').then(readDefaultAlgorithm),
 
   // Backtracking
-  'n-queens': () => import('./backtracking').then((m) => m.nQueens),
-  'sudoku-solver': () => import('./backtracking').then((m) => m.sudokuSolver),
-  'maze-pathfinding': () => import('./backtracking').then((m) => m.mazePathfinding),
+  'n-queens': () => import('./backtracking?algorithm=nQueens').then(readDefaultAlgorithm),
+  'sudoku-solver': () => import('./backtracking?algorithm=sudokuSolver').then(readDefaultAlgorithm),
+  'maze-pathfinding': () =>
+    import('./backtracking?algorithm=mazePathfinding').then(readDefaultAlgorithm),
 
   // Divide and conquer
-  'tower-of-hanoi': () => import('./divide-and-conquer').then((m) => m.towerOfHanoi),
+  'tower-of-hanoi': () =>
+    import('./divide-and-conquer?algorithm=towerOfHanoi').then(readDefaultAlgorithm),
 
   // Math
-  'sieve-of-eratosthenes': () => import('./math').then((m) => m.sieveOfEratosthenes),
+  'sieve-of-eratosthenes': () =>
+    import('./math?algorithm=sieveOfEratosthenes').then(readDefaultAlgorithm),
 }
 
-const LANGUAGE_LOADERS: Record<LangPack, () => Promise<Record<string, CodeImplementation>>> = {
-  python: () => import('./python').then((m) => m.pythonImplementations),
-  java: () => import('./java').then((m) => m.javaImplementations),
-  cpp: () => import('./cpp').then((m) => m.cppImplementations),
-  rust: () => import('./rust').then((m) => m.rustImplementations),
+const IMPLEMENTATION_GROUP_BY_CATEGORY: Record<string, ImplementationGroup> = {
+  Concepts: 'concepts',
+  'Data Structures': 'data-structures',
+  Sorting: 'sorting',
+  Searching: 'searching',
+  Graphs: 'graphs',
+  'Dynamic Programming': 'dynamic-programming',
+  Backtracking: 'backtracking',
+  'Divide and Conquer': 'divide-and-conquer',
+  Math: 'math',
+}
+
+const IMPLEMENTATION_LOADERS: Record<
+  LangPack,
+  Record<ImplementationGroup, () => Promise<ImplementationLoader>>
+> = {
+  python: {
+    concepts: () =>
+      import('./python/concepts?implementation-loader').then(readImplementationLoader),
+    'data-structures': () =>
+      import('./python/data-structures?implementation-loader').then(readImplementationLoader),
+    sorting: () => import('./python/sorting?implementation-loader').then(readImplementationLoader),
+    searching: () =>
+      import('./python/searching?implementation-loader').then(readImplementationLoader),
+    graphs: () => import('./python/graphs?implementation-loader').then(readImplementationLoader),
+    'dynamic-programming': () =>
+      import('./python/dynamic-programming?implementation-loader').then(readImplementationLoader),
+    backtracking: () =>
+      import('./python/backtracking?implementation-loader').then(readImplementationLoader),
+    'divide-and-conquer': () =>
+      import('./python/divide-and-conquer?implementation-loader').then(readImplementationLoader),
+    math: () => import('./python/math?implementation-loader').then(readImplementationLoader),
+  },
+  java: {
+    concepts: () => import('./java/concepts?implementation-loader').then(readImplementationLoader),
+    'data-structures': () =>
+      import('./java/data-structures?implementation-loader').then(readImplementationLoader),
+    sorting: () => import('./java/sorting?implementation-loader').then(readImplementationLoader),
+    searching: () =>
+      import('./java/searching?implementation-loader').then(readImplementationLoader),
+    graphs: () => import('./java/graphs?implementation-loader').then(readImplementationLoader),
+    'dynamic-programming': () =>
+      import('./java/dynamic-programming?implementation-loader').then(readImplementationLoader),
+    backtracking: () =>
+      import('./java/backtracking?implementation-loader').then(readImplementationLoader),
+    'divide-and-conquer': () =>
+      import('./java/divide-and-conquer?implementation-loader').then(readImplementationLoader),
+    math: () => import('./java/math?implementation-loader').then(readImplementationLoader),
+  },
+  cpp: {
+    concepts: () => import('./cpp/concepts?implementation-loader').then(readImplementationLoader),
+    'data-structures': () =>
+      import('./cpp/data-structures?implementation-loader').then(readImplementationLoader),
+    sorting: () => import('./cpp/sorting?implementation-loader').then(readImplementationLoader),
+    searching: () => import('./cpp/searching?implementation-loader').then(readImplementationLoader),
+    graphs: () => import('./cpp/graphs?implementation-loader').then(readImplementationLoader),
+    'dynamic-programming': () =>
+      import('./cpp/dynamic-programming?implementation-loader').then(readImplementationLoader),
+    backtracking: () =>
+      import('./cpp/backtracking?implementation-loader').then(readImplementationLoader),
+    'divide-and-conquer': () =>
+      import('./cpp/divide-and-conquer?implementation-loader').then(readImplementationLoader),
+    math: () => import('./cpp/math?implementation-loader').then(readImplementationLoader),
+  },
+  rust: {
+    concepts: () => import('./rust/concepts?implementation-loader').then(readImplementationLoader),
+    'data-structures': () =>
+      import('./rust/data-structures?implementation-loader').then(readImplementationLoader),
+    sorting: () => import('./rust/sorting?implementation-loader').then(readImplementationLoader),
+    searching: () =>
+      import('./rust/searching?implementation-loader').then(readImplementationLoader),
+    graphs: () => import('./rust/graphs?implementation-loader').then(readImplementationLoader),
+    'dynamic-programming': () =>
+      import('./rust/dynamic-programming?implementation-loader').then(readImplementationLoader),
+    backtracking: () =>
+      import('./rust/backtracking?implementation-loader').then(readImplementationLoader),
+    'divide-and-conquer': () =>
+      import('./rust/divide-and-conquer?implementation-loader').then(readImplementationLoader),
+    math: () => import('./rust/math?implementation-loader').then(readImplementationLoader),
+  },
 }
 
 /** Load a single algorithm (JS code + step generator). Language packs stay separate. */
@@ -101,22 +203,22 @@ export function loadAlgorithm(id: string): Promise<Algorithm> {
   return promise
 }
 
-function loadLanguagePack(language: LangPack): Promise<Record<string, CodeImplementation>> {
-  const cached = languagePackCache.get(language)
-  if (cached) return cached
-
-  const promise = LANGUAGE_LOADERS[language]()
-  languagePackCache.set(language, promise)
-  return promise
-}
-
-/** Load one language translation for an algorithm (python / java / cpp). */
-export async function loadLanguageImplementation(
+/** Load one language implementation without downloading the rest of its pack. */
+export function loadLanguageImplementation(
   algorithmId: string,
   language: LangPack,
 ): Promise<CodeImplementation | undefined> {
-  const pack = await loadLanguagePack(language)
-  return pack[algorithmId]
+  const cacheKey = `${language}:${algorithmId}`
+  const cached = implementationCache.get(cacheKey)
+  if (cached) return cached
+
+  const category = getCatalogEntry(algorithmId)?.category
+  const group = category ? IMPLEMENTATION_GROUP_BY_CATEGORY[category] : undefined
+  if (!group) return Promise.resolve(undefined)
+
+  const promise = IMPLEMENTATION_LOADERS[language][group]().then((load) => load(algorithmId))
+  implementationCache.set(cacheKey, promise)
+  return promise
 }
 
 export function isLoadableAlgorithm(id: string): boolean {

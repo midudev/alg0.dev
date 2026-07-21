@@ -1,0 +1,137 @@
+---
+import ComplexityChart from "@components/ComplexityChart.astro"
+import type { Locale } from "@i18n/translations"
+import type { Difficulty } from "@lib/types"
+
+interface Props {
+  description: string
+  difficulty: Difficulty
+  locale: Locale
+  pageTitle?: string
+  metaDescription?: string
+}
+
+type ContentBlock =
+  | { type: "heading"; text: string }
+  | { type: "bullet-list"; items: string[] }
+  | { type: "mono"; text: string }
+  | { type: "numbered"; text: string }
+  | { type: "spacer" }
+  | { type: "paragraph"; text: string }
+
+const { description, difficulty, locale, pageTitle, metaDescription } = Astro.props
+const lines = description.split("\n")
+const title = lines.shift()?.trim() ?? ""
+const blocks: ContentBlock[] = []
+
+for (let index = 0; index < lines.length; index++) {
+  const line = lines[index]
+  const trimmed = line.trim()
+  const isBullet = trimmed.startsWith("-") || trimmed.startsWith("•")
+
+  if (isBullet) {
+    const items: string[] = []
+    while (index < lines.length) {
+      const item = lines[index].trim()
+      if (!item.startsWith("-") && !item.startsWith("•")) break
+      items.push(item.replace(/^[-•]\s*/, ""))
+      index++
+    }
+    index--
+    blocks.push({ type: "bullet-list", items })
+  } else if (
+    /^[A-ZÁÉÍÓÚ][a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+:$/.test(line)
+  ) {
+    blocks.push({ type: "heading", text: line })
+  } else if (/^\s{2,}/.test(line)) {
+    blocks.push({ type: "mono", text: trimmed })
+  } else if (/^\d+\./.test(trimmed)) {
+    blocks.push({ type: "numbered", text: trimmed })
+  } else if (!trimmed) {
+    blocks.push({ type: "spacer" })
+  } else {
+    blocks.push({ type: "paragraph", text: line })
+  }
+}
+
+const difficultyConfig = {
+  easy: {
+    en: "Easy",
+    es: "Fácil",
+    color: "text-emerald-400",
+    background: "bg-emerald-400/10 border-emerald-400/20",
+    dot: "bg-emerald-400",
+  },
+  intermediate: {
+    en: "Intermediate",
+    es: "Intermedio",
+    color: "text-amber-400",
+    background: "bg-amber-400/10 border-amber-400/20",
+    dot: "bg-amber-400",
+  },
+  advanced: {
+    en: "Advanced",
+    es: "Avanzado",
+    color: "text-red-400",
+    background: "bg-red-400/10 border-red-400/20",
+    dot: "bg-red-400",
+  },
+} satisfies Record<Difficulty, Record<string, string>>
+
+const difficultyStyle = difficultyConfig[difficulty]
+---
+
+<article
+  data-algorithm-description
+  data-page-title={pageTitle}
+  data-meta-description={metaDescription}
+  class="text-[13px] text-neutral-400 leading-relaxed font-[inherit]"
+>
+  <div class="mb-4">
+    <h3 class="text-lg font-semibold text-white font-heading">{title}</h3>
+    <span
+      class:list={[
+        "inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 text-[11px] font-semibold rounded-full border",
+        difficultyStyle.background,
+        difficultyStyle.color,
+      ]}
+    >
+      <span class:list={["w-1.5 h-1.5 rounded-full", difficultyStyle.dot]}></span>
+      {difficultyStyle[locale]}
+    </span>
+  </div>
+
+  <ComplexityChart description={description} locale={locale} />
+
+  {
+    blocks.map((block) => {
+      if (block.type === "heading") {
+        return (
+          <h4 class="text-sm font-semibold text-neutral-200 mt-5 mb-2 font-heading">
+            {block.text}
+          </h4>
+        )
+      }
+      if (block.type === "bullet-list") {
+        return (
+          <ul class="list-none m-0 p-0" role="list">
+            {block.items.map((item) => (
+              <li class="flex gap-2 ml-2 my-0.5">
+                <span class="text-neutral-600 shrink-0" aria-hidden="true">•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      if (block.type === "mono") {
+        return <div class="font-mono text-xs text-neutral-500 ml-4 my-0.5">{block.text}</div>
+      }
+      if (block.type === "numbered") {
+        return <div class="flex gap-2 ml-2 my-0.5"><span>{block.text}</span></div>
+      }
+      if (block.type === "spacer") return <div class="h-2"></div>
+      return <p class="my-1">{block.text}</p>
+    })
+  }
+</article>

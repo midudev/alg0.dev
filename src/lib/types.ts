@@ -239,7 +239,6 @@ export interface Algorithm {
   name: string
   category: string
   difficulty: Difficulty
-  description: string
   /** JavaScript source. `Step.codeLine` numbers always refer to this one. */
   code: string
   /** Same algorithm written in other languages, keyed by language id. */

@@ -24,24 +24,6 @@ const towerOfHanoi: Algorithm = {
 }
 
 hanoi(3, 'A', 'C', 'B');`,
-  description: `Tower of Hanoi
-
-The Tower of Hanoi is a classic divide and conquer problem. Move a stack of disks from the source peg to the target peg, using an auxiliary peg, following these rules:
-1. Only one disk can be moved at a time
-2. Only the top disk of a stack can be moved
-3. A larger disk cannot be placed on a smaller disk
-
-How it works (Recursive):
-1. Move n-1 disks from source to auxiliary (using target as helper)
-2. Move the largest disk from source to target
-3. Move n-1 disks from auxiliary to target (using source as helper)
-
-This visualization uses 3 disks on 3 pegs.
-
-Time Complexity: O(2^n) — requires 2^n - 1 moves
-Space Complexity: O(n) — recursive call stack
-
-The minimum number of moves for n disks is 2^n - 1. For 3 disks, that's 7 moves.`,
 
   generateSteps(locale = 'en') {
     const numDisks = 3
@@ -75,7 +57,11 @@ The minimum number of moves for n disks is 2^n - 1. For 3 disks, that's 7 moves.
         values: pegsToMatrix(),
         highlights: getAllHighlights(),
       },
-      description: d(locale, `Tower of Hanoi: Move ${numDisks} disks from peg 0 to peg 2. Disks: 3 (large), 2 (medium), 1 (small).`, `Torre de Hanoi: Mover ${numDisks} discos de la torre 0 a la torre 2. Discos: 3 (grande), 2 (mediano), 1 (pequeño).`),
+      description: d(
+        locale,
+        `Tower of Hanoi: Move ${numDisks} disks from peg 0 to peg 2. Disks: 3 (large), 2 (medium), 1 (small).`,
+        `Torre de Hanoi: Mover ${numDisks} discos de la torre 0 a la torre 2. Discos: 3 (grande), 2 (mediano), 1 (pequeño).`,
+      ),
       codeLine: 1,
       variables: { n: numDisks, source: 0, target: 2, auxiliary: 1 },
     })
@@ -112,7 +98,11 @@ The minimum number of moves for n disks is 2^n - 1. For 3 disks, that's 7 moves.
           values: pegsToMatrix(),
           highlights: h,
         },
-        description: d(locale, `Move ${moveCount}: disk ${disk} from peg ${source} → peg ${target}`, `Movimiento ${moveCount}: disco ${disk} de torre ${source} → torre ${target}`),
+        description: d(
+          locale,
+          `Move ${moveCount}: disk ${disk} from peg ${source} → peg ${target}`,
+          `Movimiento ${moveCount}: disco ${disk} de torre ${source} → torre ${target}`,
+        ),
         codeLine: 8,
         variables: { move: moveCount, disk, from: source, to: target },
       })
@@ -133,7 +123,11 @@ The minimum number of moves for n disks is 2^n - 1. For 3 disks, that's 7 moves.
         values: pegsToMatrix(),
         highlights: finalH,
       },
-      description: d(locale, `Tower of Hanoi complete! All ${numDisks} disks moved to peg 2 in ${moveCount} moves.`, `¡Torre de Hanoi completada! Los ${numDisks} discos movidos a la torre 2 en ${moveCount} movimientos.`),
+      description: d(
+        locale,
+        `Tower of Hanoi complete! All ${numDisks} disks moved to peg 2 in ${moveCount} moves.`,
+        `¡Torre de Hanoi completada! Los ${numDisks} discos movidos a la torre 2 en ${moveCount} movimientos.`,
+      ),
       codeLine: 14,
       variables: { totalMoves: moveCount, n: numDisks },
     })

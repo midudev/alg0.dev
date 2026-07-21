@@ -1,0 +1,117 @@
+---
+/**
+ * Time-complexity curve for an algorithm description (SSR only, zero JS).
+ * All parsing and geometry happens at build time in `@lib/complexity`.
+ */
+import type { Locale } from "@i18n/translations"
+import { buildComplexityChart, W, H, PAD, plotW, plotH } from "@lib/complexity"
+
+interface Props {
+  description: string
+  locale: Locale
+}
+
+const { description, locale } = Astro.props
+const chart = buildComplexityChart(description, locale)
+---
+
+{
+  chart && (
+    <div class="mt-5 mb-3">
+      <div class="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold mb-2">
+        {chart.heading}
+      </div>
+
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        class="w-full"
+        style="max-height: 150px"
+        role="img"
+        aria-label={chart.ariaLabel}
+      >
+        {/* Gradient definitions for area fills */}
+        <defs>
+          {chart.series.map((series) => (
+            <linearGradient id={series.gradientId} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color={series.color} stop-opacity="0.1" />
+              <stop offset="100%" stop-color={series.color} stop-opacity="0" />
+            </linearGradient>
+          ))}
+        </defs>
+
+        {/* Plot area background */}
+        <rect
+          x={PAD.left}
+          y={PAD.top}
+          width={plotW}
+          height={plotH}
+          rx="4"
+          fill="white"
+          fill-opacity="0.02"
+        />
+
+        {/* Reference curves (faint) */}
+        {chart.referencePaths.map((d) => (
+          <path d={d} fill="none" stroke="white" stroke-opacity="0.06" stroke-width="1" />
+        ))}
+
+        {/* Highlighted area fills */}
+        {chart.series.map((series) => (
+          <path d={series.areaPath} fill={`url(#${series.gradientId})`} />
+        ))}
+
+        {/* Highlighted curves */}
+        {chart.series.map((series) => (
+          <path
+            d={series.linePath}
+            fill="none"
+            stroke={series.color}
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        ))}
+
+        {/* Right-side labels */}
+        {chart.labels.map((label) => (
+          <text
+            x={PAD.left + plotW + 6}
+            y={label.y}
+            fill={label.color}
+            fill-opacity={label.opacity}
+            font-size="8"
+            font-family="ui-monospace, monospace"
+            dominant-baseline="middle"
+          >
+            {label.text}
+          </text>
+        ))}
+
+        {/* Axis hint */}
+        <text
+          x={PAD.left + plotW}
+          y={H - 2}
+          fill="white"
+          fill-opacity="0.12"
+          font-size="7.5"
+          text-anchor="end"
+          font-style="italic"
+        >
+          n →
+        </text>
+      </svg>
+
+      {/* Legend */}
+      <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+        {chart.entries.map((entry) => (
+          <div class="flex items-center gap-1.5">
+            <div class="w-3 h-0.5 rounded-full shrink-0" style={`background-color: ${entry.color}`} />
+            <span class="text-[10px] text-neutral-500">
+              {entry.label ? `${entry.label}: ` : ""}
+              <span class="font-mono text-neutral-400">{entry.raw}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

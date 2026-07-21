@@ -1,0 +1,35 @@
+---
+import AlgorithmDescription from "@components/AlgorithmDescription.astro"
+import { algorithmCatalog, getCatalogEntry } from "@lib/algorithms/catalog"
+import {
+  getAlgorithmMetaDescription,
+  getAlgorithmMetaTitle,
+  loadAlgorithmDescription,
+} from "@lib/algorithm-content"
+import { locales, type Locale } from "@i18n/translations"
+import type { GetStaticPaths } from "astro"
+
+export const getStaticPaths: GetStaticPaths = () =>
+  locales.flatMap((lang) =>
+    algorithmCatalog.map((algorithm) => ({
+      params: { lang, algorithm: algorithm.id },
+    })),
+  )
+
+const { algorithm: algorithmId, lang } = Astro.params as {
+  algorithm: string
+  lang: Locale
+}
+const algorithm = getCatalogEntry(algorithmId)!
+const description = await loadAlgorithmDescription(lang, algorithm.id)
+const pageTitle = getAlgorithmMetaTitle(lang, algorithm.name, description)
+const metaDescription = getAlgorithmMetaDescription(lang, description)
+---
+
+<AlgorithmDescription
+  description={description}
+  difficulty={algorithm.difficulty}
+  locale={lang}
+  pageTitle={pageTitle}
+  metaDescription={metaDescription}
+/>

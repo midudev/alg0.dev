@@ -41,25 +41,6 @@ const nQueens: Algorithm = {
   solve(0);
   return board;
 }`,
-  description: `N-Queens Problem
-
-The N-Queens problem asks: how can N chess queens be placed on an N×N chessboard so that no two queens threaten each other?
-
-A queen can attack any piece in the same row, column, or diagonal. Therefore, a solution requires that no two queens share the same row, column, or diagonal.
-
-How it works (Backtracking):
-1. Place queens one row at a time
-2. For each row, try each column
-3. Check if the position is safe (no conflicts)
-4. If safe, place the queen and move to the next row
-5. If no safe column exists, backtrack to the previous row
-
-This visualization shows the 4-Queens problem on a 4×4 board.
-
-Time Complexity: O(N!) — in the worst case
-Space Complexity: O(N²) — for the board
-
-The N-Queens problem is a classic example of backtracking algorithms and constraint satisfaction problems.`,
 
   generateSteps(locale = 'en') {
     const N = 5
@@ -100,7 +81,16 @@ The N-Queens problem is a classic example of backtracking algorithms and constra
       return h
     }
 
-    makeStep({}, d(locale, `Empty ${N}x${N} board. Place ${N} queens with no conflicts.`, `Tablero ${N}x${N} vacío. Colocar ${N} reinas sin conflictos.`), 1, { n: N })
+    makeStep(
+      {},
+      d(
+        locale,
+        `Empty ${N}x${N} board. Place ${N} queens with no conflicts.`,
+        `Tablero ${N}x${N} vacío. Colocar ${N} reinas sin conflictos.`,
+      ),
+      1,
+      { n: N },
+    )
 
     function isSafe(row: number, col: number): boolean {
       for (let i = 0; i < row; i++) {
@@ -126,26 +116,49 @@ The N-Queens problem is a classic example of backtracking algorithms and constra
         if (isSafe(row, col)) {
           board[row][col] = 'Q'
           const ph = getQueenHighlights()
-          makeStep(ph, d(locale, `Placed queen at (${row}, ${col})`, `Reina colocada en (${row}, ${col})`), 22, { row, col, isSafe: true })
+          makeStep(
+            ph,
+            d(locale, `Placed queen at (${row}, ${col})`, `Reina colocada en (${row}, ${col})`),
+            22,
+            { row, col, isSafe: true },
+          )
 
           if (solve(row + 1)) return true
 
           board[row][col] = 0
           const rh = getQueenHighlights()
           rh[`${row},${col}`] = 'conflict'
-          makeStep(rh, d(locale, `Backtracking: removed queen from (${row}, ${col})`, `Backtracking: reina removida de (${row}, ${col})`), 24, {
-            row,
-            col,
-            action: 'backtrack',
-          })
+          makeStep(
+            rh,
+            d(
+              locale,
+              `Backtracking: removed queen from (${row}, ${col})`,
+              `Backtracking: reina removida de (${row}, ${col})`,
+            ),
+            24,
+            {
+              row,
+              col,
+              action: 'backtrack',
+            },
+          )
         } else {
           const ch = getQueenHighlights()
           ch[`${row},${col}`] = 'conflict'
-          makeStep(ch, d(locale, `(${row}, ${col}) not safe — conflicts with existing queen`, `(${row}, ${col}) no es seguro — conflicto con reina existente`), 21, {
-            row,
-            col,
-            isSafe: false,
-          })
+          makeStep(
+            ch,
+            d(
+              locale,
+              `(${row}, ${col}) not safe — conflicts with existing queen`,
+              `(${row}, ${col}) no es seguro — conflicto con reina existente`,
+            ),
+            21,
+            {
+              row,
+              col,
+              isSafe: false,
+            },
+          )
         }
       }
 
@@ -160,10 +173,19 @@ The N-Queens problem is a classic example of backtracking algorithms and constra
         if (board[r][c] === 'Q') fh[`${r},${c}`] = 'found'
       }
     }
-    makeStep(fh, d(locale, `Solution found! All ${N} queens placed without conflicts.`, `¡Solución encontrada! Las ${N} reinas colocadas sin conflictos.`), 29, {
-      n: N,
-      solved: true,
-    })
+    makeStep(
+      fh,
+      d(
+        locale,
+        `Solution found! All ${N} queens placed without conflicts.`,
+        `¡Solución encontrada! Las ${N} reinas colocadas sin conflictos.`,
+      ),
+      29,
+      {
+        n: N,
+        solved: true,
+      },
+    )
 
     return steps
   },
@@ -216,21 +238,6 @@ const sudokuSolver: Algorithm = {
   solve();
   return board;
 }`,
-  description: `Sudoku Solver (4×4)
-
-Solves a 4×4 Sudoku puzzle using backtracking. The board is divided into four 2×2 boxes, and each row, column, and box must contain the numbers 1 through 4 exactly once.
-
-How it works (Backtracking):
-1. Find the next empty cell
-2. Try placing numbers 1 through 4
-3. Check constraints: no duplicate in row, column, or 2×2 box
-4. If valid, place the number and recurse
-5. If no valid number exists, backtrack (undo) and try the next option
-
-Time Complexity: O(k^(n×n)) worst case, where k=4 and n=4
-Space Complexity: O(n×n) for the board
-
-Sudoku solving is a classic example of constraint satisfaction via backtracking. The 4×4 variant provides a clear, compact visualization of the algorithm.`,
 
   generateSteps(locale = 'en') {
     const board: (number | string)[][] = [
@@ -267,7 +274,11 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
         values: displayBoard(),
         highlights: getHighlights(),
       },
-      description: d(locale, '4×4 Sudoku puzzle. Fill with numbers 1-4, no repeats in rows, columns, or 2×2 boxes.', 'Sudoku 4×4. Rellenar con números 1-4, sin repetir en filas, columnas o cajas 2×2.'),
+      description: d(
+        locale,
+        '4×4 Sudoku puzzle. Fill with numbers 1-4, no repeats in rows, columns, or 2×2 boxes.',
+        'Sudoku 4×4. Rellenar con números 1-4, sin repetir en filas, columnas o cajas 2×2.',
+      ),
       codeLine: 1,
       variables: { size: 4, boxSize: 2 },
     })
@@ -306,7 +317,11 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
                   values: tryValues,
                   highlights: tryH,
                 },
-                description: d(locale, `Trying ${num} at (${r}, ${c})`, `Probando ${num} en (${r}, ${c})`),
+                description: d(
+                  locale,
+                  `Trying ${num} at (${r}, ${c})`,
+                  `Probando ${num} en (${r}, ${c})`,
+                ),
                 codeLine: 22,
                 variables: { row: r, col: c, num },
               })
@@ -322,7 +337,11 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
                     values: displayBoard(),
                     highlights: ph,
                   },
-                  description: d(locale, `Placed ${num} at (${r}, ${c}) — valid!`, `${num} colocado en (${r}, ${c}) — ¡válido!`),
+                  description: d(
+                    locale,
+                    `Placed ${num} at (${r}, ${c}) — valid!`,
+                    `${num} colocado en (${r}, ${c}) — ¡válido!`,
+                  ),
                   codeLine: 24,
                   variables: { row: r, col: c, num, valid: true },
                 })
@@ -340,7 +359,11 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
                     values: displayBoard(),
                     highlights: bh,
                   },
-                  description: d(locale, `Backtrack: removed ${num} from (${r}, ${c})`, `Backtrack: ${num} removido de (${r}, ${c})`),
+                  description: d(
+                    locale,
+                    `Backtrack: removed ${num} from (${r}, ${c})`,
+                    `Backtrack: ${num} removido de (${r}, ${c})`,
+                  ),
                   codeLine: 26,
                   variables: { row: r, col: c, num, action: 'backtrack' },
                 })
@@ -355,7 +378,11 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
                     values: displayBoard(),
                     highlights: ch,
                   },
-                  description: d(locale, `${num} at (${r}, ${c}) — conflict!`, `${num} en (${r}, ${c}) — ¡conflicto!`),
+                  description: d(
+                    locale,
+                    `${num} at (${r}, ${c}) — conflict!`,
+                    `${num} en (${r}, ${c}) — ¡conflicto!`,
+                  ),
                   codeLine: 23,
                   variables: { row: r, col: c, num, valid: false },
                 })
@@ -383,7 +410,11 @@ Sudoku solving is a classic example of constraint satisfaction via backtracking.
         values: displayBoard(),
         highlights: finalH,
       },
-      description: d(locale, 'Sudoku solved! All cells filled with valid numbers.', '¡Sudoku resuelto! Todas las celdas llenas con números válidos.'),
+      description: d(
+        locale,
+        'Sudoku solved! All cells filled with valid numbers.',
+        '¡Sudoku resuelto! Todas las celdas llenas con números válidos.',
+      ),
       codeLine: 33,
       variables: { solved: true },
     })
@@ -441,23 +472,6 @@ const mazePathfinding: Algorithm = {
 
   return null; // No path found
 }`,
-  description: `Maze Pathfinding (BFS)
-
-Finds the shortest path through a maze using Breadth-First Search. The maze is a grid where 0 = open cell and 1 = wall. The algorithm explores cells level by level, guaranteeing the shortest path.
-
-How it works:
-1. Start BFS from the start cell
-2. Explore all 4 neighbors (up, down, left, right)
-3. Skip walls and already-visited cells
-4. Track parent of each cell to reconstruct the path
-5. When the end cell is reached, trace back the shortest path
-
-Maze: 6×6 grid, Start: (0,0), End: (5,5)
-
-Time Complexity: O(rows × cols)
-Space Complexity: O(rows × cols)
-
-BFS guarantees the shortest path in an unweighted grid. Used in robotics, game AI, and navigation systems.`,
 
   generateSteps(locale = 'en') {
     const maze = [
@@ -504,7 +518,11 @@ BFS guarantees the shortest path in an unweighted grid. Used in robotics, game A
         values: toDisplayValues(),
         highlights: initH,
       },
-      description: d(locale, 'Maze initialized. Finding shortest path from S(0,0) to E(5,5) using BFS.', 'Laberinto inicializado. Buscando el camino más corto de S(0,0) a E(5,5) usando BFS.'),
+      description: d(
+        locale,
+        'Maze initialized. Finding shortest path from S(0,0) to E(5,5) using BFS.',
+        'Laberinto inicializado. Buscando el camino más corto de S(0,0) a E(5,5) usando BFS.',
+      ),
       codeLine: 1,
       variables: { start: '(0,0)', end: '(5,5)', rows, cols },
     })
@@ -601,7 +619,11 @@ BFS guarantees the shortest path in an unweighted grid. Used in robotics, game A
           values: toDisplayValues(),
           highlights: pathH,
         },
-        description: d(locale, `Path found! Length: ${path.length}. Route: ${path.map(([r, c]) => `(${r},${c})`).join(' → ')}`, `¡Camino encontrado! Longitud: ${path.length}. Ruta: ${path.map(([r, c]) => `(${r},${c})`).join(' → ')}`),
+        description: d(
+          locale,
+          `Path found! Length: ${path.length}. Route: ${path.map(([r, c]) => `(${r},${c})`).join(' → ')}`,
+          `¡Camino encontrado! Longitud: ${path.length}. Ruta: ${path.map(([r, c]) => `(${r},${c})`).join(' → ')}`,
+        ),
         codeLine: 22,
         variables: { pathLength: path.length },
       })
