@@ -5,17 +5,17 @@ import { translations } from '@i18n/translations'
 const NODE_RADIUS = 22
 
 const colors = {
-  nodeDefault: '#1a1a1a',
-  nodeVisited: '#555',
-  nodeCurrent: '#fff',
-  edgeDefault: '#222',
-  edgeVisited: '#555',
-  edgeCurrent: '#fff',
-  strokeDefault: '#333',
-  strokeVisited: '#666',
-  strokeCurrent: '#fff',
-  weightText: '#888',
-  weightBg: '#000',
+  nodeDefault: 'var(--subtle-strong)',
+  nodeVisited: 'var(--viz-muted)',
+  nodeCurrent: 'var(--foreground)',
+  edgeDefault: 'var(--viz-border)',
+  edgeVisited: 'var(--viz-muted)',
+  edgeCurrent: 'var(--foreground)',
+  strokeDefault: 'var(--viz-faint)',
+  strokeVisited: 'var(--viz-muted)',
+  strokeCurrent: 'var(--foreground)',
+  weightText: 'var(--viz-label)',
+  weightBg: 'var(--surface)',
 }
 
 interface GraphVisualizerProps {
@@ -195,7 +195,7 @@ export default function GraphVisualizer({ step, locale = 'en' }: GraphVisualizer
                 y={node.y}
                 textAnchor="middle"
                 dominantBaseline="central"
-                fill={isCurrent ? '#000' : '#fff'}
+                fill={isCurrent ? 'var(--surface)' : 'var(--foreground)'}
                 fontSize="13"
                 fontWeight="600"
                 fontFamily="Inter, system-ui, sans-serif"

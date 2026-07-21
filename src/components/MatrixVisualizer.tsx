@@ -29,7 +29,12 @@ export default function MatrixVisualizer({ step }: MatrixVisualizerProps) {
           ? 'w-7 h-7 md:w-10 md:h-10 text-base md:text-lg'
           : 'w-6 h-6 md:w-8 md:h-8 text-xs md:text-sm'
   const gapSize = maxDim <= 6 ? 'gap-1 md:gap-1.5' : 'gap-0.5 md:gap-1'
-  const fontSize = maxDim <= 5 ? 'text-[10px] md:text-xs' : maxDim <= 8 ? 'text-[9px] md:text-[10px]' : 'text-[8px] md:text-[9px]'
+  const fontSize =
+    maxDim <= 5
+      ? 'text-[10px] md:text-xs'
+      : maxDim <= 8
+        ? 'text-[9px] md:text-[10px]'
+        : 'text-[8px] md:text-[9px]'
 
   // Build text description for screen readers
   const specialCells: string[] = []
@@ -69,17 +74,15 @@ export default function MatrixVisualizer({ step }: MatrixVisualizerProps) {
                 className={`${cellSize} flex items-center justify-center rounded-lg transition-all duration-300 border`}
                 style={{
                   backgroundColor:
-                    styles?.bg || (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.01)'),
-                  borderColor:
-                    styles?.border ||
-                    (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)'),
+                    styles?.bg || (isDark ? 'var(--viz-cell)' : 'var(--viz-cell-alt)'),
+                  borderColor: styles?.border || (isDark ? 'var(--viz-border)' : 'var(--subtle)'),
                 }}
               >
                 {symbol ? (
                   <span
                     className="leading-none transition-all duration-300"
                     style={{
-                      color: styles?.text || '#e2e8f0',
+                      color: styles?.text || 'var(--viz-text)',
                       filter:
                         highlight === 'found'
                           ? 'drop-shadow(0 0 6px rgba(74,222,128,0.5))'
@@ -92,7 +95,7 @@ export default function MatrixVisualizer({ step }: MatrixVisualizerProps) {
                   <span
                     className={`font-mono font-semibold leading-none transition-all duration-300 ${fontSize}`}
                     style={{
-                      color: styles?.text || '#e2e8f0',
+                      color: styles?.text || 'var(--viz-text)',
                     }}
                   >
                     {value}

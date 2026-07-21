@@ -77,7 +77,7 @@ export default function ArrayVisualizer({ step }: ArrayVisualizerProps) {
             ? highlightColors[highlight]
             : isSorted
               ? highlightColors.sorted
-              : '#333'
+              : 'var(--viz-faint)'
 
           return (
             <div

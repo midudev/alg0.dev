@@ -27,15 +27,193 @@
   font-display: swap;
 }
 
+:root {
+  --surface: #000;
+  --foreground: #fff;
+  --subtle: rgba(255, 255, 255, 0.04);
+  --subtle-strong: rgba(255, 255, 255, 0.08);
+  --subtle-hover: rgba(255, 255, 255, 0.14);
+  --viz-muted: #555;
+  --viz-faint: #333;
+  --viz-grid: rgba(255, 255, 255, 0.06);
+  --viz-axis: rgba(255, 255, 255, 0.2);
+  --viz-label: rgba(255, 255, 255, 0.45);
+  --viz-cell: rgba(255, 255, 255, 0.04);
+  --viz-cell-alt: rgba(255, 255, 255, 0.01);
+  --viz-border: rgba(255, 255, 255, 0.08);
+  --viz-text: #e2e8f0;
+}
+
+[data-theme='light'] {
+  --surface: #fff;
+  --foreground: #171717;
+  --subtle: rgba(0, 0, 0, 0.035);
+  --subtle-strong: rgba(0, 0, 0, 0.08);
+  --subtle-hover: rgba(0, 0, 0, 0.14);
+  --viz-muted: #a3a3a3;
+  --viz-faint: #d4d4d4;
+  --viz-grid: rgba(0, 0, 0, 0.08);
+  --viz-axis: rgba(0, 0, 0, 0.22);
+  --viz-label: rgba(0, 0, 0, 0.5);
+  --viz-cell: rgba(0, 0, 0, 0.045);
+  --viz-cell-alt: rgba(0, 0, 0, 0.015);
+  --viz-border: rgba(0, 0, 0, 0.1);
+  --viz-text: #334155;
+}
+
 @theme {
   --font-sans: 'Geist Pixel Square', system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --font-heading: 'Geist Pixel Circle', system-ui, sans-serif;
 }
 
+/* The app predates semantic color tokens. Keep the dark palette intact while
+   mapping its monochrome utilities to equivalent light surfaces. */
+[data-theme='light'] .bg-black {
+  background-color: #fff;
+}
+[data-theme='light'] .bg-black\/60 {
+  background-color: rgb(255 255 255 / 0.72);
+}
+[data-theme='light'] .bg-white {
+  background-color: #171717;
+}
+[data-theme='light'] .bg-neutral-900 {
+  background-color: #f5f5f5;
+}
+[data-theme='light']
+  :where(
+    .bg-white\/1,
+    .bg-white\/2,
+    .bg-white\/3,
+    .bg-white\/4,
+    .bg-white\/5,
+    .bg-white\/\[0\.04\]
+  ) {
+  background-color: rgb(0 0 0 / 0.035);
+}
+[data-theme='light'] :where(.bg-white\/6, .bg-white\/8) {
+  background-color: rgb(0 0 0 / 0.06);
+}
+[data-theme='light'] .bg-white\/10 {
+  background-color: rgb(0 0 0 / 0.1);
+}
+[data-theme='light'] .bg-white\/20 {
+  background-color: rgb(0 0 0 / 0.16);
+}
+[data-theme='light']
+  :where(.border-white\/5, .border-white\/6, .border-white\/8, .border-white\/\[0\.08\]) {
+  border-color: rgb(0 0 0 / 0.08);
+}
+[data-theme='light'] :where(.border-white\/10, .border-white\/12, .border-white\/15) {
+  border-color: rgb(0 0 0 / 0.12);
+}
+[data-theme='light'] .border-white\/20 {
+  border-color: rgb(0 0 0 / 0.2);
+}
+[data-theme='light'] .text-white {
+  color: #171717;
+}
+[data-theme='light'] .text-black {
+  color: #fff;
+}
+[data-theme='light'] .text-gray-100 {
+  color: #171717;
+}
+[data-theme='light'] .text-gray-600 {
+  color: #525252;
+}
+[data-theme='light'] .text-neutral-200 {
+  color: #262626;
+}
+[data-theme='light'] .text-neutral-300 {
+  color: #404040;
+}
+[data-theme='light'] .text-neutral-400 {
+  color: #525252;
+}
+[data-theme='light'] .text-neutral-500 {
+  color: #737373;
+}
+[data-theme='light'] .text-neutral-600 {
+  color: #737373;
+}
+[data-theme='light'] .text-neutral-700 {
+  color: #a3a3a3;
+}
+[data-theme='light'] .text-neutral-800 {
+  color: #d4d4d4;
+}
+[data-theme='light'] .text-white\/40 {
+  color: rgb(0 0 0 / 0.4);
+}
+[data-theme='light'] .text-white\/50 {
+  color: rgb(0 0 0 / 0.5);
+}
+[data-theme='light'] .text-white\/60 {
+  color: rgb(0 0 0 / 0.6);
+}
+[data-theme='light'] .text-white\/80 {
+  color: rgb(0 0 0 / 0.8);
+}
+[data-theme='light'] :where(.text-amber-300\/90, .text-amber-400) {
+  color: #a16207;
+}
+[data-theme='light'] :where(.text-emerald-300\/90, .text-emerald-400, .text-emerald-400\/90) {
+  color: #047857;
+}
+[data-theme='light'] :where(.text-red-400, .text-red-400\/90) {
+  color: #b91c1c;
+}
+[data-theme='light'] .text-sky-300\/90 {
+  color: #0369a1;
+}
+[data-theme='light'] .from-black\/70 {
+  --tw-gradient-from: rgb(255 255 255 / 0.78);
+}
+[data-theme='light'] .focus-visible\:ring-white\/20:focus-visible {
+  --tw-ring-color: rgb(0 0 0 / 0.2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-theme='light']
+    :where(
+      .hover\:bg-white\/3,
+      .hover\:bg-white\/4,
+      .hover\:bg-white\/6,
+      .hover\:bg-white\/8,
+      .hover\:bg-white\/\[0\.08\]
+    ):hover {
+    background-color: rgb(0 0 0 / 0.06);
+  }
+  [data-theme='light'] .hover\:bg-white\/10:hover {
+    background-color: rgb(0 0 0 / 0.1);
+  }
+  [data-theme='light'] .hover\:bg-neutral-200:hover {
+    background-color: #404040;
+  }
+  [data-theme='light'] :where(.hover\:border-white\/12, .hover\:border-white\/20):hover {
+    border-color: rgb(0 0 0 / 0.18);
+  }
+  [data-theme='light']
+    :where(.hover\:text-white, .hover\:text-neutral-300, .hover\:text-neutral-400):hover {
+    color: #171717;
+  }
+}
+
+.theme-icon-light {
+  display: none;
+}
+[data-theme='light'] .theme-icon-light {
+  display: block;
+}
+[data-theme='light'] .theme-icon-dark {
+  display: none;
+}
+
 /* Monaco Editor – active line decoration */
 .algoviz-active-line {
-  background: rgba(250, 204, 21, 0.10) !important;
+  background: rgba(250, 204, 21, 0.1) !important;
   box-shadow: inset 0 0 0 1px rgba(250, 204, 21, 0.08);
 }
 
@@ -61,7 +239,7 @@
 
 /* Monaco Editor – inline variable annotations */
 .algoviz-inline-vars {
-  color: rgba(255, 255, 255, 0.3) !important;
+  color: var(--viz-label) !important;
   font-style: italic !important;
   font-size: 12px !important;
   padding-left: 16px !important;
