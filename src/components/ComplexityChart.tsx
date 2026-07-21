@@ -75,8 +75,7 @@ function parseTimeComplexity(description: string): Entry[] {
   if (!blockMatch) return entries
   const block = blockMatch[0]
 
-  const oRe = (prefix: string) =>
-    new RegExp(`${prefix}:\\s*(O\\((?:[^()]+|\\([^)]*\\))*\\))`, 'i')
+  const oRe = (prefix: string) => new RegExp(`${prefix}:\\s*(O\\((?:[^()]+|\\([^)]*\\))*\\))`, 'i')
 
   const best = block.match(oRe(isSpanish ? 'Mejor' : 'Best'))
   const avg = block.match(oRe(isSpanish ? 'Promedio' : 'Average'))
@@ -85,15 +84,28 @@ function parseTimeComplexity(description: string): Entry[] {
   if (best || avg || worst) {
     if (best) {
       const k = normalizeToKey(best[1])
-      if (k) entries.push({ label: isSpanish ? 'Mejor' : 'Best', raw: best[1], key: k, color: '#34d399' })
+      if (k)
+        entries.push({
+          label: isSpanish ? 'Mejor' : 'Best',
+          raw: best[1],
+          key: k,
+          color: '#34d399',
+        })
     }
     if (avg) {
       const k = normalizeToKey(avg[1])
-      if (k) entries.push({ label: isSpanish ? 'Prom' : 'Avg', raw: avg[1], key: k, color: '#fbbf24' })
+      if (k)
+        entries.push({ label: isSpanish ? 'Prom' : 'Avg', raw: avg[1], key: k, color: '#fbbf24' })
     }
     if (worst) {
       const k = normalizeToKey(worst[1])
-      if (k) entries.push({ label: isSpanish ? 'Peor' : 'Worst', raw: worst[1], key: k, color: '#f87171' })
+      if (k)
+        entries.push({
+          label: isSpanish ? 'Peor' : 'Worst',
+          raw: worst[1],
+          key: k,
+          color: '#f87171',
+        })
     }
   } else {
     const single = block.match(O_RE)
@@ -162,7 +174,13 @@ function resolveOverlaps(
   return sorted
 }
 
-export default function ComplexityChart({ description, locale = 'en' }: { description: string; locale?: string }) {
+export default function ComplexityChart({
+  description,
+  locale = 'en',
+}: {
+  description: string
+  locale?: string
+}) {
   const entries = useMemo(() => parseTimeComplexity(description), [description])
 
   if (entries.length === 0) return null
@@ -179,7 +197,12 @@ export default function ComplexityChart({ description, locale = 'en' }: { descri
   const labels: { y: number; text: string; color: string; opacity: number }[] = []
   for (const key of REFERENCE_KEYS) {
     if (!highlightedKeys.has(key)) {
-      labels.push({ y: endY(COMPLEXITY_FNS[key]), text: key, color: '#fff', opacity: 0.18 })
+      labels.push({
+        y: endY(COMPLEXITY_FNS[key]),
+        text: key,
+        color: 'var(--foreground)',
+        opacity: 0.18,
+      })
     }
   }
   for (const [key, group] of grouped) {
@@ -300,10 +323,7 @@ export default function ComplexityChart({ description, locale = 'en' }: { descri
       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
         {entries.map((e, i) => (
           <div key={i} className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-0.5 rounded-full shrink-0"
-              style={{ backgroundColor: e.color }}
-            />
+            <div className="w-3 h-0.5 rounded-full shrink-0" style={{ backgroundColor: e.color }} />
             <span className="text-[10px] text-neutral-500">
               {e.label ? `${e.label}: ` : ''}
               <span className="font-mono text-neutral-400">{e.raw}</span>
