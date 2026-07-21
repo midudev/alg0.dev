@@ -33,6 +33,7 @@ export interface Translations {
   expandCodePanel: string
   collapseCodePanel: string
   variables: string
+  codeLanguage: string
 
   // Controls
   speed: string
@@ -103,6 +104,7 @@ export const translations: Record<Locale, Translations> = {
     expandCodePanel: 'Expand code panel',
     collapseCodePanel: 'Collapse code panel',
     variables: 'Variables',
+    codeLanguage: 'Programming language',
 
     speed: 'Speed',
     skipToStart: 'Skip to start',
@@ -1076,6 +1078,7 @@ Named after the Greek mathematician Eratosthenes of Cyrene (~276–194 BCE), thi
     expandCodePanel: 'Expandir panel de código',
     collapseCodePanel: 'Contraer panel de código',
     variables: 'Variables',
+    codeLanguage: 'Lenguaje de programación',
 
     speed: 'Velocidad',
     skipToStart: 'Ir al inicio',

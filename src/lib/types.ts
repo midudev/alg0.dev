@@ -222,18 +222,47 @@ export interface Step {
 
 export type Difficulty = 'easy' | 'intermediate' | 'advanced'
 
+export type CodeLanguage = 'javascript' | 'python' | 'java' | 'cpp' | 'rust'
+
+/** A translation of an algorithm's source into another language. */
+export interface CodeImplementation {
+  code: string
+  /**
+   * Maps a JavaScript line number — the one `Step.codeLine` points at — to the
+   * equivalent line in `code`. Built from `#@` / `//@` markers, see `annotated()`.
+   */
+  lineMap: Record<number, number>
+}
+
 export interface Algorithm {
   id: string
   name: string
   category: string
   difficulty: Difficulty
   description: string
+  /** JavaScript source. `Step.codeLine` numbers always refer to this one. */
   code: string
+  /** Same algorithm written in other languages, keyed by language id. */
+  implementations?: Partial<Record<Exclude<CodeLanguage, 'javascript'>, CodeImplementation>>
   visualization: VisualizationType
   generateSteps: (locale?: string) => Step[]
+}
+
+/** Lightweight listing data for the sidebar / routing (no code or step generators). */
+export interface AlgorithmSummary {
+  id: string
+  name: string
+  category: string
+  difficulty: Difficulty
+  visualization: VisualizationType
 }
 
 export interface Category {
   name: string
   algorithms: Algorithm[]
+}
+
+export interface CategorySummary {
+  name: string
+  algorithms: AlgorithmSummary[]
 }
