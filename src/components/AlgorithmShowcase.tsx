@@ -2,10 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { loadAlgorithm } from '@lib/algorithms/loaders'
 import type { Algorithm, AlgorithmSummary, Step } from '@lib/types'
 import type { Locale } from '@i18n/translations'
-import ArrayVisualizer from '@components/ArrayVisualizer'
+import DomStepViz from '@components/DomStepViz'
 import GraphVisualizer from '@components/GraphVisualizer'
-import MatrixVisualizer from '@components/MatrixVisualizer'
 import ConceptVisualizer from '@components/ConceptVisualizer'
+import { renderArrayVisualizer } from '@lib/visualizers/array'
+import { renderMatrixVisualizer } from '@lib/visualizers/matrix'
 
 const SHOWCASE_IDS = [
   'bubble-sort',
@@ -140,11 +141,11 @@ export default function AlgorithmShowcase({
   const renderVisualizer = () => {
     switch (current.algorithm.visualization) {
       case 'array':
-        return <ArrayVisualizer step={step} />
+        return <DomStepViz step={step} render={renderArrayVisualizer} />
       case 'graph':
         return <GraphVisualizer step={step} locale={locale} />
       case 'matrix':
-        return <MatrixVisualizer step={step} />
+        return <DomStepViz step={step} render={renderMatrixVisualizer} />
       case 'concept':
         return <ConceptVisualizer step={step} />
       default:

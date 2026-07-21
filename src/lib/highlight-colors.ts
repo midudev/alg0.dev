@@ -1,6 +1,6 @@
 import type { HighlightType } from '@lib/types'
 
-/** Hex colors used by the ArrayVisualizer bar chart */
+/** Hex colors used by the array bar-chart visualizer */
 export const highlightColors: Record<HighlightType, string> = {
   comparing: '#60a5fa',
   swapped: '#f87171',
@@ -26,7 +26,7 @@ export const highlightColors: Record<HighlightType, string> = {
   visited: '#a78bfa',
 }
 
-/** RGBA styles used by the MatrixVisualizer cells */
+/** RGBA styles used by the matrix / board visualizer cells */
 export const highlightStyles: Record<string, { bg: string; text: string; border: string }> = {
   placed: { bg: 'rgba(34,197,94,0.12)', text: '#4ade80', border: 'rgba(34,197,94,0.25)' },
   conflict: { bg: 'rgba(239,68,68,0.12)', text: '#f87171', border: 'rgba(239,68,68,0.25)' },
