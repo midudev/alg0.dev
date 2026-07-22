@@ -88,6 +88,13 @@ export const categoryColors: Record<string, CategoryColor> = {
     selectedCss: 'rgb(240 171 252)', // fuchsia-300
     dot: 'bg-fuchsia-400 shadow-[0_0_6px_rgba(232,121,249,0.45)]',
   },
+  Compression: {
+    icon: 'text-lime-400',
+    badge: 'bg-lime-500/10 text-lime-400/70',
+    line: 'border-lime-500/20',
+    selectedCss: 'rgb(190 242 100)', // lime-300
+    dot: 'bg-lime-400 shadow-[0_0_6px_rgba(163,230,53,0.45)]',
+  },
 }
 
 /** SVG path `d` for each category icon (24×24 stroke icons) — inlined by Astro at build time. */
@@ -105,6 +112,9 @@ export const categoryIconPaths: Record<string, string> = {
   'Divide and Conquer':
     'M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z',
   Math: 'M5 5h14M9 5c0 4-1.5 10-3 14M15 5c0 4 1.5 10 3 14',
+  // Tabler file-zip (multiple subpaths in one d)
+  Compression:
+    'M6 20.735a2 2 0 0 1 -1 -1.735v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-1M11 17a2 2 0 0 1 2 2v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2a2 2 0 0 1 2 -2M11 5l-1 0M13 7l-1 0M11 9l-1 0M13 11l-1 0M11 13l-1 0M13 15l-1 0',
 }
 
 export function getCategoryColor(name: string): CategoryColor {
