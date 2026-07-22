@@ -267,6 +267,132 @@ export interface HuffmanState {
   operation?: string
 }
 
+export interface RleState {
+  type: 'rle'
+  phase: 'scan' | 'emit' | 'done'
+  text: string
+  charStates: Record<number, 'default' | 'inRun' | 'current' | 'emitted'>
+  runStart?: number
+  runEnd?: number
+  tokens: { char: string; count: number; active?: boolean }[]
+  encoded?: string
+  summary?: {
+    originalLen: number
+    encodedLen: number
+    tokenCount: number
+    savingPct: number
+  }
+  operation?: string
+}
+
+export interface Lz77State {
+  type: 'lz77'
+  phase: 'search' | 'match' | 'emit' | 'done'
+  text: string
+  position: number
+  windowStart: number
+  windowSize: number
+  charStates: Record<number, 'outside' | 'window' | 'lookAhead' | 'current' | 'match' | 'encoded'>
+  /** Best match found so far: offset (distance back), length, next literal */
+  match?: { offset: number; length: number; next: string } | null
+  tokens: { offset: number; length: number; next: string; active?: boolean }[]
+  summary?: {
+    originalLen: number
+    tokenCount: number
+    literals: number
+    matches: number
+  }
+  operation?: string
+}
+
+export interface LzwState {
+  type: 'lzw'
+  phase: 'init' | 'scan' | 'output' | 'add' | 'done'
+  text: string
+  position: number
+  /** Current matched phrase `w` */
+  current: string
+  /** Candidate `w + c` under consideration */
+  candidate?: string | null
+  charStates: Record<number, 'default' | 'inPhrase' | 'current' | 'done'>
+  dictionary: { code: number; entry: string; active?: boolean; isNew?: boolean }[]
+  output: { code: number; entry: string; active?: boolean }[]
+  summary?: {
+    originalLen: number
+    codeCount: number
+    dictSize: number
+  }
+  operation?: string
+}
+
+/** Pedagogical DEFLATE = LZ77 stage + Huffman stage (gzip engine). */
+export interface DeflateState {
+  type: 'deflate'
+  phase: 'intro' | 'lz77' | 'symbols' | 'huffman' | 'encode' | 'done'
+  /** Which pipeline stages are complete / active for the stage bar */
+  stages: {
+    id: 'lz77' | 'symbols' | 'huffman' | 'bits'
+    label: string
+    state: 'pending' | 'active' | 'done'
+  }[]
+  text: string
+  position: number
+  windowStart: number
+  windowSize: number
+  charStates: Record<number, 'outside' | 'window' | 'lookAhead' | 'current' | 'match' | 'encoded'>
+  match?: { offset: number; length: number; next: string } | null
+  tokens: { offset: number; length: number; next: string; active?: boolean }[]
+  symbols: { label: string; kind: 'literal' | 'match'; active?: boolean }[]
+  freqTable?: { symbol: string; freq: number; code?: string; active?: boolean }[]
+  encodedBits?: string
+  summary?: {
+    originalBits: number
+    lz77Symbols: number
+    fixedBits: number
+    deflateBits: number
+    savingPct: number
+  }
+  operation?: string
+}
+
+/** Pedagogical Brotli: static dictionary → LZ back-ref → entropy coding. */
+export interface BrotliState {
+  type: 'brotli'
+  phase: 'intro' | 'dict' | 'scan' | 'encode' | 'done'
+  stages: {
+    id: 'dict' | 'scan' | 'entropy' | 'bits'
+    label: string
+    state: 'pending' | 'active' | 'done'
+  }[]
+  text: string
+  position: number
+  charStates: Record<number, 'default' | 'current' | 'dict' | 'match' | 'literal' | 'done'>
+  /** Static dictionary entries (common phrases) */
+  dictionary: { entry: string; active?: boolean; used?: boolean }[]
+  /** Emitted commands */
+  commands: {
+    kind: 'dict' | 'match' | 'literal'
+    label: string
+    active?: boolean
+  }[]
+  /** Current match highlight range in already-seen text */
+  matchRange?: { start: number; end: number } | null
+  /** Current span being consumed */
+  consumeRange?: { start: number; end: number } | null
+  codes?: { symbol: string; code: string; freq: number; active?: boolean }[]
+  encodedBits?: string
+  summary?: {
+    originalBits: number
+    commandCount: number
+    dictHits: number
+    lzHits: number
+    literals: number
+    brotliBits: number
+    savingPct: number
+  }
+  operation?: string
+}
+
 export type ConceptState =
   | BigOState
   | CallStackState
@@ -282,6 +408,11 @@ export type ConceptState =
   | CoinChangeState
   | BucketsState
   | HuffmanState
+  | RleState
+  | Lz77State
+  | LzwState
+  | DeflateState
+  | BrotliState
 
 export interface Step {
   array?: number[]

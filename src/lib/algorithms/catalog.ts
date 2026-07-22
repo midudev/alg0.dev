@@ -311,8 +311,43 @@ export const algorithmCatalog: AlgorithmSummary[] = [
   },
   // Compression
   {
+    id: 'run-length-encoding',
+    name: 'Run-Length Encoding',
+    category: 'Compression',
+    difficulty: 'easy',
+    visualization: 'concept',
+  },
+  {
+    id: 'lz77',
+    name: 'LZ77',
+    category: 'Compression',
+    difficulty: 'intermediate',
+    visualization: 'concept',
+  },
+  {
+    id: 'lzw',
+    name: 'LZW',
+    category: 'Compression',
+    difficulty: 'intermediate',
+    visualization: 'concept',
+  },
+  {
     id: 'huffman-coding',
     name: 'Huffman Coding',
+    category: 'Compression',
+    difficulty: 'advanced',
+    visualization: 'concept',
+  },
+  {
+    id: 'deflate',
+    name: 'DEFLATE',
+    category: 'Compression',
+    difficulty: 'advanced',
+    visualization: 'concept',
+  },
+  {
+    id: 'brotli',
+    name: 'Brotli',
     category: 'Compression',
     difficulty: 'advanced',
     visualization: 'concept',

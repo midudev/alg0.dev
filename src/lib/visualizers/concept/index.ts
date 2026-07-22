@@ -18,6 +18,11 @@ export type ConceptType =
   | 'coinChange'
   | 'buckets'
   | 'huffman'
+  | 'rle'
+  | 'lz77'
+  | 'lzw'
+  | 'deflate'
+  | 'brotli'
 
 type ConceptRenderer = (state: never) => HTMLElement
 
@@ -60,6 +65,13 @@ const loaders: Record<ConceptType, () => Promise<ConceptRenderer>> = {
     import('@lib/visualizers/concept/buckets').then((m) => m.renderBuckets as ConceptRenderer),
   huffman: () =>
     import('@lib/visualizers/concept/huffman').then((m) => m.renderHuffman as ConceptRenderer),
+  rle: () => import('@lib/visualizers/concept/rle').then((m) => m.renderRle as ConceptRenderer),
+  lz77: () => import('@lib/visualizers/concept/lz77').then((m) => m.renderLz77 as ConceptRenderer),
+  lzw: () => import('@lib/visualizers/concept/lzw').then((m) => m.renderLzw as ConceptRenderer),
+  deflate: () =>
+    import('@lib/visualizers/concept/deflate').then((m) => m.renderDeflate as ConceptRenderer),
+  brotli: () =>
+    import('@lib/visualizers/concept/brotli').then((m) => m.renderBrotli as ConceptRenderer),
 }
 
 const cache = new Map<ConceptType, ConceptRenderer>()

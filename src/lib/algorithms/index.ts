@@ -51,7 +51,14 @@ import { towerOfHanoi } from '@lib/algorithms/divide-and-conquer'
 
 import { sieveOfEratosthenes } from '@lib/algorithms/math'
 
-import { huffmanCoding } from '@lib/algorithms/compression'
+import {
+  runLengthEncoding,
+  lz77,
+  lzw,
+  huffmanCoding,
+  deflate,
+  brotli,
+} from '@lib/algorithms/compression'
 
 /**
  * Full algorithm list for SSR / static generation (getStaticPaths, SEO).
@@ -111,7 +118,12 @@ export const algorithms: Algorithm[] = [
   // Math
   sieveOfEratosthenes,
   // Compression
+  runLengthEncoding,
+  lz77,
+  lzw,
   huffmanCoding,
+  deflate,
+  brotli,
 ]
 
 export const categories: Category[] = [

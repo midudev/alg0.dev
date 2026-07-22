@@ -101,8 +101,14 @@ const ALGORITHM_LOADERS: Record<string, () => Promise<Algorithm>> = {
     import('./math?algorithm=sieveOfEratosthenes').then(readDefaultAlgorithm),
 
   // Compression
+  'run-length-encoding': () =>
+    import('./compression?algorithm=runLengthEncoding').then(readDefaultAlgorithm),
+  lz77: () => import('./compression?algorithm=lz77').then(readDefaultAlgorithm),
+  lzw: () => import('./compression?algorithm=lzw').then(readDefaultAlgorithm),
   'huffman-coding': () =>
     import('./compression?algorithm=huffmanCoding').then(readDefaultAlgorithm),
+  deflate: () => import('./compression?algorithm=deflate').then(readDefaultAlgorithm),
+  brotli: () => import('./compression?algorithm=brotli').then(readDefaultAlgorithm),
 }
 
 const IMPLEMENTATION_GROUP_BY_CATEGORY: Record<string, ImplementationGroup> = {
