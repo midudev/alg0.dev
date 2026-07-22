@@ -9,6 +9,7 @@ import { dynamicProgrammingRust } from '@lib/algorithms/rust/dynamic-programming
 import { backtrackingRust } from '@lib/algorithms/rust/backtracking'
 import { divideAndConquerRust } from '@lib/algorithms/rust/divide-and-conquer'
 import { mathRust } from '@lib/algorithms/rust/math'
+import { compressionRust } from '@lib/algorithms/rust/compression'
 
 /** Rust translations keyed by algorithm id. */
 export const rustImplementations: Record<string, CodeImplementation> = {
@@ -21,4 +22,5 @@ export const rustImplementations: Record<string, CodeImplementation> = {
   ...backtrackingRust,
   ...divideAndConquerRust,
   ...mathRust,
+  ...compressionRust,
 }

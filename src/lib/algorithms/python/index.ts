@@ -9,6 +9,7 @@ import { dynamicProgrammingPython } from '@lib/algorithms/python/dynamic-program
 import { backtrackingPython } from '@lib/algorithms/python/backtracking'
 import { divideAndConquerPython } from '@lib/algorithms/python/divide-and-conquer'
 import { mathPython } from '@lib/algorithms/python/math'
+import { compressionPython } from '@lib/algorithms/python/compression'
 
 /** Python translations keyed by algorithm id. */
 export const pythonImplementations: Record<string, CodeImplementation> = {
@@ -21,4 +22,5 @@ export const pythonImplementations: Record<string, CodeImplementation> = {
   ...backtrackingPython,
   ...divideAndConquerPython,
   ...mathPython,
+  ...compressionPython,
 }

@@ -15,6 +15,7 @@ export type ConceptType =
   | 'memoTable'
   | 'coinChange'
   | 'buckets'
+  | 'huffman'
 
 type ConceptRenderer = (state: never) => HTMLElement
 
@@ -52,6 +53,8 @@ const loaders: Record<ConceptType, () => Promise<ConceptRenderer>> = {
     ),
   buckets: () =>
     import('@lib/visualizers/concept/buckets').then((m) => m.renderBuckets as ConceptRenderer),
+  huffman: () =>
+    import('@lib/visualizers/concept/huffman').then((m) => m.renderHuffman as ConceptRenderer),
 }
 
 const cache = new Map<ConceptType, ConceptRenderer>()

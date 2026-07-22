@@ -9,6 +9,7 @@ import { dynamicProgrammingJava } from '@lib/algorithms/java/dynamic-programming
 import { backtrackingJava } from '@lib/algorithms/java/backtracking'
 import { divideAndConquerJava } from '@lib/algorithms/java/divide-and-conquer'
 import { mathJava } from '@lib/algorithms/java/math'
+import { compressionJava } from '@lib/algorithms/java/compression'
 
 /** Java translations keyed by algorithm id. */
 export const javaImplementations: Record<string, CodeImplementation> = {
@@ -21,4 +22,5 @@ export const javaImplementations: Record<string, CodeImplementation> = {
   ...backtrackingJava,
   ...divideAndConquerJava,
   ...mathJava,
+  ...compressionJava,
 }

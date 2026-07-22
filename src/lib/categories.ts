@@ -14,6 +14,7 @@ export const categorySlugs: Record<string, string> = {
   Backtracking: 'backtracking',
   'Divide and Conquer': 'divide-and-conquer',
   Math: 'math',
+  Compression: 'compression',
 }
 
 const slugToCategory = Object.fromEntries(
@@ -64,6 +65,8 @@ export function getCategoryIntro(locale: Locale, categoryName: string): string {
       'Divide and Conquer':
         'Divide el problema, resuelve subproblemas y combina resultados. Torre de Hanoi y más.',
       Math: 'Algoritmos matemáticos clásicos con visualización clara del proceso.',
+      Compression:
+        'Algoritmos de compresión sin pérdida que reducen datos mediante representaciones eficientes.',
     }
     return intros[categoryName] ?? `Explora visualizaciones interactivas de ${label.toLowerCase()}.`
   }
@@ -85,6 +88,8 @@ export function getCategoryIntro(locale: Locale, categoryName: string): string {
     'Divide and Conquer':
       'Split the problem, solve subproblems, combine results. Tower of Hanoi and more.',
     Math: 'Classic mathematical algorithms with a clear step-by-step visualization.',
+    Compression:
+      'Lossless compression algorithms that reduce data through efficient representations.',
   }
   return intros[categoryName] ?? `Explore interactive ${label.toLowerCase()} visualizations.`
 }

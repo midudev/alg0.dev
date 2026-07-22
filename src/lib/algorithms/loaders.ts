@@ -13,6 +13,7 @@ type ImplementationGroup =
   | 'backtracking'
   | 'divide-and-conquer'
   | 'math'
+  | 'compression'
 
 /** Cache so revisiting an algorithm does not re-download its chunk. */
 const algorithmCache = new Map<string, Promise<Algorithm>>()
@@ -96,6 +97,10 @@ const ALGORITHM_LOADERS: Record<string, () => Promise<Algorithm>> = {
   // Math
   'sieve-of-eratosthenes': () =>
     import('./math?algorithm=sieveOfEratosthenes').then(readDefaultAlgorithm),
+
+  // Compression
+  'huffman-coding': () =>
+    import('./compression?algorithm=huffmanCoding').then(readDefaultAlgorithm),
 }
 
 const IMPLEMENTATION_GROUP_BY_CATEGORY: Record<string, ImplementationGroup> = {
@@ -108,6 +113,7 @@ const IMPLEMENTATION_GROUP_BY_CATEGORY: Record<string, ImplementationGroup> = {
   Backtracking: 'backtracking',
   'Divide and Conquer': 'divide-and-conquer',
   Math: 'math',
+  Compression: 'compression',
 }
 
 const IMPLEMENTATION_LOADERS: Record<
@@ -130,6 +136,8 @@ const IMPLEMENTATION_LOADERS: Record<
     'divide-and-conquer': () =>
       import('./python/divide-and-conquer?implementation-loader').then(readImplementationLoader),
     math: () => import('./python/math?implementation-loader').then(readImplementationLoader),
+    compression: () =>
+      import('./python/compression?implementation-loader').then(readImplementationLoader),
   },
   java: {
     concepts: () => import('./java/concepts?implementation-loader').then(readImplementationLoader),
@@ -146,6 +154,8 @@ const IMPLEMENTATION_LOADERS: Record<
     'divide-and-conquer': () =>
       import('./java/divide-and-conquer?implementation-loader').then(readImplementationLoader),
     math: () => import('./java/math?implementation-loader').then(readImplementationLoader),
+    compression: () =>
+      import('./java/compression?implementation-loader').then(readImplementationLoader),
   },
   cpp: {
     concepts: () => import('./cpp/concepts?implementation-loader').then(readImplementationLoader),
@@ -161,6 +171,8 @@ const IMPLEMENTATION_LOADERS: Record<
     'divide-and-conquer': () =>
       import('./cpp/divide-and-conquer?implementation-loader').then(readImplementationLoader),
     math: () => import('./cpp/math?implementation-loader').then(readImplementationLoader),
+    compression: () =>
+      import('./cpp/compression?implementation-loader').then(readImplementationLoader),
   },
   rust: {
     concepts: () => import('./rust/concepts?implementation-loader').then(readImplementationLoader),
@@ -177,6 +189,8 @@ const IMPLEMENTATION_LOADERS: Record<
     'divide-and-conquer': () =>
       import('./rust/divide-and-conquer?implementation-loader').then(readImplementationLoader),
     math: () => import('./rust/math?implementation-loader').then(readImplementationLoader),
+    compression: () =>
+      import('./rust/compression?implementation-loader').then(readImplementationLoader),
   },
 }
 

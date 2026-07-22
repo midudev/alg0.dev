@@ -194,6 +194,33 @@ export interface BucketsState {
   operation?: string
 }
 
+// ── Compression visualization types ──
+
+export interface HuffmanState {
+  type: 'huffman'
+  phase: 'frequency' | 'build' | 'encode' | 'done'
+  text: string
+  highlightChar?: string | null
+  nodes: Record<
+    number,
+    { id: number; char: string | null; freq: number; left: number | null; right: number | null }
+  >
+  queue: number[]
+  nodeStates?: Record<number, 'normal' | 'merging' | 'new' | 'path' | 'leafFound'>
+  freqTable?: { char: string; freq: number; active?: boolean }[]
+  codes?: { char: string; code: string; freq: number; active?: boolean }[]
+  activeCode?: string | null
+  summary?: {
+    uniqueChars: number
+    originalBits: number
+    compressedBits: number
+    avgBits: number
+    savingPct: number
+    encoded: string
+  }
+  operation?: string
+}
+
 export type ConceptState =
   | BigOState
   | CallStackState
@@ -206,6 +233,7 @@ export type ConceptState =
   | MemoTableState
   | CoinChangeState
   | BucketsState
+  | HuffmanState
 
 export interface Step {
   array?: number[]

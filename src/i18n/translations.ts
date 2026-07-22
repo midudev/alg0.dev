@@ -163,6 +163,7 @@ export const translations: Record<Locale, Translations> = {
       Backtracking: 'Backtracking',
       'Divide and Conquer': 'Divide and Conquer',
       Math: 'Math',
+      Compression: 'Compression',
     },
   },
 
@@ -243,6 +244,7 @@ export const translations: Record<Locale, Translations> = {
       Backtracking: 'Backtracking',
       'Divide and Conquer': 'Divide y Vencerás',
       Math: 'Matemáticas',
+      Compression: 'Compresión',
     },
   },
 }

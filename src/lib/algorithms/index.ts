@@ -44,6 +44,8 @@ import { towerOfHanoi } from '@lib/algorithms/divide-and-conquer'
 
 import { sieveOfEratosthenes } from '@lib/algorithms/math'
 
+import { huffmanCoding } from '@lib/algorithms/compression'
+
 /**
  * Full algorithm list for SSR / static generation (getStaticPaths, SEO).
  * Client islands should import `catalog` + `loadAlgorithm` instead so the
@@ -99,6 +101,8 @@ export const algorithms: Algorithm[] = [
   towerOfHanoi,
   // Math
   sieveOfEratosthenes,
+  // Compression
+  huffmanCoding,
 ]
 
 export const categories: Category[] = [
@@ -120,6 +124,7 @@ export const categories: Category[] = [
     algorithms: algorithms.filter((a) => a.category === 'Divide and Conquer'),
   },
   { name: 'Math', algorithms: algorithms.filter((a) => a.category === 'Math') },
+  { name: 'Compression', algorithms: algorithms.filter((a) => a.category === 'Compression') },
 ]
 
 export { algorithmCatalog, catalogCategories, getCatalogEntry, isKnownAlgorithmId } from './catalog'
