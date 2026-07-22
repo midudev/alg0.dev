@@ -61,6 +61,11 @@ const CATEGORY_META = {
     color: '#e879f9',
     icon: 'M5 5h14M9 5c0 4-1.5 10-3 14M15 5c0 4 1.5 10 3 14',
   },
+  Compression: {
+    color: '#a3e635',
+    // Tabler file-zip (multi-subpath)
+    icon: 'M6 20.735a2 2 0 0 1 -1 -1.735v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-1M11 17a2 2 0 0 1 2 2v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2a2 2 0 0 1 2 -2M11 5l-1 0M13 7l-1 0M11 9l-1 0M13 11l-1 0M11 13l-1 0M13 15l-1 0',
+  },
 }
 
 const algorithms = [
@@ -106,6 +111,12 @@ const algorithms = [
   ['maze-pathfinding', 'Maze Pathfinding', 'Backtracking'],
   ['tower-of-hanoi', 'Tower of Hanoi', 'Divide and Conquer'],
   ['sieve-of-eratosthenes', 'Sieve of Eratosthenes', 'Math'],
+  ['run-length-encoding', 'Run-Length Encoding', 'Compression'],
+  ['lz77', 'LZ77', 'Compression'],
+  ['lzw', 'LZW', 'Compression'],
+  ['huffman-coding', 'Huffman Coding', 'Compression'],
+  ['deflate', 'DEFLATE', 'Compression'],
+  ['brotli', 'Brotli', 'Compression'],
 ]
 
 const categories = [
@@ -118,6 +129,7 @@ const categories = [
   ['backtracking', 'Backtracking'],
   ['divide-and-conquer', 'Divide and Conquer'],
   ['math', 'Math'],
+  ['compression', 'Compression'],
 ]
 
 function ensureFonts() {
@@ -144,7 +156,10 @@ for src, dst in pairs:
   print('wrote', dst)
 `,
       ],
-      { cwd: root, stdio: 'pipe' },
+      {
+        cwd: root,
+        stdio: 'pipe',
+      },
     )
   } catch (error) {
     console.error(
@@ -248,7 +263,10 @@ function buildSvg({ title, categoryLabel, categoryKey, kicker = 'Algorithm Visua
 
 function renderJpg(svg, outPath) {
   const resvg = new Resvg(svg, {
-    fitTo: { mode: 'width', value: 1200 },
+    fitTo: {
+      mode: 'width',
+      value: 1200,
+    },
     font: {
       fontFiles: [FONT_PIXEL, FONT_MONO],
       loadSystemFonts: false,
@@ -329,7 +347,7 @@ function main() {
   console.log(
     `Generated OG images → public/og/ (${algorithms.length} algorithms + ${categories.length} categories)`,
   )
-  console.log(`Fonts: Geist Pixel Square + Geist Mono`)
+  console.log('Fonts: Geist Pixel Square + Geist Mono')
   console.log(`Sample: ${Math.round(statSync(join(outDir, 'bubble-sort.jpg')).size / 1024)} KB`)
 }
 
