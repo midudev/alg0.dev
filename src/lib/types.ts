@@ -137,6 +137,52 @@ export interface BinaryTreeState {
   heapType?: 'min' | 'max'
 }
 
+export interface TrieNodeData {
+  id: number
+  /** Single character this node consumes. Empty string for the root. */
+  char: string
+  /** True when a stored word ends here. */
+  isEnd: boolean
+  /** Child ids keyed by character. */
+  children: Record<string, number>
+  state: 'normal' | 'current' | 'new' | 'found' | 'path' | 'subtree' | 'missing'
+}
+
+export interface TrieState {
+  type: 'trie'
+  /** Flat node map. Id 0 is always the root. */
+  nodes: Record<number, TrieNodeData>
+  /** Words stored so far, for the side panel. */
+  words: string[]
+  /** Word or prefix being walked, rendered above the tree. */
+  probe?: string | null
+  /** How many characters of `probe` have matched so far. */
+  matched?: number
+  /** Result chips for startsWith / autocomplete steps. */
+  suggestions?: string[]
+  operation?: string
+}
+
+export interface LruEntry {
+  key: string
+  value: number
+  state: 'normal' | 'new' | 'hit' | 'moving' | 'evicting' | 'updated'
+}
+
+export interface LruCacheState {
+  type: 'lruCache'
+  capacity: number
+  /** Nodes in recency order: index 0 is the most recently used. */
+  entries: LruEntry[]
+  /** Key currently being looked up in the map. */
+  lookupKey?: string | null
+  /** True when `lookupKey` is not in the cache. */
+  miss?: boolean
+  /** Key that was just evicted, shown leaving the structure. */
+  evictedKey?: string | null
+  operation?: string
+}
+
 // ── Algorithm technique visualization types ──
 
 export interface TwoPointersState {
@@ -228,6 +274,8 @@ export type ConceptState =
   | LinkedListState
   | HashTableState
   | BinaryTreeState
+  | TrieState
+  | LruCacheState
   | TwoPointersState
   | SlidingWindowState
   | MemoTableState

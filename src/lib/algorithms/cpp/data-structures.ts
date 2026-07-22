@@ -263,4 +263,119 @@ public:
         }
     }
 };`),
+
+  trie: annotated(`struct TrieNode {
+    unordered_map<char, TrieNode*> children;
+    bool isEnd = false;
+};
+
+class Trie {
+    TrieNode* root = new TrieNode();  //@10
+
+    void walk(TrieNode* node, string acc, vector<string>& out) {
+        if (!node) return;
+        if (node->isEnd) out.push_back(acc);
+        for (auto& [c, child] : node->children) {
+            walk(child, acc + c, out);
+        }
+    }
+
+public:
+    void insert(const string& word) {
+        TrieNode* node = root;
+        for (char c : word) {
+            if (!node->children.count(c)) {
+                node->children[c] = new TrieNode();  //@17
+            }
+            node = node->children[c];  //@19
+        }
+        node->isEnd = true;  //@21
+    }
+
+    TrieNode* traverse(const string& prefix) {
+        TrieNode* node = root;
+        for (char c : prefix) {
+            auto it = node->children.find(c);  //@27
+            if (it == node->children.end()) return nullptr;  //@28
+            node = it->second;
+        }
+        return node;
+    }
+
+    bool search(const string& word) {
+        TrieNode* node = traverse(word);
+        return node != nullptr && node->isEnd;  //@35
+    }
+
+    bool startsWith(const string& prefix) {
+        return traverse(prefix) != nullptr;  //@39
+    }
+
+    vector<string> wordsWithPrefix(const string& prefix) {
+        vector<string> out;
+        walk(traverse(prefix), prefix, out);  //@50
+        return out;
+    }
+};`),
+
+  'lru-cache': annotated(`struct Node {
+    string key;  // needed to erase from the map on eviction
+    int value;
+    Node* prev = nullptr;
+    Node* next = nullptr;
+    Node(string k, int v) : key(move(k)), value(v) {}
+};
+
+class LRUCache {
+    int capacity;
+    unordered_map<string, Node*> map;
+    // sentinels: head side = MRU, tail side = LRU
+    Node* head = new Node("", 0);
+    Node* tail = new Node("", 0);
+
+    void remove(Node* node) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+
+    void addToFront(Node* node) {
+        node->next = head->next;
+        node->prev = head;
+        head->next->prev = node;
+        head->next = node;
+    }
+
+public:
+    explicit LRUCache(int capacity) : capacity(capacity) {  //@11
+        head->next = tail;
+        tail->prev = head;
+    }
+
+    int get(const string& key) {
+        auto it = map.find(key);  //@34
+        if (it == map.end()) return -1;  //@35
+        remove(it->second);
+        addToFront(it->second);  //@37
+        return it->second->value;
+    }
+
+    void put(const string& key, int value) {
+        auto it = map.find(key);
+        if (it != map.end()) {
+            it->second->value = value;
+            remove(it->second);
+            addToFront(it->second);  //@46
+            return;
+        }
+        Node* node = new Node(key, value);
+        map[key] = node;
+        addToFront(node);  //@51
+        if ((int)map.size() > capacity) {
+            Node* lru = tail->prev;  //@53
+            remove(lru);
+            map.erase(lru->key);  //@55
+            delete lru;
+        }
+    }
+};`),
 }

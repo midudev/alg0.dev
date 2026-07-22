@@ -200,4 +200,100 @@ class BST:  #@9
             self.heap[i], self.heap[smallest] = (  #@37
                 self.heap[smallest], self.heap[i])
             i = smallest`),
+
+  trie: annotated(`class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()  #@10
+
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()  #@17
+            node = node.children[char]  #@19
+        node.is_end = True  #@21
+
+    def traverse(self, prefix):
+        node = self.root
+        for char in prefix:
+            node = node.children.get(char)  #@27
+            if node is None:
+                return None  #@28
+        return node
+
+    def search(self, word):
+        node = self.traverse(word)
+        return node is not None and node.is_end  #@35
+
+    def starts_with(self, prefix):
+        return self.traverse(prefix) is not None  #@39
+
+    def words_with_prefix(self, prefix):
+        out = []
+
+        def walk(node, acc):
+            if node is None:
+                return
+            if node.is_end:
+                out.append(acc)
+            for char, child in node.children.items():
+                walk(child, acc + char)
+
+        walk(self.traverse(prefix), prefix)  #@50
+        return out`),
+
+  'lru-cache': annotated(`class Node:
+    def __init__(self, key, value):
+        self.key = key  # needed to delete from the map on eviction
+        self.value = value
+        self.prev = None
+        self.next = None
+
+class LRUCache:
+    def __init__(self, capacity):  #@11
+        self.capacity = capacity
+        self.map = {}
+        # sentinels: head side = MRU, tail side = LRU
+        self.head = Node(None, None)
+        self.tail = Node(None, None)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+    def _remove(self, node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    def _add_to_front(self, node):
+        node.next = self.head.next
+        node.prev = self.head
+        self.head.next.prev = node
+        self.head.next = node
+
+    def get(self, key):
+        node = self.map.get(key)  #@34
+        if node is None:
+            return -1  #@35
+        self._remove(node)
+        self._add_to_front(node)  #@37
+        return node.value
+
+    def put(self, key, value):
+        existing = self.map.get(key)
+        if existing is not None:
+            existing.value = value
+            self._remove(existing)
+            self._add_to_front(existing)  #@46
+            return
+        node = Node(key, value)
+        self.map[key] = node
+        self._add_to_front(node)  #@51
+        if len(self.map) > self.capacity:
+            lru = self.tail.prev  #@53
+            self._remove(lru)
+            del self.map[lru.key]  #@55`),
 }

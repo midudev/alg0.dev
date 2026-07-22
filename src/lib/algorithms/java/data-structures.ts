@@ -262,4 +262,117 @@ class BST {  //@9
         }
     }
 }`),
+
+  trie: annotated(`class TrieNode {
+    Map<Character, TrieNode> children = new HashMap<>();
+    boolean isEnd = false;
+}
+
+class Trie {
+    private final TrieNode root = new TrieNode();  //@10
+
+    void insert(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            node.children.putIfAbsent(c, new TrieNode());  //@17
+            node = node.children.get(c);  //@19
+        }
+        node.isEnd = true;  //@21
+    }
+
+    TrieNode traverse(String prefix) {
+        TrieNode node = root;
+        for (char c : prefix.toCharArray()) {
+            node = node.children.get(c);  //@27
+            if (node == null) return null;  //@28
+        }
+        return node;
+    }
+
+    boolean search(String word) {
+        TrieNode node = traverse(word);
+        return node != null && node.isEnd;  //@35
+    }
+
+    boolean startsWith(String prefix) {
+        return traverse(prefix) != null;  //@39
+    }
+
+    List<String> wordsWithPrefix(String prefix) {
+        List<String> out = new ArrayList<>();
+        walk(traverse(prefix), prefix, out);  //@50
+        return out;
+    }
+
+    private void walk(TrieNode node, String acc, List<String> out) {
+        if (node == null) return;
+        if (node.isEnd) out.add(acc);
+        for (Map.Entry<Character, TrieNode> e : node.children.entrySet()) {
+            walk(e.getValue(), acc + e.getKey(), out);
+        }
+    }
+}`),
+
+  'lru-cache': annotated(`class Node {
+    String key;  // needed to delete from the map on eviction
+    int value;
+    Node prev, next;
+
+    Node(String key, int value) {
+        this.key = key;
+        this.value = value;
+    }
+}
+
+class LRUCache {
+    private final int capacity;
+    private final Map<String, Node> map = new HashMap<>();
+    // sentinels: head side = MRU, tail side = LRU
+    private final Node head = new Node(null, 0);
+    private final Node tail = new Node(null, 0);
+
+    LRUCache(int capacity) {  //@11
+        this.capacity = capacity;
+        head.next = tail;
+        tail.prev = head;
+    }
+
+    private void remove(Node node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private void addToFront(Node node) {
+        node.next = head.next;
+        node.prev = head;
+        head.next.prev = node;
+        head.next = node;
+    }
+
+    int get(String key) {
+        Node node = map.get(key);  //@34
+        if (node == null) return -1;  //@35
+        remove(node);
+        addToFront(node);  //@37
+        return node.value;
+    }
+
+    void put(String key, int value) {
+        Node existing = map.get(key);
+        if (existing != null) {
+            existing.value = value;
+            remove(existing);
+            addToFront(existing);  //@46
+            return;
+        }
+        Node node = new Node(key, value);
+        map.put(key, node);
+        addToFront(node);  //@51
+        if (map.size() > capacity) {
+            Node lru = tail.prev;  //@53
+            remove(lru);
+            map.remove(lru.key);  //@55
+        }
+    }
+}`),
 }

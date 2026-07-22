@@ -12,7 +12,14 @@ import {
   queue,
 } from '@lib/algorithms/concepts'
 
-import { linkedList, hashTable, binarySearchTree, heap } from '@lib/algorithms/data-structures'
+import {
+  linkedList,
+  hashTable,
+  binarySearchTree,
+  heap,
+  trie,
+  lruCache,
+} from '@lib/algorithms/data-structures'
 
 import {
   bubbleSort,
@@ -67,6 +74,8 @@ export const algorithms: Algorithm[] = [
   hashTable,
   binarySearchTree,
   heap,
+  trie,
+  lruCache,
   // Sorting
   bubbleSort,
   selectionSort,

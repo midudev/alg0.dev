@@ -77,6 +77,8 @@ const algorithms = [
   ['hash-table', 'Hash Table', 'Data Structures'],
   ['binary-search-tree', 'Binary Search Tree', 'Data Structures'],
   ['heap', 'Heap', 'Data Structures'],
+  ['trie', 'Trie', 'Data Structures'],
+  ['lru-cache', 'LRU Cache', 'Data Structures'],
   ['bubble-sort', 'Bubble Sort', 'Sorting'],
   ['selection-sort', 'Selection Sort', 'Sorting'],
   ['insertion-sort', 'Insertion Sort', 'Sorting'],

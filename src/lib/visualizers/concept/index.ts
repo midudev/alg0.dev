@@ -10,6 +10,8 @@ export type ConceptType =
   | 'linkedList'
   | 'hashTable'
   | 'binaryTree'
+  | 'trie'
+  | 'lruCache'
   | 'twoPointers'
   | 'slidingWindow'
   | 'memoTable'
@@ -37,6 +39,9 @@ const loaders: Record<ConceptType, () => Promise<ConceptRenderer>> = {
     import('@lib/visualizers/concept/binary-tree').then(
       (m) => m.renderBinaryTree as ConceptRenderer,
     ),
+  trie: () => import('@lib/visualizers/concept/trie').then((m) => m.renderTrie as ConceptRenderer),
+  lruCache: () =>
+    import('@lib/visualizers/concept/lru-cache').then((m) => m.renderLruCache as ConceptRenderer),
   twoPointers: () =>
     import('@lib/visualizers/concept/two-pointers').then(
       (m) => m.renderTwoPointers as ConceptRenderer,

@@ -298,4 +298,159 @@ impl MinHeap {
         }
     }
 }`),
+
+  trie: annotated(`#[derive(Default)]
+struct TrieNode {
+    children: HashMap<char, TrieNode>,
+    is_end: bool,
+}
+
+struct Trie {
+    // A trie is a tree, never a graph: every node has exactly
+    // one owner, so plain ownership works — no Rc/RefCell.
+    root: TrieNode,
+}
+
+impl Trie {
+    fn new() -> Self {
+        Trie { root: TrieNode::default() }  //@10
+    }
+
+    fn insert(&mut self, word: &str) {
+        let mut node = &mut self.root;
+        for ch in word.chars() {
+            // entry() is exactly "create only if missing"
+            node = node.children.entry(ch).or_default();  //@17,19
+        }
+        node.is_end = true;  //@21
+    }
+
+    fn traverse(&self, prefix: &str) -> Option<&TrieNode> {
+        let mut node = &self.root;
+        for ch in prefix.chars() {
+            // ? returns None the moment a character is missing
+            node = node.children.get(&ch)?;  //@27,28
+        }
+        Some(node)
+    }
+
+    fn search(&self, word: &str) -> bool {
+        self.traverse(word).is_some_and(|n| n.is_end)  //@35
+    }
+
+    fn starts_with(&self, prefix: &str) -> bool {
+        self.traverse(prefix).is_some()  //@39
+    }
+
+    fn words_with_prefix(&self, prefix: &str) -> Vec<String> {
+        let mut out = Vec::new();
+        if let Some(node) = self.traverse(prefix) {
+            collect(node, prefix.to_string(), &mut out);  //@50
+        }
+        out
+    }
+}
+
+fn collect(node: &TrieNode, acc: String, out: &mut Vec<String>) {
+    if node.is_end {
+        out.push(acc.clone());
+    }
+    for (ch, child) in &node.children {
+        collect(child, format!("{acc}{ch}"), out);
+    }
+}`),
+
+  'lru-cache': annotated(`struct Node {
+    key: String,  // needed to remove from the map on eviction
+    value: i32,
+    prev: usize,
+    next: usize,
+}
+
+// Safe Rust will not let the map and the list both own a node,
+// so the list lives in a Vec arena and the links are indices.
+// Slots 0 and 1 are the head/tail sentinels.
+const HEAD: usize = 0;
+const TAIL: usize = 1;
+
+struct LruCache {
+    capacity: usize,
+    map: HashMap<String, usize>,
+    nodes: Vec<Node>,
+    free: Vec<usize>,
+}
+
+impl LruCache {
+    fn new(capacity: usize) -> Self {  //@11
+        let sentinel = |prev, next| Node {
+            key: String::new(),
+            value: 0,
+            prev,
+            next,
+        };
+        LruCache {
+            capacity,
+            map: HashMap::new(),
+            nodes: vec![sentinel(TAIL, TAIL), sentinel(HEAD, HEAD)],
+            free: Vec::new(),
+        }
+    }
+
+    fn remove(&mut self, i: usize) {
+        let (prev, next) = (self.nodes[i].prev, self.nodes[i].next);
+        self.nodes[prev].next = next;
+        self.nodes[next].prev = prev;
+    }
+
+    fn add_to_front(&mut self, i: usize) {
+        let first = self.nodes[HEAD].next;
+        self.nodes[i].next = first;
+        self.nodes[i].prev = HEAD;
+        self.nodes[first].prev = i;
+        self.nodes[HEAD].next = i;
+    }
+
+    fn get(&mut self, key: &str) -> i32 {
+        let Some(&i) = self.map.get(key) else {  //@34
+            return -1;  //@35
+        };
+        self.remove(i);
+        self.add_to_front(i);  //@37
+        self.nodes[i].value
+    }
+
+    fn put(&mut self, key: &str, value: i32) {
+        if let Some(&i) = self.map.get(key) {
+            self.nodes[i].value = value;
+            self.remove(i);
+            self.add_to_front(i);  //@46
+            return;
+        }
+        let node = Node {
+            key: key.to_string(),
+            value,
+            prev: HEAD,
+            next: HEAD,
+        };
+        let i = match self.free.pop() {
+            Some(slot) => {
+                self.nodes[slot] = node;
+                slot
+            }
+            None => {
+                self.nodes.push(node);
+                self.nodes.len() - 1
+            }
+        };
+        self.map.insert(key.to_string(), i);
+        self.add_to_front(i);  //@51
+        if self.map.len() > self.capacity {
+            let lru = self.nodes[TAIL].prev;  //@53
+            self.remove(lru);
+            let evicted = self.nodes[lru].key.clone();
+            self.map.remove(&evicted);  //@55
+            self.free.push(lru);
+        }
+    }
+}`),
 }

@@ -99,6 +99,20 @@ export const algorithmCatalog: AlgorithmSummary[] = [
     difficulty: 'intermediate',
     visualization: 'concept',
   },
+  {
+    id: 'trie',
+    name: 'Trie',
+    category: 'Data Structures',
+    difficulty: 'intermediate',
+    visualization: 'concept',
+  },
+  {
+    id: 'lru-cache',
+    name: 'LRU Cache',
+    category: 'Data Structures',
+    difficulty: 'advanced',
+    visualization: 'concept',
+  },
   // Sorting
   {
     id: 'bubble-sort',

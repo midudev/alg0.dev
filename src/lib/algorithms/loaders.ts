@@ -51,6 +51,8 @@ const ALGORITHM_LOADERS: Record<string, () => Promise<Algorithm>> = {
   'binary-search-tree': () =>
     import('./data-structures?algorithm=binarySearchTree').then(readDefaultAlgorithm),
   heap: () => import('./data-structures?algorithm=heap').then(readDefaultAlgorithm),
+  trie: () => import('./data-structures?algorithm=trie').then(readDefaultAlgorithm),
+  'lru-cache': () => import('./data-structures?algorithm=lruCache').then(readDefaultAlgorithm),
 
   // Sorting
   'bubble-sort': () => import('./sorting?algorithm=bubbleSort').then(readDefaultAlgorithm),
