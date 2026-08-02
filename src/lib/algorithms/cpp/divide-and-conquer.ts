@@ -17,4 +17,14 @@ export const divideAndConquerCpp: Record<string, CodeImplementation> = {
 }
 
 hanoi(3, "A", "C", "B");  //@14`),
+  'binary-exponentiation': annotated(`long long binPow(long long base, long long exp) {
+    if (exp == 0) return 1;  //@2
+    long long half = binPow(base, exp / 2);  //@3
+    if (exp % 2 == 0) {  //@4
+        return half * half;  //@5
+    }
+    return half * half * base;  //@7
+}
+
+binPow(2, 10);`),
 }

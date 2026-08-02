@@ -27,7 +27,7 @@ Una herramienta web interactiva y gratuita para aprender algoritmos a través de
 - **Seguimiento de variables** — ve el estado de cada variable en tiempo real
 - **Explicación contextual** — entiende el _porqué_ de cada operación
 
-## +40 algoritmos en 8 categorías
+## +41 algoritmos en 8 categorías
 
 <table>
 <tr>
@@ -35,7 +35,7 @@ Una herramienta web interactiva y gratuita para aprender algoritmos a través de
 
 ### Ordenamiento
 
-Bubble Sort · Selection Sort · Insertion Sort · Quick Sort · Merge Sort · Heap Sort · Counting Sort · Radix Sort · Shell Sort
+Bubble Sort · Selection Sort · Insertion Sort · Quick Sort · Merge Sort · Heap Sort · Counting Sort · Radix Sort · Shell Sort · Bucket Sort
 
 </td>
 <td width="25%" valign="top">
@@ -79,7 +79,7 @@ N-Queens · Sudoku Solver · Maze Pathfinding
 
 ### Divide y vencerás
 
-Torre de Hanói
+Torre de Hanói · Exponenciación Binaria
 
 </td>
 <td width="25%" valign="top">

@@ -18,4 +18,17 @@ export const divideAndConquerRust: Record<string, CodeImplementation> = {
 }
 
 hanoi(3, "A", "C", "B");  //@14`),
+  'binary-exponentiation': annotated(`fn bin_pow(base: i64, exp: i64) -> i64 {
+    if exp == 0 {
+        return 1;  //@2
+    }
+
+    let half = bin_pow(base, exp / 2);  //@3
+    if exp % 2 == 0 {  //@4
+        return half * half;  //@5
+    }
+    half * half * base  //@7
+}
+
+bin_pow(2, 10);`),
 }

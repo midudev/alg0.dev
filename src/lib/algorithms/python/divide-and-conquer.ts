@@ -17,4 +17,15 @@ export const divideAndConquerPython: Record<string, CodeImplementation> = {
 
 
 hanoi(3, "A", "C", "B")  #@14`),
+  'binary-exponentiation': annotated(`def bin_pow(base, exp):  #@1
+    if exp == 0:
+        return 1  #@2
+
+    half = bin_pow(base, exp // 2)  #@3
+    if exp % 2 == 0:  #@4
+        return half * half  #@5
+    return half * half * base  #@7
+
+
+bin_pow(2, 10)`),
 }

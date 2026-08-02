@@ -301,6 +301,13 @@ export const algorithmCatalog: AlgorithmSummary[] = [
     difficulty: 'intermediate',
     visualization: 'matrix',
   },
+  {
+    id: 'binary-exponentiation',
+    name: 'Binary Exponentiation',
+    category: 'Divide and Conquer',
+    difficulty: 'intermediate',
+    visualization: 'concept',
+  },
   // Math
   {
     id: 'euclidean',

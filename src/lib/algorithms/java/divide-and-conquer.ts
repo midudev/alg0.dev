@@ -17,4 +17,14 @@ export const divideAndConquerJava: Record<string, CodeImplementation> = {
 }
 
 hanoi(3, "A", "C", "B");  //@14`),
+  'binary-exponentiation': annotated(`long binPow(long base, long exp) {
+    if (exp == 0) return 1;  //@2
+    long half = binPow(base, exp / 2);  //@3
+    if (exp % 2 == 0) {  //@4
+        return half * half;  //@5
+    }
+    return half * half * base;  //@7
+}
+
+binPow(2, 10);`),
 }

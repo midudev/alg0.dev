@@ -95,6 +95,8 @@ const ALGORITHM_LOADERS: Record<string, () => Promise<Algorithm>> = {
   // Divide and conquer
   'tower-of-hanoi': () =>
     import('./divide-and-conquer?algorithm=towerOfHanoi').then(readDefaultAlgorithm),
+  'binary-exponentiation': () =>
+    import('./divide-and-conquer?algorithm=binaryExponentiation').then(readDefaultAlgorithm),
 
   // Math
   euclidean: () => import('./math?algorithm=euclideanAlgorithm').then(readDefaultAlgorithm),
