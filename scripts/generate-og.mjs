@@ -73,6 +73,7 @@ const algorithms = [
   ['recursion', 'Recursion', 'Concepts'],
   ['two-pointers', 'Two Pointers', 'Concepts'],
   ['sliding-window', 'Sliding Window', 'Concepts'],
+  ['prefix-sum-array', 'Prefix Sum Array', 'Concepts'],
   ['space-complexity', 'Space Complexity', 'Concepts'],
   ['memoization', 'Memoization', 'Concepts'],
   ['greedy-vs-dp', 'Greedy vs DP', 'Concepts'],

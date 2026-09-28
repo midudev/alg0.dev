@@ -112,6 +112,23 @@ fn merge_sort(arr: &[i32]) -> Vec<i32> {
     chars[best_start..best_start + best].iter().collect()
 }`),
 
+  'prefix-sum-array': annotated(`fn build_prefix_sum(arr: &[i32]) -> Vec<i32> {  //@1
+    let mut prefix = vec![0; arr.len()];
+    prefix[0] = arr[0];  //@3
+
+    for i in 1..arr.len() {  //@5
+        prefix[i] = prefix[i - 1] + arr[i];  //@6
+    }
+    prefix  //@8
+}
+
+fn range_sum(prefix: &[i32], left: usize, right: usize) -> i32 {  //@11
+    if left == 0 {  //@12
+        return prefix[right];  //@13
+    }
+    prefix[right] - prefix[left - 1]  //@15
+}`),
+
   'space-complexity': annotated(`// O(1) space — fixed variables  //@1
 fn swap(arr: &mut [i32], i: usize, j: usize) {  //@2
     let temp = arr[i];

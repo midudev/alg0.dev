@@ -38,6 +38,8 @@ const ALGORITHM_LOADERS: Record<string, () => Promise<Algorithm>> = {
   recursion: () => import('./concepts?algorithm=recursion').then(readDefaultAlgorithm),
   'two-pointers': () => import('./concepts?algorithm=twoPointers').then(readDefaultAlgorithm),
   'sliding-window': () => import('./concepts?algorithm=slidingWindow').then(readDefaultAlgorithm),
+  'prefix-sum-array': () =>
+    import('./concepts?algorithm=prefixSumArray').then(readDefaultAlgorithm),
   'space-complexity': () =>
     import('./concepts?algorithm=spaceComplexity').then(readDefaultAlgorithm),
   memoization: () => import('./concepts?algorithm=memoization').then(readDefaultAlgorithm),

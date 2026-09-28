@@ -36,6 +36,13 @@ export const algorithmCatalog: AlgorithmSummary[] = [
     visualization: 'concept',
   },
   {
+    id: 'prefix-sum-array',
+    name: 'Prefix Sum Array',
+    category: 'Concepts',
+    difficulty: 'easy',
+    visualization: 'concept',
+  },
+  {
     id: 'space-complexity',
     name: 'Space Complexity',
     category: 'Concepts',

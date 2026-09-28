@@ -206,6 +206,23 @@ export interface SlidingWindowState {
   operation?: string
 }
 
+export interface PrefixSumState {
+  type: 'prefixSum'
+  array: number[]
+  prefix: (number | null)[]
+  phase: 'intro' | 'build' | 'query' | 'done'
+  currentIndex?: number | null
+  range?: { start: number; end: number } | null
+  activePrefixIndices?: number[]
+  query?: {
+    left: number
+    right: number
+    sum: number
+    usesBaseCase: boolean
+  } | null
+  operation?: string
+}
+
 export interface MemoTableState {
   type: 'memoTable'
   entries: { key: number; value: number | null; state: 'empty' | 'computing' | 'cached' | 'hit' }[]
@@ -424,6 +441,7 @@ export type ConceptState =
   | LruCacheState
   | TwoPointersState
   | SlidingWindowState
+  | PrefixSumState
   | MemoTableState
   | CoinChangeState
   | BucketsState

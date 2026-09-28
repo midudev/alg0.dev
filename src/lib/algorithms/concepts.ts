@@ -1206,6 +1206,178 @@ export const slidingWindow: Algorithm = {
 }
 
 // ============================================================
+// PREFIX SUM ARRAY
+// ============================================================
+
+export const prefixSumArray: Algorithm = {
+  id: 'prefix-sum-array',
+  name: 'Prefix Sum Array',
+  category: 'Concepts',
+  difficulty: 'easy',
+  visualization: 'concept',
+  code: `function buildPrefixSum(arr) {
+  const prefix = new Array(arr.length);
+  prefix[0] = arr[0];
+
+  for (let i = 1; i < arr.length; i++) {
+    prefix[i] = prefix[i - 1] + arr[i];
+  }
+  return prefix;
+}
+
+function rangeSum(prefix, left, right) {
+  if (left === 0) {
+    return prefix[right];
+  }
+  return prefix[right] - prefix[left - 1];
+}`,
+
+  generateSteps(locale = 'en') {
+    const steps: Step[] = []
+    const array = [3, 1, 4, 2, 5]
+    const fullPrefix = [3, 4, 8, 10, 15]
+
+    const partialPrefix = (filledThrough: number) =>
+      array.map((_, index) => (index <= filledThrough ? fullPrefix[index] : null))
+
+    steps.push({
+      concept: {
+        type: 'prefixSum',
+        array,
+        prefix: array.map(() => null),
+        phase: 'intro',
+        currentIndex: null,
+        range: null,
+        activePrefixIndices: [],
+        query: null,
+        operation: 'preprocess static array',
+      },
+      description: d(
+        locale,
+        'Prefix sums trade one O(n) preprocessing pass for O(1) range-sum queries on a static array.',
+        'Los prefix sums cambian una pasada de preprocesamiento O(n) por consultas de suma por rango O(1) sobre un arreglo estático.',
+      ),
+      codeLine: 1,
+      variables: { array: '[3, 1, 4, 2, 5]', preprocessing: 'O(n)', 'per query': 'O(1)' },
+    })
+
+    steps.push({
+      concept: {
+        type: 'prefixSum',
+        array,
+        prefix: partialPrefix(0),
+        phase: 'build',
+        currentIndex: 0,
+        range: { start: 0, end: 0 },
+        activePrefixIndices: [0],
+        query: null,
+        operation: 'build prefix[0]',
+      },
+      description: d(
+        locale,
+        'Initialize the prefix array with the first value. prefix[0] equals arr[0], so the sum from 0 to 0 is already known.',
+        'Inicializa el arreglo prefix con el primer valor. prefix[0] es igual a arr[0], así que la suma de 0 a 0 ya queda conocida.',
+      ),
+      codeLine: 3,
+      variables: { i: 0, 'arr[i]': 3, 'prefix[0]': 3 },
+    })
+
+    for (let i = 1; i < array.length; i++) {
+      steps.push({
+        concept: {
+          type: 'prefixSum',
+          array,
+          prefix: partialPrefix(i),
+          phase: 'build',
+          currentIndex: i,
+          range: { start: 0, end: i },
+          activePrefixIndices: [i - 1, i],
+          query: null,
+          operation: `build prefix[${i}]`,
+        },
+        description: d(
+          locale,
+          `Add arr[${i}] = ${array[i]} to the previous prefix. Now prefix[${i}] stores the sum of the whole range [0..${i}] = ${fullPrefix[i]}.`,
+          `Suma arr[${i}] = ${array[i]} al prefijo anterior. Ahora prefix[${i}] guarda la suma de todo el rango [0..${i}] = ${fullPrefix[i]}.`,
+        ),
+        codeLine: 6,
+        variables: {
+          i,
+          'prefix[i - 1]': fullPrefix[i - 1],
+          'arr[i]': array[i],
+          'prefix[i]': fullPrefix[i],
+        },
+      })
+    }
+
+    steps.push({
+      concept: {
+        type: 'prefixSum',
+        array,
+        prefix: partialPrefix(array.length - 1),
+        phase: 'query',
+        currentIndex: null,
+        range: { start: 0, end: 2 },
+        activePrefixIndices: [2],
+        query: { left: 0, right: 2, sum: 8, usesBaseCase: true },
+        operation: 'query sum(0, 2)',
+      },
+      description: d(
+        locale,
+        'Base case: if the range starts at index 0, the answer is just prefix[right]. sum(0, 2) = prefix[2] = 8.',
+        'Caso base: si el rango empieza en el índice 0, la respuesta es simplemente prefix[right]. sum(0, 2) = prefix[2] = 8.',
+      ),
+      codeLine: 13,
+      variables: { left: 0, right: 2, answer: 8, formula: 'prefix[2]' },
+    })
+
+    steps.push({
+      concept: {
+        type: 'prefixSum',
+        array,
+        prefix: partialPrefix(array.length - 1),
+        phase: 'query',
+        currentIndex: null,
+        range: { start: 1, end: 4 },
+        activePrefixIndices: [0, 4],
+        query: { left: 1, right: 4, sum: 12, usesBaseCase: false },
+        operation: 'query sum(1, 4)',
+      },
+      description: d(
+        locale,
+        'General case: subtract the prefix before the range. sum(1, 4) = prefix[4] - prefix[0] = 15 - 3 = 12.',
+        'Caso general: resta el prefijo anterior al rango. sum(1, 4) = prefix[4] - prefix[0] = 15 - 3 = 12.',
+      ),
+      codeLine: 15,
+      variables: { left: 1, right: 4, 'prefix[4]': 15, 'prefix[0]': 3, answer: 12 },
+    })
+
+    steps.push({
+      concept: {
+        type: 'prefixSum',
+        array,
+        prefix: partialPrefix(array.length - 1),
+        phase: 'done',
+        currentIndex: null,
+        range: { start: 1, end: 4 },
+        activePrefixIndices: [0, 2, 4],
+        query: { left: 1, right: 4, sum: 12, usesBaseCase: false },
+        operation: 'ready for many queries',
+      },
+      description: d(
+        locale,
+        'After one linear build, every later query is O(1). That is why prefix sums shine when the array is static and queries are frequent.',
+        'Después de una construcción lineal, cada consulta posterior es O(1). Por eso los prefix sums destacan cuando el arreglo es estático y las consultas son frecuentes.',
+      ),
+      codeLine: 11,
+      variables: { preprocessing: 'O(n)', 'per query': 'O(1)', limitation: 'no dynamic updates' },
+    })
+
+    return steps
+  },
+}
+
+// ============================================================
 // SPACE COMPLEXITY (reuses BigO chart)
 // ============================================================
 

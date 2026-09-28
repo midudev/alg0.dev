@@ -86,7 +86,7 @@ Torre de Hanói
 
 ### Conceptos
 
-Big O · Recursión · Two Pointers · Sliding Window · Memoización · Greedy vs DP · Space Complexity
+Big O · Recursión · Two Pointers · Sliding Window · Prefix Sum Array · Memoización · Greedy vs DP · Space Complexity
 
 </td>
 </tr>

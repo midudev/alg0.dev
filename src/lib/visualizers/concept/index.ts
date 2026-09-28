@@ -14,6 +14,7 @@ export type ConceptType =
   | 'lruCache'
   | 'twoPointers'
   | 'slidingWindow'
+  | 'prefixSum'
   | 'memoTable'
   | 'coinChange'
   | 'buckets'
@@ -56,6 +57,8 @@ const loaders: Record<ConceptType, () => Promise<ConceptRenderer>> = {
     import('@lib/visualizers/concept/sliding-window').then(
       (m) => m.renderSlidingWindow as ConceptRenderer,
     ),
+  prefixSum: () =>
+    import('@lib/visualizers/concept/prefix-sum').then((m) => m.renderPrefixSum as ConceptRenderer),
   memoTable: () =>
     import('@lib/visualizers/concept/memo-table').then((m) => m.renderMemoTable as ConceptRenderer),
   coinChange: () =>

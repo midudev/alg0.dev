@@ -106,6 +106,23 @@ vector<int> mergeSort(vector<int> arr) {
     return s.substr(bestStart, best);
 }`),
 
+  'prefix-sum-array': annotated(`vector<int> buildPrefixSum(const vector<int>& arr) {  //@1
+    vector<int> prefix(arr.size());
+    prefix[0] = arr[0];  //@3
+
+    for (int i = 1; i < (int)arr.size(); i++) {  //@5
+        prefix[i] = prefix[i - 1] + arr[i];  //@6
+    }
+    return prefix;  //@8
+}
+
+int rangeSum(const vector<int>& prefix, int left, int right) {  //@11
+    if (left == 0) {  //@12
+        return prefix[right];  //@13
+    }
+    return prefix[right] - prefix[left - 1];  //@15
+}`),
+
   'space-complexity': annotated(`// O(1) space — fixed variables  //@1
 void swap(vector<int>& arr, int i, int j) {  //@2
     int temp = arr[i];

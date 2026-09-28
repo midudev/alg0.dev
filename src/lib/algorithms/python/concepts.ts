@@ -96,6 +96,19 @@ def merge(left, right):
             best_start = start
     return s[best_start:best_start + best]`),
 
+  'prefix-sum-array': annotated(`def build_prefix_sum(arr):  #@1
+    prefix = [0] * len(arr)
+    prefix[0] = arr[0]  #@3
+
+    for i in range(1, len(arr)):  #@5
+        prefix[i] = prefix[i - 1] + arr[i]  #@6
+    return prefix  #@8
+
+def range_sum(prefix, left, right):  #@11
+    if left == 0:  #@12
+        return prefix[right]  #@13
+    return prefix[right] - prefix[left - 1]  #@15`),
+
   'space-complexity': annotated(`# O(1) space — fixed variables  #@1
 def swap(arr, i, j):  #@2
     temp = arr[i]
