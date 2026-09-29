@@ -45,6 +45,7 @@ const tabs = $$<HTMLButtonElement>('[role="tab"]', panel)
 - Bootstrap: `<script type="application/json" data-algo-bootstrap>` with `{ locale, algorithm, steps }`.
 - Runtime: `initAlgoPage` / `initAllAlgoPages` — SPA select, popstate, playback, chrome sync, step paint.
 - Sidebar SPA: dispatches cancelable `alg0:select-algorithm`; algo-page `preventDefault()`s to claim; home navigates fully.
+- Side panels: `side-panels.ts` keeps the stage ≥ `STAGE_MIN_WIDTH`; expanding the sidebar or code panel collapses the other when both don't fit (tablets).
 
 ### Playback
 

@@ -3,6 +3,7 @@
  * Catalog, icons, and colors are SSR HTML/CSS — this file only wires interaction.
  */
 import { $, $$ } from '@lib/dom'
+import { announceSidePanelExpand, onSidePanelNeedsRoom } from '@lib/side-panels'
 
 export const SELECT_ALGORITHM_EVENT = 'alg0:select-algorithm'
 export type SelectAlgorithmDetail = { id: string }
@@ -95,6 +96,7 @@ function setPanelWidth(width: number, { animate = true }: { animate?: boolean } 
 export function expandSidebar(): void {
   clearCollapsePreview()
   setPanelWidth(SIDEBAR_MAX)
+  announceSidePanelExpand('sidebar')
 }
 
 export function collapseSidebar(): void {
@@ -254,6 +256,9 @@ function initResize(): void {
 export function initSidebar(): void {
   applyViewportLayout({ animate: false })
   initResize()
+  onSidePanelNeedsRoom('sidebar', () => {
+    if (!isMobile()) collapseSidebar()
+  })
 
   document.addEventListener('click', (event) => {
     const target = event.target

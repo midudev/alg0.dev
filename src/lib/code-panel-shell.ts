@@ -4,11 +4,16 @@
 import { $, $$ } from '@lib/dom'
 import { CODE_LANGUAGE_STORAGE_KEY, defaultCodeLanguage, isCodeLanguage } from '@lib/code-languages'
 import { CODE_PANEL_STATE_EVENT, type CodePanelState } from '@lib/code-panel-state'
+import {
+  STAGE_MIN_WIDTH,
+  announceSidePanelExpand,
+  onSidePanelNeedsRoom,
+  sidePanelWidth,
+} from '@lib/side-panels'
 import type { CodeLanguage } from '@lib/types'
 
 const CODE_PANEL_DEFAULT_WIDTH = 420
 const CODE_PANEL_MAX_WIDTH = 760
-const MAIN_CONTENT_MIN_WIDTH = 360
 const COLLAPSE_THRESHOLD = 100
 const COLLAPSE_FADE_START = 240
 const MOBILE_MQ = '(max-width: 767px)'
@@ -284,7 +289,7 @@ function syncCodePanelToggle(collapsed: boolean): void {
 function maxPanelWidth(): number {
   return Math.max(
     CODE_PANEL_DEFAULT_WIDTH,
-    Math.min(CODE_PANEL_MAX_WIDTH, window.innerWidth - MAIN_CONTENT_MIN_WIDTH),
+    Math.min(CODE_PANEL_MAX_WIDTH, window.innerWidth - STAGE_MIN_WIDTH - sidePanelWidth('sidebar')),
   )
 }
 
@@ -352,6 +357,7 @@ export function expandCodePanel(): void {
   }
   clearCollapsePreview()
   setPanelWidth(expandedWidth)
+  announceSidePanelExpand('code')
 }
 
 export function collapseCodePanel(): void {
@@ -530,6 +536,9 @@ export function initCodePanelShell(): void {
   }
 
   initResize()
+  onSidePanelNeedsRoom('code', () => {
+    if (!isMobile()) collapseCodePanel()
+  })
 
   document.addEventListener('click', (event) => {
     const target = event.target
