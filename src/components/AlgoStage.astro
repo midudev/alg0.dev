@@ -57,8 +57,53 @@ const bootstrapJson = JSON.stringify({ locale, algorithm, steps }).replace(/</g,
         aria-label={t.visualizationLabel}
         data-algorithm-demo
       >
-        <div class="flex-1 flex flex-col px-3 py-3 md:px-5 md:py-4 min-h-0 overflow-hidden">
-          <div data-step-viz class="flex-1 flex min-h-0 w-full" style="min-height: 200px"></div>
+        <div class="flex-1 flex flex-col px-3 pt-2 pb-3 md:px-5 md:pt-3 md:pb-4 min-h-0 overflow-hidden">
+          <div class="shrink-0 flex justify-end">
+            <div
+              class="flex items-center rounded-md border border-white/8"
+              role="group"
+              aria-label={t.zoomControls}
+              data-viz-zoom-controls
+            >
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-md text-neutral-500 hover:text-white hover:bg-white/6 transition-colors disabled:opacity-30 disabled:pointer-events-none size-6"
+                aria-label={t.zoomOut}
+                data-viz-zoom-out
+              >
+                <svg class="size-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path stroke-linecap="round" d="M3.5 8h9"></path>
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-md text-neutral-500 hover:text-white hover:bg-white/6 transition-colors disabled:opacity-30 disabled:pointer-events-none h-6 min-w-10 px-1 text-[10px] font-mono tabular-nums"
+                aria-label={`${t.resetZoom} (100%)`}
+                data-label={t.resetZoom}
+                data-viz-zoom-reset
+              >
+                100%
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-md text-neutral-500 hover:text-white hover:bg-white/6 transition-colors disabled:opacity-30 disabled:pointer-events-none size-6"
+                aria-label={t.zoomIn}
+                data-viz-zoom-in
+              >
+                <svg class="size-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path stroke-linecap="round" d="M8 3.5v9M3.5 8h9"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="relative flex-1 min-h-0" data-viz-zoom>
+            <div class="viz-zoom-viewport absolute inset-0" data-viz-viewport>
+              <div class="flex flex-col w-full h-full" data-viz-canvas>
+                <div data-step-viz class="flex-1 flex min-h-0 w-full" style="min-height: 200px"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div
@@ -283,6 +328,23 @@ const bootstrapJson = JSON.stringify({ locale, algorithm, steps }).replace(/</g,
 </div>
 
 <style is:global>
+  .viz-zoom-viewport {
+    overflow: hidden;
+    /* Pinch zooms the visualization, not the page; one finger still pans. */
+    touch-action: pan-x pan-y;
+  }
+
+  /* Only a magnified step scrolls; at 100% and below it always fits. */
+  [data-algo-page][data-zoomed-in] .viz-zoom-viewport {
+    overflow: auto;
+    cursor: grab;
+  }
+
+  [data-algo-page][data-panning] .viz-zoom-viewport {
+    cursor: grabbing;
+    user-select: none;
+  }
+
   [data-algo-page][data-explanation-collapsed] [data-algorithm-demo] {
     flex: 1 1 0%;
     height: auto;

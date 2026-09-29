@@ -23,6 +23,7 @@ import {
 } from '@lib/code-panel-shell'
 import { publishCodePanelState } from '@lib/code-panel-state'
 import { bindStepVisualizer } from '@lib/visualizers/bind-step-viz'
+import { initVizZoom } from '@lib/viz-zoom'
 import type { Algorithm, AlgorithmSummary, Step } from '@lib/types'
 
 const MOBILE_MQ = '(max-width: 767px)'
@@ -278,6 +279,7 @@ export function initAlgoPage(root: HTMLElement): () => void {
   const unbindViz = stepHost
     ? bindStepVisualizer(stepHost, playback.getSnapshot, playback.subscribe, locale)
     : () => {}
+  const disposeZoom = initVizZoom(root)
 
   const publishChrome = () => {
     const snap = playback.getSnapshot()
@@ -409,6 +411,7 @@ export function initAlgoPage(root: HTMLElement): () => void {
   return () => {
     unsubPlayback()
     unbindViz()
+    disposeZoom()
     playback.dispose()
     window.removeEventListener(SELECT_ALGORITHM_EVENT, onSelect)
     window.removeEventListener('popstate', onPopState)

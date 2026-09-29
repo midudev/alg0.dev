@@ -55,6 +55,10 @@ export interface Translations {
   sidebarAriaLabel: string
   codePanelAriaLabel: string
   visualizationLabel: string
+  zoomControls: string
+  zoomIn: string
+  zoomOut: string
+  resetZoom: string
   mobileMenuTitle: string
   openMenu: string
   closeMenu: string
@@ -128,6 +132,10 @@ export const translations: Record<Locale, Translations> = {
     sidebarAriaLabel: 'Algorithm categories',
     codePanelAriaLabel: 'Code and details panel',
     visualizationLabel: 'Algorithm visualization',
+    zoomControls: 'Visualization zoom',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    resetZoom: 'Reset zoom',
     mobileMenuTitle: 'Algorithms',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
@@ -209,6 +217,10 @@ export const translations: Record<Locale, Translations> = {
     sidebarAriaLabel: 'Categorías de algoritmos',
     codePanelAriaLabel: 'Panel de código y detalles',
     visualizationLabel: 'Visualización del algoritmo',
+    zoomControls: 'Zoom de la visualización',
+    zoomIn: 'Acercar',
+    zoomOut: 'Alejar',
+    resetZoom: 'Restablecer zoom',
     mobileMenuTitle: 'Algoritmos',
     openMenu: 'Abrir menú',
     closeMenu: 'Cerrar menú',
