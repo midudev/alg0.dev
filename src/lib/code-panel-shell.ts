@@ -387,6 +387,7 @@ export function closeMobileCodePanel(): void {
 
 /** Called when algorithm selection changes (show/hide expand affordances). */
 export function syncCodePanelForAlgorithm(hasAlgorithm: boolean): void {
+  const hadAlgorithm = document.documentElement.hasAttribute('data-has-algorithm')
   document.documentElement.toggleAttribute('data-has-algorithm', hasAlgorithm)
   if (!hasAlgorithm) {
     closeMobileCodePanel()
@@ -397,7 +398,9 @@ export function syncCodePanelForAlgorithm(hasAlgorithm: boolean): void {
     syncCodePanelToggle(true)
     return
   }
-  // Selecting an algorithm expands the code panel (desktop)
+  // Runs on every playback tick: only open the panel when an algorithm first
+  // appears, so a panel the user collapsed stays collapsed while stepping.
+  if (hadAlgorithm) return
   if (!isMobile()) expandCodePanel()
   else syncCodePanelToggle(false)
 }
