@@ -89,5 +89,6 @@ Packs load on demand through `loaders.ts`.
 - Response headers live in `public/_headers`. `scripts/cloudflare-routing.mjs` (Astro integration) appends Early Hints `Link` preloads for the hashed CSS/fonts and writes `dist/_redirects` (301 `/slug` → `/slug/`) after each build.
 - Canonical URLs end in `/`; internal links, `pushState` and fragment fetches use trailing slashes.
 - `www.alg0.dev` → `alg0.dev` is a zone Redirect Rule, not app code.
+- SEO extras: sitemap `lastmod` + JSON-LD `dateModified` come from the last git commit of `src/content/algorithms/<id>.ts` (`scripts/content-dates.mjs`); `/llms.txt` is generated from the catalog (`src/pages/llms.txt.ts`).
 - Code-language logos are an external sprite (`/icons/code-languages.svg?v=<hash>`, built by `src/pages/icons/code-languages.svg.ts` from `code-languages.ts`), not inline SVG.
 - Prefetch: speculation rules in `Layout.astro` (hover, `moderate`). Algorithm pages mark the shell with `data-spa-shell` so SPA sidebar links are excluded; instead `algo-page.ts` warms the algorithm chunk + description fragment on hover/focus.

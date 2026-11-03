@@ -14,6 +14,7 @@ import {
   getCategorySlug,
 } from '@lib/categories'
 import type { AlgorithmSummary, CategorySummary } from '@lib/types'
+import { getContentDates } from '../../scripts/content-dates.mjs'
 
 const AUTHOR = {
   '@type': 'Person',
@@ -27,7 +28,7 @@ const SITE = {
   name: 'Algorithm Visualizer',
 }
 
-/** Approximate content freshness for LearningResource (update when copy changes meaningfully). */
+/** Fallback when git history is unavailable; real dates come from `getContentDates()`. */
 const CONTENT_DATE_MODIFIED = '2026-07-21'
 
 export function getHomeStructuredData(locale: Locale, canonicalURL: string) {
@@ -197,7 +198,7 @@ export function getAlgorithmStructuredData(
           locale === 'es' ? 'Visualización interactiva' : 'Interactive visualization',
         educationalLevel: schemaEducationalLevel(algorithm.difficulty),
         isAccessibleForFree: true,
-        dateModified: CONTENT_DATE_MODIFIED,
+        dateModified: getContentDates().get(algorithm.id) ?? CONTENT_DATE_MODIFIED,
         about: {
           '@type': 'Thing',
           name: categoryLabel,
