@@ -81,7 +81,7 @@ const popular = POPULAR_IDS.map((id) => algorithmCatalog.find((a) => a.id === id
 
   <!-- Popular deep links (crawlable) -->
   <nav
-    class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px]"
+    class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px]"
     aria-label={isEs ? "Algoritmos populares" : "Popular algorithms"}
   >
     <span class="text-neutral-700 shrink-0">
@@ -97,7 +97,7 @@ const popular = POPULAR_IDS.map((id) => algorithmCatalog.find((a) => a.id === id
           )}
           <a
             href={getAlgorithmPath(locale, algo.id)}
-            class="text-neutral-500 hover:text-white transition-colors duration-150"
+            class="py-1 -my-1 text-neutral-500 hover:text-white transition-colors duration-150"
           >
             {algo.name}
           </a>

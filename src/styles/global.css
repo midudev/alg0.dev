@@ -38,6 +38,12 @@
   --viz-text: #e2e8f0;
 }
 
+/* Dark theme muted text: #7a7a7a instead of Tailwind's #737373 reaches the WCAG AA
+   4.5:1 ratio on the black surface; the difference is not visible. */
+[data-theme='dark'] {
+  --color-neutral-500: #7a7a7a;
+}
+
 [data-theme='light'] {
   --surface: #fff;
   --foreground: #171717;
@@ -582,7 +588,7 @@ input[type='search']::-webkit-search-decoration {
 :root {
   --header-border: rgb(255 255 255 / 0.08);
   --header-muted: #404040;
-  --header-subtle: #737373;
+  --header-subtle: #7a7a7a; /* WCAG AA 4.5:1 on black (see --color-neutral-500 note) */
   --header-strong: #d4d4d4;
   --header-hover: rgb(255 255 255 / 0.06);
   --header-logo-bg: #fff;
