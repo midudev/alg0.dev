@@ -85,7 +85,9 @@ Packs load on demand through `loaders.ts`.
 
 - Cloudflare Workers Static Assets, assets-only (no Worker script): `wrangler.jsonc` serves `dist/`.
 - `pnpm preview` = build + `wrangler dev` (production routing). Manual deploy: `pnpm run deploy` (`pnpm deploy` is a pnpm built-in).
+- Production deploys (Workers Builds on `main` and `pnpm run deploy`) run `scripts/deploy.mjs`: diffs built pages against the live site, `wrangler deploy`, then pings IndexNow with the changed URLs (key file `public/<key>.txt`).
 - Response headers live in `public/_headers`. `scripts/cloudflare-routing.mjs` (Astro integration) appends Early Hints `Link` preloads for the hashed CSS/fonts and writes `dist/_redirects` (301 `/slug` → `/slug/`) after each build.
 - Canonical URLs end in `/`; internal links, `pushState` and fragment fetches use trailing slashes.
 - `www.alg0.dev` → `alg0.dev` is a zone Redirect Rule, not app code.
+- Code-language logos are an external sprite (`/icons/code-languages.svg?v=<hash>`, built by `src/pages/icons/code-languages.svg.ts` from `code-languages.ts`), not inline SVG.
 - Prefetch: speculation rules in `Layout.astro` (hover, `moderate`). Algorithm pages mark the shell with `data-spa-shell` so SPA sidebar links are excluded; instead `algo-page.ts` warms the algorithm chunk + description fragment on hover/focus.

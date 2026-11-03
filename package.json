@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro build && wrangler dev",
-    "deploy": "astro build && wrangler deploy",
+    "deploy": "astro build && node scripts/deploy.mjs",
     "astro": "astro",
     "prepare": "husky",
     "og:generate": "node scripts/generate-og.mjs",
