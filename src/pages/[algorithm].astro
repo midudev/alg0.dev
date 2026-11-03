@@ -93,7 +93,11 @@ if (isCategory) {
 >
   <div class="h-screen flex flex-col overflow-hidden">
     <SiteHeader locale={defaultLocale} algorithm={algo ?? undefined} />
-    <div class="flex-1 flex overflow-hidden min-h-0 relative">
+    {/* data-spa-shell: sidebar links swap content client-side (see speculation rules in Layout) */}
+    <div
+      class="flex-1 flex overflow-hidden min-h-0 relative"
+      data-spa-shell={!isCategory && algo ? "" : undefined}
+    >
       <SiteSidebar locale={defaultLocale} selectedId={algo?.id} />
       {
         isCategory && category ? (

@@ -109,6 +109,23 @@ async function loadAlgorithmPageContent(
   }
 }
 
+/** One request per fragment: hover warm-ups and the click that follows share it. */
+const pageContentCache = new Map<string, Promise<AlgorithmPageContent | null>>()
+
+function loadAlgorithmPageContentCached(
+  locale: Locale,
+  algorithmId: string,
+): Promise<AlgorithmPageContent | null> {
+  const key = `${locale}/${algorithmId}`
+  let pending = pageContentCache.get(key)
+  if (!pending) {
+    pending = loadAlgorithmPageContent(locale, algorithmId)
+    pageContentCache.set(key, pending)
+    pending.catch(() => pageContentCache.delete(key))
+  }
+  return pending
+}
+
 async function loadAlgorithmOnDemand(id: string): Promise<Algorithm> {
   const { loadAlgorithm } = await import('@lib/algorithms/loaders')
   return loadAlgorithm(id)
@@ -333,7 +350,7 @@ export function initAlgoPage(root: HTMLElement): () => void {
     try {
       const [algo, pageContent] = await Promise.all([
         loadAlgorithmOnDemand(id),
-        loadAlgorithmPageContent(locale, id).catch((error) => {
+        loadAlgorithmPageContentCached(locale, id).catch((error) => {
           console.error(`Failed to load description for "${id}"`, error)
           return null
         }),
@@ -404,6 +421,29 @@ export function initAlgoPage(root: HTMLElement): () => void {
   }
   document.addEventListener('click', onMobileClick)
 
+  // Warm the algorithm chunk + description fragment while the pointer rests on a
+  // sidebar link (or on focus / touch), so the SPA swap after the click is instant.
+  let warmTimer: number | undefined
+  const warmAlgorithm = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) return
+    const link = target.closest<HTMLAnchorElement>('[data-sidebar] a[data-algo-id]')
+    const id = link?.dataset.algoId
+    if (!id || id === headerAlgorithm?.id || !isKnownAlgorithmId(id)) return
+    void loadAlgorithmOnDemand(id).catch(() => {})
+    void loadAlgorithmPageContentCached(locale, id).catch(() => {})
+  }
+  const onPointerOver = (event: PointerEvent) => {
+    window.clearTimeout(warmTimer)
+    if (event.pointerType !== 'mouse') return
+    warmTimer = window.setTimeout(() => warmAlgorithm(event.target), 100)
+  }
+  const onPointerOut = () => window.clearTimeout(warmTimer)
+  const onWarmNow = (event: Event) => warmAlgorithm(event.target)
+  document.addEventListener('pointerover', onPointerOver)
+  document.addEventListener('pointerout', onPointerOut)
+  document.addEventListener('pointerdown', onWarmNow)
+  document.addEventListener('focusin', onWarmNow)
+
   const onMq = () => syncMobileTransport(root, playback, headerAlgorithm != null)
   const mq = window.matchMedia(MOBILE_MQ)
   mq.addEventListener('change', onMq)
@@ -417,6 +457,11 @@ export function initAlgoPage(root: HTMLElement): () => void {
     window.removeEventListener('popstate', onPopState)
     root.removeEventListener('click', onExplanationClick)
     document.removeEventListener('click', onMobileClick)
+    window.clearTimeout(warmTimer)
+    document.removeEventListener('pointerover', onPointerOver)
+    document.removeEventListener('pointerout', onPointerOut)
+    document.removeEventListener('pointerdown', onWarmNow)
+    document.removeEventListener('focusin', onWarmNow)
     mq.removeEventListener('change', onMq)
   }
 }

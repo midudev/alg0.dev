@@ -1,5 +1,7 @@
 /**
- * Subsets the original fonts in `fonts-src/` into `public/fonts/`.
+ * Subsets the original fonts in `fonts-src/` into `src/assets/fonts/`.
+ * Vite fingerprints them at build time, so they ship under `/_astro/` with an
+ * immutable cache policy.
  *
  * The site only ships English and Spanish copy plus code samples, so the full
  * fonts (Cyrillic, Greek, Vietnamese, thousands of symbols) are mostly dead
@@ -13,7 +15,7 @@ import subsetFont from 'subset-font'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SRC_DIR = join(root, 'fonts-src')
-const OUT_DIR = join(root, 'public/fonts')
+const OUT_DIR = join(root, 'src/assets/fonts')
 
 /** Inclusive code point ranges kept in every subset. */
 const RANGES = [

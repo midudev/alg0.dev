@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config'
 import tailwindcss from '@tailwindcss/vite'
 import sitemap from '@astrojs/sitemap'
 import { splitAlgorithmChunks } from './scripts/split-algorithm-chunks.mjs'
+import { cloudflareRouting } from './scripts/cloudflare-routing.mjs'
 
 export default defineConfig({
   site: 'https://alg0.dev',
@@ -10,6 +11,7 @@ export default defineConfig({
     enabled: false,
   },
   integrations: [
+    cloudflareRouting(),
     sitemap({
       filter: (page) => !page.includes('/algorithm-content/') && !page.includes('/algorithm-code/'),
       i18n: {

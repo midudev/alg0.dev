@@ -1,5 +1,7 @@
 ---
 import "@styles/global.css"
+import geistPixelUrl from "@assets/fonts/GeistPixel-Square.woff2?url"
+import geistMonoUrl from "@assets/fonts/GeistMono-Variable.woff2?url"
 import type { Locale } from "@i18n/translations"
 import { translations } from "@i18n/translations"
 
@@ -41,6 +43,25 @@ const basePath = locale === "es" && pathname.startsWith("/es/")
 const enAlternateUrl = new URL(basePath, Astro.site).href
 const esAlternateUrl = new URL(basePath === "/" ? "/es/" : `/es${basePath}`, Astro.site).href
 const alternateOgLocale = locale === "es" ? "en_US" : "es_ES"
+
+// Prefetch same-site pages on hover/pointerdown (Chromium). Skips the SPA fragments and
+// sidebar links on algorithm pages, which swap content client-side instead of navigating.
+const speculationRules = {
+  prefetch: [
+    {
+      source: "document",
+      where: {
+        and: [
+          { href_matches: "/*" },
+          { not: { href_matches: "/algorithm-content/*" } },
+          { not: { href_matches: "/algorithm-code/*" } },
+          { not: { selector_matches: "[data-spa-shell] [data-sidebar] a[data-algo-id]" } },
+        ],
+      },
+      eagerness: "moderate",
+    },
+  ],
+}
 const defaultStructuredData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -76,14 +97,14 @@ const defaultStructuredData = {
     <!-- Fonts (Latin subsets) — both paint above the fold -->
     <link
       rel="preload"
-      href="/fonts/GeistPixel-Square.woff2"
+      href={geistPixelUrl}
       as="font"
       type="font/woff2"
       crossorigin
     />
     <link
       rel="preload"
-      href="/fonts/GeistMono-Variable.woff2"
+      href={geistMonoUrl}
       as="font"
       type="font/woff2"
       crossorigin
@@ -147,6 +168,7 @@ const defaultStructuredData = {
       type="application/ld+json"
       set:html={JSON.stringify(structuredData ?? defaultStructuredData)}
     />
+    <script type="speculationrules" set:html={JSON.stringify(speculationRules)} />
   </head>
   <body class="bg-black text-gray-100 font-sans antialiased">
     <!-- Skip to main content link for keyboard/screen reader users -->

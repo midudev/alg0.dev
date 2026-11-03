@@ -78,13 +78,14 @@ Packs load on demand through `loaders.ts`.
 
 ## Fonts
 
-- Originals in `fonts-src/`; `public/fonts/` is generated — `pnpm fonts:subset`.
+- Originals in `fonts-src/`; `src/assets/fonts/` is generated — `pnpm fonts:subset`. Vite hashes them into `/_astro/` (immutable cache).
 - Faces: Geist Pixel Square + Geist Mono.
 
 ## Hosting
 
 - Cloudflare Workers Static Assets, assets-only (no Worker script): `wrangler.jsonc` serves `dist/`.
 - `pnpm preview` = build + `wrangler dev` (production routing). Manual deploy: `pnpm run deploy` (`pnpm deploy` is a pnpm built-in).
-- Response headers live in `public/_headers`.
-- Canonical URLs end in `/`; `html_handling: auto-trailing-slash` 307s slashless paths, so internal links, `pushState` and fragment fetches use trailing slashes.
+- Response headers live in `public/_headers`. `scripts/cloudflare-routing.mjs` (Astro integration) appends Early Hints `Link` preloads for the hashed CSS/fonts and writes `dist/_redirects` (301 `/slug` → `/slug/`) after each build.
+- Canonical URLs end in `/`; internal links, `pushState` and fragment fetches use trailing slashes.
 - `www.alg0.dev` → `alg0.dev` is a zone Redirect Rule, not app code.
+- Prefetch: speculation rules in `Layout.astro` (hover, `moderate`). Algorithm pages mark the shell with `data-spa-shell` so SPA sidebar links are excluded; instead `algo-page.ts` warms the algorithm chunk + description fragment on hover/focus.

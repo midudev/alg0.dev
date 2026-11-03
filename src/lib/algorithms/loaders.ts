@@ -227,6 +227,8 @@ export function loadAlgorithm(id: string): Promise<Algorithm> {
   })
 
   algorithmCache.set(id, promise)
+  // Drop failures so a later attempt (e.g. a click after a failed hover warm-up) retries.
+  promise.catch(() => algorithmCache.delete(id))
   return promise
 }
 

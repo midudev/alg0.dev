@@ -6,7 +6,7 @@
 /* Geist Mono — variable weight, for the code viewer */
 @font-face {
   font-family: 'Geist Mono';
-  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  src: url('../assets/fonts/GeistMono-Variable.woff2') format('woff2');
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
@@ -15,7 +15,7 @@
 /* Geist Pixel Square — body text and headings */
 @font-face {
   font-family: 'Geist Pixel Square';
-  src: url('/fonts/GeistPixel-Square.woff2') format('woff2');
+  src: url('../assets/fonts/GeistPixel-Square.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
