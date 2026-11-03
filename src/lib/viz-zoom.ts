@@ -78,7 +78,8 @@ export function initVizZoom(root: HTMLElement): () => void {
     if (zoomOut) zoomOut.disabled = zoom <= MIN_ZOOM
     if (reset) {
       reset.textContent = percent
-      reset.setAttribute('aria-label', `${reset.dataset.label ?? ''} (${percent})`)
+      // Visible text first (WCAG 2.5.3 Label in Name).
+      reset.setAttribute('aria-label', `${percent} (${reset.dataset.label ?? ''})`)
     }
   }
 

@@ -175,7 +175,7 @@ const hasAlgorithm = algorithm != null
               data-lang={l}
               href={getLocaleUrl(l, algorithm?.id)}
               class:list={["header-lang-link", { "is-active": l === locale }]}
-              aria-label={localeNames[l]}
+              aria-label={`${l.toUpperCase()} (${localeNames[l]})`}
               aria-current={l === locale ? "page" : undefined}
               lang={l}
             >
