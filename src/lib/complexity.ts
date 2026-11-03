@@ -145,14 +145,22 @@ function toScreenY(value: number): number {
 }
 
 function buildPath(fn: (n: number) => number): string {
-  const pts: string[] = []
+  const pts: [number, number][] = []
   for (let i = 0; i <= STEPS; i++) {
     const n = 0.5 + (i / STEPS) * (N_MAX - 0.5)
     const x = PAD.left + (i / STEPS) * plotW
     const y = toScreenY(fn(n))
-    pts.push(`${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`)
+    pts.push([Number(x.toFixed(1)), Number(y.toFixed(1))])
   }
-  return pts.join('')
+  // Drop points that sit exactly on the line between their neighbours (flat O(1),
+  // straight O(n), curves clamped at the top): same drawing, far fewer bytes per page.
+  const kept = pts.filter((point, i) => {
+    if (i === 0 || i === pts.length - 1) return true
+    const [x0, y0] = pts[i - 1]
+    const [x2, y2] = pts[i + 1]
+    return (point[0] - x0) * (y2 - y0) - (point[1] - y0) * (x2 - x0) !== 0
+  })
+  return kept.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join('')
 }
 
 function buildAreaPath(fn: (n: number) => number): string {

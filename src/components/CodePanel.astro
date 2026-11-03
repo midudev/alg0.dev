@@ -1,5 +1,6 @@
 ---
 import { codeLanguages } from "@lib/code-languages"
+import { codeLanguageSpriteUrl } from "@lib/code-language-sprite"
 import { renderAlgorithmCodeHtml } from "@lib/algorithm-code"
 import type { Locale } from "@i18n/translations"
 import { translations } from "@i18n/translations"
@@ -47,13 +48,8 @@ const algorithmCodeHtml = initialAlgorithmId
             aria-pressed="false"
             class="code-language-button inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium rounded-md whitespace-nowrap"
           >
-            <svg
-              class="w-3.5 h-3.5 shrink-0"
-              viewBox={language.iconViewBox ?? "0 0 24 24"}
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d={language.iconPath} />
+            <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" aria-hidden="true">
+              <use href={`${codeLanguageSpriteUrl}#${language.id}`} />
             </svg>
             {language.label}
           </button>
