@@ -64,7 +64,7 @@ export function getCategoryIntro(locale: Locale, categoryName: string): string {
         'Exploración con retroceso: N-Reinas, Sudoku y pathfinding. Ve cómo se poda el espacio de búsqueda.',
       'Divide and Conquer':
         'Divide el problema, resuelve subproblemas y combina resultados. Torre de Hanoi y más.',
-      Math: 'Algoritmos matemáticos clásicos con visualización clara del proceso.',
+      Math: 'Algoritmos matemáticos clásicos paso a paso: el algoritmo de Euclides para el máximo común divisor y la criba de Eratóstenes para encontrar primos.',
       Compression:
         'Compresión sin pérdida desde RLE hasta DEFLATE (gzip) y Brotli: diccionarios, entropía y los pipelines reales de la web.',
     }
@@ -87,7 +87,7 @@ export function getCategoryIntro(locale: Locale, categoryName: string): string {
       'Backtracking exploration: N-Queens, Sudoku, and pathfinding. See how the search space is pruned.',
     'Divide and Conquer':
       'Split the problem, solve subproblems, combine results. Tower of Hanoi and more.',
-    Math: 'Classic mathematical algorithms with a clear step-by-step visualization.',
+    Math: 'Classic math algorithms visualized step by step: the Euclidean algorithm for the greatest common divisor and the Sieve of Eratosthenes for primes.',
     Compression:
       'Lossless compression from RLE to DEFLATE (gzip) and Brotli: dictionaries, entropy coding, and real web pipelines.',
   }
