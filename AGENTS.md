@@ -80,3 +80,11 @@ Packs load on demand through `loaders.ts`.
 
 - Originals in `fonts-src/`; `public/fonts/` is generated — `pnpm fonts:subset`.
 - Faces: Geist Pixel Square + Geist Mono.
+
+## Hosting
+
+- Cloudflare Workers Static Assets, assets-only (no Worker script): `wrangler.jsonc` serves `dist/`.
+- `pnpm preview` = build + `wrangler dev` (production routing). Manual deploy: `pnpm run deploy` (`pnpm deploy` is a pnpm built-in).
+- Response headers live in `public/_headers`.
+- Canonical URLs end in `/`; `html_handling: auto-trailing-slash` 307s slashless paths, so internal links, `pushState` and fragment fetches use trailing slashes.
+- `www.alg0.dev` → `alg0.dev` is a zone Redirect Rule, not app code.

@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "alg0-dev",
+  "account_id": "599228840df452ef6b4df93a2b67c0ee",
+  "compatibility_date": "2026-11-03",
+  // Assets-only Worker: no script, every request is served straight from `dist/`.
+  "assets": {
+    "directory": "./dist",
+    // `/foo/index.html` is served at `/foo/` (matches canonical URLs); `/foo` 307s there.
+    "html_handling": "auto-trailing-slash",
+    // Unknown paths render `dist/404.html` with a 404 status (it localizes client-side).
+    "not_found_handling": "404-page",
+  },
+  // www.alg0.dev → alg0.dev (301) is a zone Redirect Rule, applied before the Worker.
+  "routes": [
+    { "pattern": "alg0.dev", "custom_domain": true },
+    { "pattern": "www.alg0.dev", "custom_domain": true },
+  ],
+  "workers_dev": true,
+  "preview_urls": true,
+}

@@ -2,10 +2,12 @@
   "name": "alg0.dev",
   "type": "module",
   "version": "0.0.2",
+  "packageManager": "pnpm@12.16.1",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "astro build && wrangler dev",
+    "deploy": "astro build && wrangler deploy",
     "astro": "astro",
     "prepare": "husky",
     "og:generate": "node scripts/generate-og.mjs",
@@ -33,6 +35,7 @@
     "lint-staged": "17.6.0",
     "prettier": "3.9.10",
     "shiki": "4.5.0",
-    "subset-font": "^2.9.0"
+    "subset-font": "^2.9.0",
+    "wrangler": "^4.156.2"
   }
 }

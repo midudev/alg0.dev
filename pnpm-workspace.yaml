@@ -2,5 +2,6 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+  workerd: true
 minimumReleaseAgeExclude:
   - astro@6.4.8
