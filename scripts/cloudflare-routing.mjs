@@ -24,6 +24,11 @@ function attrs(tag) {
 async function getPreloadLinks(dir) {
   const html = await readFile(new URL('index.html', dir), 'utf8')
   const links = []
+  // The shared client bootstrap: fetched during the 103 instead of after the HTML.
+  for (const [tag] of html.matchAll(/<script\b[^>]*>/g)) {
+    const a = attrs(tag)
+    if (a.type === 'module' && a.src?.startsWith('/')) links.push(`<${a.src}>; rel=modulepreload`)
+  }
   for (const [tag] of html.matchAll(/<link\b[^>]*>/g)) {
     const a = attrs(tag)
     if (a.rel === 'stylesheet' && a.href?.startsWith('/')) {
@@ -55,7 +60,7 @@ async function getPagePaths(dir) {
  * Cloudflare Workers static-assets routing, generated after the build because it
  * depends on hashed asset names and the final page list:
  *
- * - `_headers`: `Link` preloads for CSS + fonts on HTML routes. Cloudflare replays
+ * - `_headers`: `Link` preloads for JS, CSS and fonts on HTML routes. Cloudflare replays
  *   them as `103 Early Hints`, so the browser fetches them before the HTML arrives.
  * - `_redirects`: `/slug` → `/slug/` with a 301. Assets `html_handling` would answer
  *   with a temporary 307; a permanent redirect consolidates ranking signals on the
