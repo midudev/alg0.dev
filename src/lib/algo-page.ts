@@ -49,7 +49,7 @@ function hydrateAlgorithm(summary: AlgorithmSummary, steps: Step[]): Algorithm {
 }
 
 function getAlgorithmUrl(locale: string, algoId: string): string {
-  return locale === defaultLocale ? `/${algoId}` : `/${locale}/${algoId}`
+  return locale === defaultLocale ? `/${algoId}/` : `/${locale}/${algoId}/`
 }
 
 function getAlgorithmIdFromPath(pathname: string): string | null {

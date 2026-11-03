@@ -7,12 +7,12 @@ export function getHomeUrl(locale: Locale): string {
 
 export function getLocaleUrl(targetLocale: Locale, algorithmId?: string): string {
   if (targetLocale === defaultLocale) {
-    return algorithmId ? `/${algorithmId}` : '/'
+    return algorithmId ? `/${algorithmId}/` : '/'
   }
-  return algorithmId ? `/${targetLocale}/${algorithmId}` : `/${targetLocale}/`
+  return algorithmId ? `/${targetLocale}/${algorithmId}/` : `/${targetLocale}/`
 }
 
-/** Absolute-path URL for an algorithm page (trailing slash omitted; site adds it). */
+/** Absolute-path URL for an algorithm page (trailing slash, matching canonical URLs). */
 export function getAlgorithmPath(locale: Locale, algorithmId: string): string {
   return locale === defaultLocale ? `/${algorithmId}/` : `/${locale}/${algorithmId}/`
 }

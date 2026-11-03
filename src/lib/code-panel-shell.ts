@@ -216,7 +216,7 @@ async function loadAlgorithmCode(algorithmId: string): Promise<void> {
   setLoading(true)
 
   try {
-    const response = await fetch(`/algorithm-code/${algorithmId}`)
+    const response = await fetch(`/algorithm-code/${algorithmId}/`)
     if (!response.ok) throw new Error(`Code request failed with ${response.status}`)
 
     const parsedDocument = new DOMParser().parseFromString(await response.text(), 'text/html')
