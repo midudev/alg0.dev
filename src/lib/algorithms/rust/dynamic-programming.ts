@@ -53,4 +53,20 @@ export const dynamicProgrammingRust: Record<string, CodeImplementation> = {
 
     dp[m][n]  //@18
 }`),
+
+  'coin-change': annotated(`fn coin_change(coins: &[usize], amount: usize) -> i32 {  //@1
+    let inf = (amount + 1) as i32;
+    let mut dp = vec![inf; amount + 1];
+    dp[0] = 0;  //@3
+
+    for a in 1..=amount {
+        for &coin in &coins {
+            if coin <= a && dp[a - coin] + 1 < dp[a] {
+                dp[a] = dp[a - coin] + 1;  //@8
+            }
+        }
+    }
+
+    if dp[amount] >= inf { -1 } else { dp[amount] }  //@13
+}`),
 }

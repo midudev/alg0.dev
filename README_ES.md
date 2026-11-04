@@ -65,7 +65,7 @@ Binary Search · Linear Search · Jump Search · Interpolation Search
 
 ### Programación dinámica
 
-Fibonacci · 0/1 Knapsack · LCS (Longest Common Subsequence)
+Fibonacci · 0/1 Knapsack · LCS (Longest Common Subsequence) · Coin Change
 
 </td>
 <td width="25%" valign="top">

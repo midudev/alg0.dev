@@ -50,4 +50,21 @@ export const dynamicProgrammingJava: Record<string, CodeImplementation> = {
 
     return dp[m][n];  //@18
 }`),
+
+  'coin-change': annotated(`int coinChange(int[] coins, int amount) {  //@1
+    int inf = amount + 1;
+    int[] dp = new int[amount + 1];
+    java.util.Arrays.fill(dp, inf);
+    dp[0] = 0;  //@3
+
+    for (int a = 1; a <= amount; a++) {
+        for (int coin : coins) {
+            if (coin <= a && dp[a - coin] + 1 < dp[a]) {
+                dp[a] = dp[a - coin] + 1;  //@8
+            }
+        }
+    }
+
+    return dp[amount] >= inf ? -1 : dp[amount];  //@13
+}`),
 }

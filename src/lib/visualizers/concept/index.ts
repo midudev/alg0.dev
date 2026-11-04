@@ -17,6 +17,7 @@ export type ConceptType =
   | 'prefixSum'
   | 'memoTable'
   | 'coinChange'
+  | 'coinChangeDp'
   | 'buckets'
   | 'huffman'
   | 'rle'
@@ -64,6 +65,10 @@ const loaders: Record<ConceptType, () => Promise<ConceptRenderer>> = {
   coinChange: () =>
     import('@lib/visualizers/concept/coin-change').then(
       (m) => m.renderCoinChange as ConceptRenderer,
+    ),
+  coinChangeDp: () =>
+    import('@lib/visualizers/concept/coin-change-dp').then(
+      (m) => m.renderCoinChangeDp as ConceptRenderer,
     ),
   buckets: () =>
     import('@lib/visualizers/concept/buckets').then((m) => m.renderBuckets as ConceptRenderer),

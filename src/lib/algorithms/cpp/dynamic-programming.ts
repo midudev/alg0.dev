@@ -51,4 +51,20 @@ export const dynamicProgrammingCpp: Record<string, CodeImplementation> = {
 
     return dp[m][n];  //@18
 }`),
+
+  'coin-change': annotated(`int coinChange(const vector<int>& coins, int amount) {  //@1
+    int inf = amount + 1;
+    vector<int> dp(amount + 1, inf);
+    dp[0] = 0;  //@3
+
+    for (int a = 1; a <= amount; a++) {
+        for (int coin : coins) {
+            if (coin <= a && dp[a - coin] + 1 < dp[a]) {
+                dp[a] = dp[a - coin] + 1;  //@8
+            }
+        }
+    }
+
+    return dp[amount] >= inf ? -1 : dp[amount];  //@13
+}`),
 }

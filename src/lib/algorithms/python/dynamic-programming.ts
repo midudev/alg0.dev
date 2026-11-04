@@ -40,4 +40,15 @@ export const dynamicProgrammingPython: Record<string, CodeImplementation> = {
                 dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])  #@12
 
     return dp[m][n]  #@18`),
+
+  'coin-change': annotated(`def coin_change(coins, amount):  #@1
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0  #@3
+
+    for a in range(1, amount + 1):
+        for coin in coins:
+            if coin <= a and dp[a - coin] + 1 < dp[a]:
+                dp[a] = dp[a - coin] + 1  #@8
+
+    return -1 if dp[amount] == float('inf') else dp[amount]  #@13`),
 }

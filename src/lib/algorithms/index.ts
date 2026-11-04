@@ -44,7 +44,7 @@ import {
 
 import { bfs, dfs, dijkstra, prim, topologicalSort } from '@lib/algorithms/graphs'
 
-import { fibonacciDp, knapsack, lcs } from '@lib/algorithms/dynamic-programming'
+import { fibonacciDp, knapsack, lcs, coinChange } from '@lib/algorithms/dynamic-programming'
 
 import { nQueens, sudokuSolver, mazePathfinding } from '@lib/algorithms/backtracking'
 
@@ -111,6 +111,7 @@ export const algorithms: Algorithm[] = [
   fibonacciDp,
   knapsack,
   lcs,
+  coinChange,
   // Backtracking
   nQueens,
   sudokuSolver,

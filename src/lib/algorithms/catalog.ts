@@ -278,6 +278,13 @@ export const algorithmCatalog: AlgorithmSummary[] = [
     difficulty: 'advanced',
     visualization: 'matrix',
   },
+  {
+    id: 'coin-change',
+    name: 'Coin Change',
+    category: 'Dynamic Programming',
+    difficulty: 'intermediate',
+    visualization: 'concept',
+  },
   // Backtracking
   {
     id: 'n-queens',

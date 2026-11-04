@@ -242,6 +242,27 @@ export interface CoinChangeState {
   operation?: string
 }
 
+export interface CoinChangeDpState {
+  type: 'coinChangeDp'
+  coins: number[]
+  /** Target amount to make up. */
+  target: number
+  /** DP table for amounts `0..target`. `null` means Infinity (not yet computed). */
+  dp: (number | null)[]
+  /** Amount `a` currently being computed (fill phase). */
+  activeAmount?: number
+  /** Coins `c` whose subproblem `dp[a - c]` feeds the min for `activeAmount`. */
+  candidateCoins?: number[]
+  /** The coin achieving the minimum for `activeAmount`. */
+  bestCoin?: number
+  phase: 'intro' | 'init' | 'fill' | 'result'
+  /** Minimum coins for `target`, set on the final step. */
+  result?: number
+  /** Coins in an optimal solution, e.g. `[5, 5, 1]`. */
+  selected?: number[]
+  operation?: string
+}
+
 export interface BucketsState {
   type: 'buckets'
   array: number[]
@@ -444,6 +465,7 @@ export type ConceptState =
   | PrefixSumState
   | MemoTableState
   | CoinChangeState
+  | CoinChangeDpState
   | BucketsState
   | HuffmanState
   | RleState

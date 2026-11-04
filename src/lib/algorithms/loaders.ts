@@ -87,6 +87,8 @@ const ALGORITHM_LOADERS: Record<string, () => Promise<Algorithm>> = {
     import('./dynamic-programming?algorithm=fibonacciDp').then(readDefaultAlgorithm),
   knapsack: () => import('./dynamic-programming?algorithm=knapsack').then(readDefaultAlgorithm),
   lcs: () => import('./dynamic-programming?algorithm=lcs').then(readDefaultAlgorithm),
+  'coin-change': () =>
+    import('./dynamic-programming?algorithm=coinChange').then(readDefaultAlgorithm),
 
   // Backtracking
   'n-queens': () => import('./backtracking?algorithm=nQueens').then(readDefaultAlgorithm),

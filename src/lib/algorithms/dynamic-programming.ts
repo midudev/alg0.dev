@@ -332,4 +332,147 @@ const lcs: Algorithm = {
   },
 }
 
-export { fibonacciDp, knapsack, lcs }
+// ============================================================
+// COIN CHANGE - MINIMUM COINS
+// ============================================================
+const coinChange: Algorithm = {
+  id: 'coin-change',
+  name: 'Coin Change',
+  category: 'Dynamic Programming',
+  difficulty: 'intermediate',
+  visualization: 'concept',
+  code: `function coinChange(coins, amount) {
+  const dp = Array(amount + 1).fill(Infinity);
+  dp[0] = 0;
+
+  for (let a = 1; a <= amount; a++) {
+    for (const coin of coins) {
+      if (coin <= a && dp[a - coin] + 1 < dp[a]) {
+        dp[a] = dp[a - coin] + 1;
+      }
+    }
+  }
+
+  return dp[amount] === Infinity ? -1 : dp[amount];
+}`,
+
+  generateSteps(locale = 'en') {
+    const coins = [1, 2, 5]
+    const target = 11
+    const dp: (number | null)[] = Array(target + 1).fill(null)
+    const steps: Step[] = []
+
+    steps.push({
+      concept: { type: 'coinChangeDp', coins, target, dp: [...dp], phase: 'intro' },
+      description: d(
+        locale,
+        'Coin Change: make 11 using coins [1, 2, 5] with the fewest coins. Greedy can be suboptimal, so DP fills dp[a] = minimum coins for amount a.',
+        'Cambio de monedas: formar 11 con monedas [1, 2, 5] con el mínimo. Greedy puede ser subóptimo, así que DP llena dp[a] = mínimo de monedas para la cantidad a.',
+      ),
+      codeLine: 1,
+      variables: { coins: '[1,2,5]', target },
+    })
+
+    dp[0] = 0
+    steps.push({
+      concept: {
+        type: 'coinChangeDp',
+        coins,
+        target,
+        dp: [...dp],
+        phase: 'init',
+        operation: 'base case',
+      },
+      description: d(
+        locale,
+        'Base case: dp[0] = 0 — zero coins make amount 0.',
+        'Caso base: dp[0] = 0 — cero monedas para la cantidad 0.',
+      ),
+      codeLine: 3,
+      variables: { 'dp[0]': 0 },
+    })
+
+    for (let a = 1; a <= target; a++) {
+      const candidateCoins = coins.filter((c) => c <= a)
+      let best = Infinity
+      let bestCoin = candidateCoins[0]
+      for (const c of candidateCoins) {
+        const base = dp[a - c]
+        if (base == null) continue
+        const val = base + 1
+        if (val < best) {
+          best = val
+          bestCoin = c
+        }
+      }
+      dp[a] = best === Infinity ? null : best
+
+      const cands = candidateCoins
+        .map((c) => `dp[${a - c}]+1=${dp[a - c] == null ? '∞' : (dp[a - c] as number) + 1}`)
+        .join(', ')
+      const bestStr = best === Infinity ? '∞' : best
+      steps.push({
+        concept: {
+          type: 'coinChangeDp',
+          coins,
+          target,
+          dp: [...dp],
+          activeAmount: a,
+          candidateCoins,
+          bestCoin,
+          phase: 'fill',
+          operation: `fill dp[${a}]`,
+        },
+        description: d(
+          locale,
+          `amount ${a}: dp[${a}] = min(${cands}) = ${bestStr}`,
+          `cantidad ${a}: dp[${a}] = min(${cands}) = ${bestStr}`,
+        ),
+        codeLine: 8,
+        variables: { a, best_coin: bestCoin, 'dp[a]': best === Infinity ? null : best },
+      })
+    }
+
+    const result = dp[target] ?? -1
+    const selected: number[] = []
+    const sortedDesc = [...coins].sort((x, y) => y - x)
+    let rem = target
+    while (rem > 0) {
+      let advanced = false
+      for (const c of sortedDesc) {
+        const base = dp[rem - c]
+        if (base != null && base + 1 === dp[rem]) {
+          selected.push(c)
+          rem -= c
+          advanced = true
+          break
+        }
+      }
+      if (!advanced) break
+    }
+
+    steps.push({
+      concept: {
+        type: 'coinChangeDp',
+        coins,
+        target,
+        dp: [...dp],
+        phase: 'result',
+        result,
+        selected,
+        operation: `optimal: ${selected.join('+')} = ${result} coins ✓`,
+      },
+      description: d(
+        locale,
+        `Coin Change complete! Minimum coins: ${result}.`,
+        `¡Cambio de monedas completado! Mínimo de monedas: ${result}.`,
+      ),
+      codeLine: 13,
+      variables: { min_coins: result },
+    })
+
+    return steps
+  },
+}
+
+export { fibonacciDp, knapsack, lcs, coinChange }
