@@ -56,6 +56,21 @@ export interface MatrixState {
   highlights: Record<string, HighlightType>
 }
 
+// ── Graph representation visualization types ──
+
+export interface AdjacencyMatrixState {
+  type: 'adjacencyMatrix'
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+  /** N×N matrix; rows are source vertices and columns are destinations. */
+  matrix: number[][]
+  directed: boolean
+  /** Directed edge currently being written to the matrix. */
+  currentEdge?: [number, number] | null
+  /** Matrix cells [row, column] currently being written. */
+  highlightCells?: [number, number][]
+}
+
 // ── Concept visualization types ──
 
 export interface BigOCurve {
@@ -452,6 +467,7 @@ export type ConceptState =
   | DeflateState
   | BrotliState
   | EuclideanState
+  | AdjacencyMatrixState
 
 export interface Step {
   array?: number[]

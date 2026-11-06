@@ -2,6 +2,19 @@ import type { CodeImplementation } from '@lib/types'
 import { annotated } from '@lib/code-languages'
 
 export const graphsJava: Record<string, CodeImplementation> = {
+  'adjacency-matrix': annotated(`int[][] buildAdjacencyMatrix(int numNodes, int[][] edges) {  //@1
+    // Initialize an N×N matrix filled with 0
+    int[][] matrix = new int[numNodes][numNodes];  //@3
+
+    // For each directed edge u → v, set matrix[u][v] = 1
+    for (int[] edge : edges) {
+        int u = edge[0], v = edge[1];
+        matrix[u][v] = 1;  //@9
+    }
+
+    return matrix;  //@12
+}`),
+
   bfs: annotated(`List<Integer> bfs(Map<Integer, List<Integer>> graph, int start) {
     Set<Integer> visited = new HashSet<>();
     Queue<Integer> queue = new LinkedList<>();  //@3

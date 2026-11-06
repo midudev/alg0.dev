@@ -2,6 +2,19 @@ import type { CodeImplementation } from '@lib/types'
 import { annotated } from '@lib/code-languages'
 
 export const graphsRust: Record<string, CodeImplementation> = {
+  'adjacency-matrix':
+    annotated(`fn build_adjacency_matrix(num_nodes: usize, edges: &[(usize, usize)]) -> Vec<Vec<i32>> {  //@1
+    // Initialize an N×N matrix filled with 0
+    let mut matrix = vec![vec![0; num_nodes]; num_nodes];  //@3
+
+    // For each directed edge u → v, set matrix[u][v] = 1
+    for &(u, v) in edges {
+        matrix[u][v] = 1;  //@9
+    }
+
+    matrix  //@12
+}`),
+
   bfs: annotated(`fn bfs(graph: &HashMap<i32, Vec<i32>>, start: i32) -> Vec<i32> {
     let mut visited: HashSet<i32> = HashSet::new();
     let mut queue: VecDeque<i32> = VecDeque::new();  //@3
