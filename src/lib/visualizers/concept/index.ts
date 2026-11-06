@@ -25,6 +25,7 @@ export type ConceptType =
   | 'deflate'
   | 'brotli'
   | 'euclidean'
+  | 'adjacencyMatrix'
 
 type ConceptRenderer = (state: never) => HTMLElement
 
@@ -78,6 +79,10 @@ const loaders: Record<ConceptType, () => Promise<ConceptRenderer>> = {
     import('@lib/visualizers/concept/brotli').then((m) => m.renderBrotli as ConceptRenderer),
   euclidean: () =>
     import('@lib/visualizers/concept/euclidean').then((m) => m.renderEuclidean as ConceptRenderer),
+  adjacencyMatrix: () =>
+    import('@lib/visualizers/concept/adjacency-matrix').then(
+      (m) => m.renderAdjacencyMatrix as ConceptRenderer,
+    ),
 }
 
 const cache = new Map<ConceptType, ConceptRenderer>()

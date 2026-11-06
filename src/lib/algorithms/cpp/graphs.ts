@@ -2,6 +2,19 @@ import type { CodeImplementation } from '@lib/types'
 import { annotated } from '@lib/code-languages'
 
 export const graphsCpp: Record<string, CodeImplementation> = {
+  'adjacency-matrix': annotated(`vector<vector<int>> buildAdjacencyMatrix(
+    int numNodes, const vector<pair<int, int>>& edges) {  //@1
+    // Initialize an N×N matrix filled with 0
+    vector<vector<int>> matrix(numNodes, vector<int>(numNodes, 0));  //@3
+
+    // For each directed edge u → v, set matrix[u][v] = 1
+    for (const auto& [u, v] : edges) {
+        matrix[u][v] = 1;  //@9
+    }
+
+    return matrix;  //@12
+}`),
+
   bfs: annotated(`vector<int> bfs(map<int, vector<int>>& graph, int start) {
     set<int> visited;
     queue<int> q;  //@3

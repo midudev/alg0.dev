@@ -49,7 +49,7 @@ Stack · Queue · Linked List · Hash Table · Binary Search Tree · Heap
 
 ### Graphs
 
-BFS · DFS · Dijkstra · Prim · Topological Sort
+Adjacency Matrix · BFS · DFS · Dijkstra · Prim · Topological Sort
 
 </td>
 <td width="25%" valign="top">

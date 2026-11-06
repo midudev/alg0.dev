@@ -1,6 +1,134 @@
 import type { Algorithm, Step, GraphNode, GraphEdge, GraphState } from '@lib/types'
 import { d, graphNodes, graphEdges, graphAdj } from '@lib/algorithms/shared'
 
+// ============================================================
+// ADJACENCY MATRIX (graph representation)
+// ============================================================
+const adjacencyMatrix: Algorithm = {
+  id: 'adjacency-matrix',
+  name: 'Adjacency Matrix',
+  category: 'Graphs',
+  difficulty: 'easy',
+  visualization: 'concept',
+  code: `function buildAdjacencyMatrix(numNodes, edges) {
+  // Initialize an N×N matrix filled with 0
+  const matrix = Array.from({ length: numNodes }, () =>
+    new Array(numNodes).fill(0)
+  );
+
+  // For each directed edge u → v, set matrix[u][v] = 1
+  for (const [u, v] of edges) {
+    matrix[u][v] = 1;
+  }
+
+  return matrix;
+}`,
+
+  generateSteps(locale = 'en') {
+    const amNodes: GraphNode[] = [
+      { id: 0, label: 'A', x: 60, y: 50 },
+      { id: 1, label: 'B', x: 300, y: 50 },
+      { id: 2, label: 'C', x: 60, y: 170 },
+      { id: 3, label: 'D', x: 300, y: 170 },
+      { id: 4, label: 'E', x: 180, y: 110 },
+    ]
+    const amEdges: GraphEdge[] = [
+      { from: 0, to: 1 },
+      { from: 0, to: 2 },
+      { from: 1, to: 3 },
+      { from: 2, to: 3 },
+      { from: 2, to: 4 },
+      { from: 3, to: 4 },
+      { from: 4, to: 0 },
+    ]
+
+    const n = amNodes.length
+    const matrix: number[][] = amNodes.map(() => new Array<number>(n).fill(0))
+    const labelOf = (id: number) => amNodes[id].label
+    const steps: Step[] = []
+    const snapshot = () => matrix.map((row) => [...row])
+
+    steps.push({
+      concept: {
+        type: 'adjacencyMatrix',
+        nodes: amNodes,
+        edges: amEdges,
+        matrix: snapshot(),
+        directed: true,
+      },
+      description: d(
+        locale,
+        `A directed graph with ${n} nodes and ${amEdges.length} edges. Let's represent it as a ${n}×${n} adjacency matrix.`,
+        `Un grafo dirigido con ${n} nodos y ${amEdges.length} aristas. Vamos a representarlo como una matriz de adyacencia de ${n}×${n}.`,
+      ),
+      codeLine: 1,
+      variables: { nodes: n, edges: amEdges.length },
+    })
+
+    steps.push({
+      concept: {
+        type: 'adjacencyMatrix',
+        nodes: amNodes,
+        edges: amEdges,
+        matrix: snapshot(),
+        directed: true,
+      },
+      description: d(
+        locale,
+        `Initialize a ${n}×${n} matrix filled with 0 — no edges recorded yet.`,
+        `Inicializa una matriz de ${n}×${n} llena de 0 — todavía sin aristas registradas.`,
+      ),
+      codeLine: 3,
+      variables: { matrix: `${n}×${n} of 0` },
+    })
+
+    for (const edge of amEdges) {
+      matrix[edge.from][edge.to] = 1
+
+      steps.push({
+        concept: {
+          type: 'adjacencyMatrix',
+          nodes: amNodes,
+          edges: amEdges,
+          matrix: snapshot(),
+          directed: true,
+          currentEdge: [edge.from, edge.to],
+          highlightCells: [[edge.from, edge.to]],
+        },
+        description: d(
+          locale,
+          `Edge ${labelOf(edge.from)}→${labelOf(edge.to)}: set matrix[${edge.from}][${edge.to}] = 1.`,
+          `Arista ${labelOf(edge.from)}→${labelOf(edge.to)}: asigna matrix[${edge.from}][${edge.to}] = 1.`,
+        ),
+        codeLine: 9,
+        variables: {
+          edge: `${labelOf(edge.from)}→${labelOf(edge.to)}`,
+          [`matrix[${edge.from}][${edge.to}]`]: 1,
+        },
+      })
+    }
+
+    steps.push({
+      concept: {
+        type: 'adjacencyMatrix',
+        nodes: amNodes,
+        edges: amEdges,
+        matrix: snapshot(),
+        directed: true,
+      },
+      description: d(
+        locale,
+        'Matrix complete. Because the graph is directed, it is asymmetric: matrix[u][v] does not always equal matrix[v][u]. Edge lookup is now O(1).',
+        'Matriz completa. Como el grafo es dirigido, es asimétrica: matrix[u][v] no siempre es igual a matrix[v][u]. La consulta de aristas ahora es O(1).',
+      ),
+      codeLine: 12,
+      variables: { space: 'O(V²)', lookup: 'O(1)' },
+    })
+
+    return steps
+  },
+}
+
 const bfs: Algorithm = {
   id: 'bfs',
   name: 'Breadth-First Search',
@@ -951,4 +1079,4 @@ const topologicalSort: Algorithm = {
   },
 }
 
-export { bfs, dfs, dijkstra, prim, topologicalSort }
+export { adjacencyMatrix, bfs, dfs, dijkstra, prim, topologicalSort }

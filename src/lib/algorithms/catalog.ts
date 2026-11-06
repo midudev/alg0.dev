@@ -222,6 +222,13 @@ export const algorithmCatalog: AlgorithmSummary[] = [
   },
   // Graphs
   {
+    id: 'adjacency-matrix',
+    name: 'Adjacency Matrix',
+    category: 'Graphs',
+    difficulty: 'easy',
+    visualization: 'concept',
+  },
+  {
     id: 'bfs',
     name: 'Breadth-First Search',
     category: 'Graphs',

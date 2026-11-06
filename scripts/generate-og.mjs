@@ -99,6 +99,7 @@ const algorithms = [
   ['linear-search', 'Linear Search', 'Searching'],
   ['jump-search', 'Jump Search', 'Searching'],
   ['interpolation-search', 'Interpolation Search', 'Searching'],
+  ['adjacency-matrix', 'Adjacency Matrix', 'Graphs'],
   ['bfs', 'Breadth-First Search', 'Graphs'],
   ['dfs', 'Depth-First Search', 'Graphs'],
   ['dijkstra', "Dijkstra's Algorithm", 'Graphs'],

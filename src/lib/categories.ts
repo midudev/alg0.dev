@@ -57,7 +57,7 @@ export function getCategoryIntro(locale: Locale, categoryName: string): string {
       Searching:
         'Búsqueda lineal, binaria y variantes sobre datos ordenados. Aprende el trade-off entre preparación y consultas.',
       Graphs:
-        'Recorridos y algoritmos sobre grafos: BFS, DFS, caminos más cortos, MST y orden topológico.',
+        'Representaciones, recorridos y algoritmos sobre grafos: matriz de adyacencia, BFS, DFS, caminos más cortos, MST y orden topológico.',
       'Dynamic Programming':
         'Programación dinámica con ejemplos clásicos: subproblemas, memoización y tablas de DP.',
       Backtracking:
@@ -80,7 +80,8 @@ export function getCategoryIntro(locale: Locale, categoryName: string): string {
       'Comparison and non-comparison sorting algorithms. Compare complexity, stability, and when to use each.',
     Searching:
       'Linear, binary, and ordered-data search variants. Learn the trade-off between preprocessing and queries.',
-    Graphs: 'Graph traversals and algorithms: BFS, DFS, shortest paths, MST, and topological sort.',
+    Graphs:
+      'Graph representations, traversals, and algorithms: adjacency matrix, BFS, DFS, shortest paths, MST, and topological sort.',
     'Dynamic Programming':
       'Dynamic programming classics: subproblems, memoization, and DP tables made visual.',
     Backtracking:

@@ -76,6 +76,7 @@ const ALGORITHM_LOADERS: Record<string, () => Promise<Algorithm>> = {
     import('./searching?algorithm=interpolationSearch').then(readDefaultAlgorithm),
 
   // Graphs
+  'adjacency-matrix': () => import('./graphs?algorithm=adjacencyMatrix').then(readDefaultAlgorithm),
   bfs: () => import('./graphs?algorithm=bfs').then(readDefaultAlgorithm),
   dfs: () => import('./graphs?algorithm=dfs').then(readDefaultAlgorithm),
   dijkstra: () => import('./graphs?algorithm=dijkstra').then(readDefaultAlgorithm),

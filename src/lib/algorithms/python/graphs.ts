@@ -2,6 +2,16 @@ import type { CodeImplementation } from '@lib/types'
 import { annotated } from '@lib/code-languages'
 
 export const graphsPython: Record<string, CodeImplementation> = {
+  'adjacency-matrix': annotated(`def build_adjacency_matrix(num_nodes, edges):  #@1
+    # Initialize an N×N matrix filled with 0
+    matrix = [[0 for _ in range(num_nodes)] for _ in range(num_nodes)]  #@3
+
+    # For each directed edge u → v, set matrix[u][v] = 1
+    for u, v in edges:
+        matrix[u][v] = 1  #@9
+
+    return matrix  #@12`),
+
   bfs: annotated(`def bfs(graph, start):
     visited = set()
     queue = [start]  #@3

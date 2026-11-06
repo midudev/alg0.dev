@@ -42,7 +42,7 @@ import {
   interpolationSearch,
 } from '@lib/algorithms/searching'
 
-import { bfs, dfs, dijkstra, prim, topologicalSort } from '@lib/algorithms/graphs'
+import { adjacencyMatrix, bfs, dfs, dijkstra, prim, topologicalSort } from '@lib/algorithms/graphs'
 
 import { fibonacciDp, knapsack, lcs } from '@lib/algorithms/dynamic-programming'
 
@@ -102,6 +102,7 @@ export const algorithms: Algorithm[] = [
   jumpSearch,
   interpolationSearch,
   // Graphs
+  adjacencyMatrix,
   bfs,
   dfs,
   dijkstra,
